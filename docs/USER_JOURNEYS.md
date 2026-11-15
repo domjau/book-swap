@@ -13,8 +13,9 @@ There is one kind of user: a **member** (in practice usually a parent). Any memb
 
 1. Opens the invite link and picks the app language.
 2. Signs in with an emailed link (no password).
-3. Enters a display name, e.g. "Ana (García family)", and the book languages they're looking for.
-4. Gets prompted to **add a few books first**, so the shelves fill up.
+3. Enters a display name, e.g. "Ana (García family)", a **postal code** (never an address) and the book languages they're looking for.
+4. Reads and **accepts the terms of use**. Book Swap is a peer-to-peer noticeboard and is not responsible for the deals between members.
+5. Gets prompted to **add a few books and a wish list**, so the shelves and matches fill up.
 
 ## 3. Listing a book: scan first
 
@@ -24,9 +25,21 @@ There is one kind of user: a **member** (in practice usually a parent). Any memb
 4. Saves. The book appears in **New this week** for the whole group.
 5. If nothing is found: enters the title and a photo. The ISBN is stored, so the next family with the same book gets everything pre-filled.
 
+## 3b. Building a wish list
+
+1. On **Add**, switches to **"I'm looking for it"**, then scans, searches or types the book they want.
+2. If someone already has it, the app shows it straight away. Otherwise the wish waits, and the member is told when someone lists that book.
+3. Their wish list is visible to the group, so others can see what would make a good swap.
+
+## 3c. Tailored exchange (wish list ↔ shelf)
+
+1. Home shows **"They want your books"**: members whose wish lists match books on your shelf, closest first.
+2. Opening a member's page shows their shelf, their wish list and a **tailored offer**: their books that are on your wish list, and your books that are on theirs, already ticked.
+3. Adjust the ticks and tap **Propose exchange**. A bundle is created with your books offered in return and a ready-written message ("I saw you are looking for Zog – would you swap for Room on the Broom?").
+
 ## 4. Finding books and making a bundle
 
-1. Browses by **book language**, **topic** (dinosaurs, fairies & magic, animals, space…), **age**, or by search.
+1. Browses by **book language**, **topic** (dinosaurs, fairies & magic, animals, space…), **age**, **Near me**, or by search. Books are sorted with the nearest owners first, to avoid shipping.
 2. Opens a book: photo, description, owner, offer type. Below it is "More from Ana".
 3. Taps **Add to request**. Books from the same owner are grouped into **one bundle** automatically. Books from different owners make separate bundles.
 4. In **Requests**, sees each bundle with the total for books on sale, optionally ticks some of their **own books to offer in return**, and writes a message.

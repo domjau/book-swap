@@ -36,6 +36,9 @@ The camera only works over HTTPS or on `localhost`.
 
   Topics are suggested from the catalogue categories. If the book isn't found, it can be entered by hand.
 - **Photos:** resized on the phone and redrawn on a canvas, which removes EXIF and GPS data before saving.
+- **Wish lists and tailored exchanges:** add books you're looking for (scan, search or type). See "From your wish list" and "They want your books" on the home screen. A member's page pre-ticks a fair swap: their books you want, and your books they want.
+- **Neighbours first:** members give a postal code (never an address). Books show the owner's area, a *Near me* filter is available, and lists are sorted nearest first to avoid shipping.
+- **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that Book Swap is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
 - **Profile stats:** books listed, given away and received, money saved, a book-language mix, favourite topics and badges.
 - **Settings:** export my data (JSON) and delete everything.
 
@@ -46,7 +49,8 @@ The camera only works over HTTPS or on `localhost`.
 | `index.html` | Page shell and Content-Security-Policy |
 | `app.js` | All screens and logic (plain JS, no build step) |
 | `i18n.js` | Translations. To add a language, copy the `en` block and add its code to `UI_LANGS` |
-| `data.js` | Topics, sample members and sample books |
+| `data.js` | Topics, sample members (with postal codes), sample books and wish lists |
+| `terms.js` | Terms of use in LT/ES/EN and the current version |
 | `styles.css` | Styles |
 | `vendor/html5-qrcode.min.js` | Barcode scanner library (Apache-2.0), hosted locally instead of from a CDN |
 
@@ -57,6 +61,7 @@ The camera only works over HTTPS or on `localhost`.
 | [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) | How organisers and members use the app, step by step |
 | [docs/FEATURES.md](docs/FEATURES.md) | What's built, what's next (MVP) and later ideas |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Prototype structure, book lookup pipeline, production design, data model, row-level security |
+| [TERMS.md](TERMS.md) | Terms of use (P2P disclaimer, limitation of liability) and notes for maintainers |
 | [SECURITY.md](SECURITY.md) | How to report vulnerabilities, current protections, production security checklist |
 | [docs/PRIVACY.md](docs/PRIVACY.md) | What data is stored and why, photo metadata, retention, GDPR checklist |
 | [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) | Adding app languages and book languages |

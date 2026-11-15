@@ -217,3 +217,68 @@ window.STRINGS = {
     today: 'today', nextSaturday: 'Saturday'
   }
 };
+
+/* Wish lists, location and terms */
+Object.assign(window.STRINGS.lt, {
+  postal: 'Pašto kodas', postalPh: 'Pvz. 2700',
+  postalHint: 'Rodomas tik pašto kodas – niekada adresas. Taip rasite kaimynus ir išvengsite siuntimo.',
+  postalRequired: 'Įveskite pašto kodą.', nameRequired: 'Įveskite vardą.',
+  acceptTerms: 'Perskaičiau ir sutinku su', termsLink: 'naudojimosi sąlygomis', termsRequired: 'Norėdami tęsti, sutikite su sąlygomis.',
+  termsUpdated: 'Atnaujinome naudojimosi sąlygas. Peržiūrėkite ir sutikite, kad galėtumėte tęsti.',
+  p2pNote: 'Knygų keitykla tik padeda susirasti. Sandoris yra tarp jūsų – patikrinkite knygą prieš mokėdami.',
+  continue: 'Tęsti', viewTerms: 'Naudojimosi sąlygos', acceptedOn: 'Sutikote {date}',
+  nearMe: 'Netoli manęs', sameArea: 'jūsų rajone', nearby: 'netoliese', location: 'Vieta', savePostal: 'Išsaugoti', saved: 'Išsaugota',
+  fromWishlist: 'Iš jūsų norų sąrašo', wantYourBooks: 'Nori jūsų knygų', wantsCount: 'Nori {n} iš jūsų lentynos',
+  onYourWishlist: 'Jūsų norų sąraše!', wantedBy: 'Šios knygos ieško:', onTheirWishlist: 'Jų norų sąraše',
+  viewProfile: 'Žiūrėti profilį', theirShelf: 'Jų lentyna', theirWishlist: 'Ko jie ieško',
+  tailored: 'Pasiūlykite mainus', tailoredHint: 'Pažymėjome sutapimus – pakeiskite, jei norite.',
+  youGet: 'Jūs gausite', youGive: 'Jūs duosite', proposeExchange: 'Siūlyti mainus', pickSomething: 'Pažymėkite bent vieną jų knygą.',
+  exchangeMsg: 'Labas! Matau, kad ieškote: {give}. Gal mainytume į: {get}?', exchangeMsgPlain: 'Labas! Norėčiau: {get}. Ar tiktų susitikti netoliese?',
+  noMatches: 'Kol kas sutapimų nėra.', nothingHere: 'Kol kas nieko.',
+  myWishlist: 'Mano norų sąrašas', wishEmpty: 'Pridėkite knygų, kurių ieškote – pranešime, kai kas nors jų turės.', addWish: 'Pridėti norą',
+  addModeShelf: 'Turiu šią knygą', addModeWish: 'Ieškau šios knygos', saveWish: 'Pridėti į norų sąrašą',
+  wishSavedTitle: 'Įtraukta į norų sąrašą!', wishSavedText: 'Pranešime, kai kas nors ją pasiūlys.',
+  alreadyAvailable: 'Jau galima gauti iš:', peopleWant: 'Šios knygos ieško {n} žm.!'
+});
+Object.assign(window.STRINGS.es, {
+  postal: 'Código postal', postalPh: 'Ej. 2700',
+  postalHint: 'Solo se muestra el código postal, nunca tu dirección. Así encontrarás vecinos y evitarás envíos.',
+  postalRequired: 'Escribe tu código postal.', nameRequired: 'Escribe tu nombre.',
+  acceptTerms: 'He leído y acepto las', termsLink: 'condiciones de uso', termsRequired: 'Para continuar, acepta las condiciones.',
+  termsUpdated: 'Hemos actualizado las condiciones de uso. Revísalas y acéptalas para continuar.',
+  p2pNote: 'Intercambio de libros solo os pone en contacto. El trato es entre vosotros: revisa el libro antes de pagar.',
+  continue: 'Continuar', viewTerms: 'Condiciones de uso', acceptedOn: 'Aceptadas el {date}',
+  nearMe: 'Cerca de mí', sameArea: 'tu zona', nearby: 'cerca', location: 'Ubicación', savePostal: 'Guardar', saved: 'Guardado',
+  fromWishlist: 'De tu lista de deseos', wantYourBooks: 'Quieren tus libros', wantsCount: 'Quiere {n} de tu estantería',
+  onYourWishlist: '¡Está en tu lista de deseos!', wantedBy: 'Buscan este libro:', onTheirWishlist: 'En su lista de deseos',
+  viewProfile: 'Ver perfil', theirShelf: 'Su estantería', theirWishlist: 'Lo que buscan',
+  tailored: 'Propón un intercambio', tailoredHint: 'Hemos marcado las coincidencias; cámbialas si quieres.',
+  youGet: 'Tú recibes', youGive: 'Tú das', proposeExchange: 'Proponer intercambio', pickSomething: 'Marca al menos un libro suyo.',
+  exchangeMsg: '¡Hola! Veo que buscas: {give}. ¿Lo cambiamos por: {get}?', exchangeMsgPlain: '¡Hola! Me gustaría: {get}. ¿Quedamos cerca?',
+  noMatches: 'Aún no hay coincidencias.', nothingHere: 'Nada por ahora.',
+  myWishlist: 'Mi lista de deseos', wishEmpty: 'Añade libros que buscas: te avisaremos cuando alguien los tenga.', addWish: 'Añadir deseo',
+  addModeShelf: 'Tengo este libro', addModeWish: 'Busco este libro', saveWish: 'Añadir a mi lista de deseos',
+  wishSavedTitle: '¡Añadido a tu lista!', wishSavedText: 'Te avisaremos cuando alguien lo ofrezca.',
+  alreadyAvailable: 'Ya disponible de:', peopleWant: '¡{n} personas buscan este libro!'
+});
+Object.assign(window.STRINGS.en, {
+  postal: 'Postal code', postalPh: 'e.g. 2700',
+  postalHint: 'Only your postal code is shown – never your address. It helps you find neighbours and avoid shipping.',
+  postalRequired: 'Please enter your postal code.', nameRequired: 'Please enter your name.',
+  acceptTerms: 'I have read and accept the', termsLink: 'Terms of use', termsRequired: 'Please accept the terms to continue.',
+  termsUpdated: 'We have updated the terms of use. Please review and accept them to continue.',
+  p2pNote: 'Book Swap only puts you in touch. The deal is between you – check the book before you pay.',
+  continue: 'Continue', viewTerms: 'Terms of use', acceptedOn: 'Accepted on {date}',
+  nearMe: 'Near me', sameArea: 'your area', nearby: 'nearby', location: 'Location', savePostal: 'Save', saved: 'Saved',
+  fromWishlist: 'From your wish list', wantYourBooks: 'They want your books', wantsCount: 'Wants {n} from your shelf',
+  onYourWishlist: 'On your wish list!', wantedBy: 'Wanted by:', onTheirWishlist: 'On their wish list',
+  viewProfile: 'View profile', theirShelf: 'Their shelf', theirWishlist: "What they're looking for",
+  tailored: 'Make a tailored offer', tailoredHint: "We've ticked the matches – change them if you like.",
+  youGet: 'You get', youGive: 'You give', proposeExchange: 'Propose exchange', pickSomething: 'Tick at least one of their books.',
+  exchangeMsg: 'Hi! I saw you are looking for: {give}. Would you swap for: {get}?', exchangeMsgPlain: 'Hi! I would like: {get}. Could we meet nearby?',
+  noMatches: 'No matches yet.', nothingHere: 'Nothing yet.',
+  myWishlist: 'My wish list', wishEmpty: "Add books you're looking for – we'll tell you when someone has them.", addWish: 'Add a wish',
+  addModeShelf: 'I have this book', addModeWish: "I'm looking for it", saveWish: 'Add to wish list',
+  wishSavedTitle: 'Added to your wish list!', wishSavedText: "We'll let you know when someone offers it.",
+  alreadyAvailable: 'Already available from:', peopleWant: '{n} people are looking for this book!'
+});

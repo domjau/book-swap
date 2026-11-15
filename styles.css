@@ -191,3 +191,31 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .onboard .btn.big { margin-top: 22px; }
 
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--ink); color: #fff; font-weight: 800; padding: 12px 18px; border-radius: 14px; z-index: 10; max-width: 90vw; text-align: center; }
+
+/* wish lists, location, terms */
+.book-card { position: relative; }
+.wish-dot { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 999px; background: #fff; color: #BE123C; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.wish-dot svg, .heart-inline svg, .b-wish svg, .notice.wish svg, .big-check.wish svg { fill: currentColor; }
+.heart-inline { color: #BE123C; display: inline-flex; }
+.book-loc { font-size: 11px; font-weight: 700; color: var(--muted); margin-top: 4px; display: flex; align-items: center; gap: 3px; }
+.b-wish { background: #FFE4E6; color: #9F1239; display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; }
+.notice.wish { background: #FFE4E6; color: #9F1239; }
+.big-check.wish { background: #FFE4E6; color: #BE123C; }
+.full { width: 100%; }
+.ulink { color: #1D4E89; text-decoration: underline; font-weight: 800; }
+.near-row { margin-top: 10px; }
+.member-chip { flex: 0 0 auto; width: 210px; display: flex; gap: 10px; align-items: center; background: #fff; border-radius: 16px; padding: 12px; }
+.avatar.sm { width: 42px; height: 42px; font-size: 18px; }
+.pick-row { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 14px; border: 1.5px solid var(--line); cursor: pointer; }
+.pick-row.on { border-color: var(--ink); background: #FBF7F0; }
+.pick-row input { width: 22px; height: 22px; accent-color: var(--ink); flex: 0 0 auto; }
+.bundle .label { margin: 8px 0 0; }
+.wish-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.wish-list li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F1EBDF; }
+.wish-list li .badge { margin-left: 0; display: inline-flex; gap: 4px; align-items: center; }
+.seg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 10px; }
+.safety { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; font-weight: 700; color: var(--muted); border-top: 1px solid #F1EBDF; padding-top: 10px; }
+.agree { align-items: flex-start; margin-top: 14px; line-height: 1.4; }
+.agree input { margin-top: 2px; }
+.terms p { line-height: 1.55; font-weight: 600; }
+.terms .h3 { margin-top: 20px; }

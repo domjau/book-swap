@@ -34,7 +34,12 @@
     star: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
     download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
     trash: 'M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13',
-    barcode: 'M4 6v12M7 6v12M10 6v12M14 6v12M17 6v12M20 6v12'
+    barcode: 'M4 6v12M7 6v12M10 6v12M14 6v12M17 6v12M20 6v12',
+    pin: 'M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+    heart: 'M12 20.5S3.5 15.5 3.5 9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.5 2.5c0 6-8.5 11-8.5 11z',
+    shield: 'M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z',
+    swapArrows: 'M7 7h12l-3-3M17 17H5l3 3',
+    doc: 'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6'
   };
   const icon = (name, size, extra) => `<svg class="i" width="${size || 22}" height="${size || 22}" viewBox="0 0 24 24" aria-hidden="true"${extra || ''}><path d="${ICON[name] || name}"></path></svg>`;
 
@@ -48,13 +53,20 @@
       v: 1, lang: detectLang(), me: null, interested: ['lt', 'es', 'en'],
       books: clone(SAMPLE_BOOKS).map((b) => Object.assign({ status: 'available', isbn: '', cover: '' }, b)),
       cart: [], cartMeta: {}, threads: clone(SAMPLE_THREADS).map((t) => Object.assign({ unread: true }, t)),
-      received: []
+      received: [], wishes: clone(SAMPLE_WISHES), agreed: null
     };
+  }
+  function migrate(s) {
+    if (!s) return null;
+    if (!s.wishes) s.wishes = clone(SAMPLE_WISHES);
+    if (s.agreed === undefined) s.agreed = null;
+    s.v = 2;
+    return s;
   }
   function load() {
     try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
-  let S = load() || fresh();
+  let S = migrate(load()) || fresh();
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Storage full – try removing a photo.'); }
   }
@@ -62,7 +74,7 @@
   const ui = {
     q: '', fLang: 'all', fTopic: null, fAge: null,
     draft: null, addStep: 'scan', addMsg: '', addMsgKind: '', searchResults: [], busy: false, lastSaved: null,
-    ticks: {}, showOffer: {}, toast: '', onbName: '', scanner: null, chatTab: 'active'
+    ticks: {}, showOffer: {}, toast: '', onbName: '', onbPostal: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, chatTab: 'active'
   };
 
   // ---------- i18n ----------
@@ -85,6 +97,37 @@
 
   // ---------- book helpers ----------
   const book = (id) => S.books.find((b) => b.id === id);
+  const needsOnboarding = () => !S.me || !S.me.postal || !S.agreed || S.agreed.version !== TERMS.version;
+
+  // Wish-list matching: same ISBN, or the same title ignoring case, accents and punctuation.
+  const norm = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  const wishMatches = (w, b) => !!((w.isbn && b.isbn && w.isbn === b.isbn) || (norm(w.title) && norm(w.title) === norm(b.title)));
+  function wishersOf(b) {
+    const out = [];
+    S.wishes.forEach((w) => { if (w.owner !== b.owner && wishMatches(w, b) && out.indexOf(w.owner) < 0) out.push(w.owner); });
+    return out;
+  }
+  const iWant = (b) => b.owner !== MINE && S.wishes.some((w) => w.owner === MINE && wishMatches(w, b));
+  const theyWant = (memberId, b) => S.wishes.some((w) => w.owner === memberId && wishMatches(w, b));
+  function membersWantingMine() {
+    const mine = S.books.filter((b) => b.owner === MINE && b.status === 'available');
+    return Object.keys(MEMBERS).map((id) => ({ id: id, n: mine.filter((b) => theyWant(id, b)).length }))
+      .filter((x) => x.n > 0).sort((a, b) => b.n - a.n || near(a.id).rank - near(b.id).rank);
+  }
+
+  // Location: postal codes only. "Nearby" is a rough guess from numeric postal codes
+  // (works well in e.g. Denmark); the production version would use postcode centre points.
+  const postalOf = (id) => (id === MINE ? (S.me && S.me.postal) || '' : (MEMBERS[id] ? MEMBERS[id].postal || '' : ''));
+  function near(id) {
+    const a = postalOf(MINE); const b = postalOf(id);
+    if (!a || !b) return { rank: 3, label: b };
+    if (a === b) return { rank: 0, label: b + ' · ' + t('sameArea') };
+    const na = parseInt(a, 10); const nb = parseInt(b, 10);
+    const d = (isNaN(na) || isNaN(nb) || /[^0-9]/.test(a + b)) ? 99999 : Math.abs(na - nb);
+    return d <= 50 ? { rank: 1 + d / 1000, label: b + ' · ' + t('nearby') } : { rank: 2 + d / 1e6, label: b };
+  }
+  const byNear = (a, b) => near(a.owner).rank - near(b.owner).rank || b.added - a.added;
+  const memberLink = (id) => `<a class="ulink" href="#/member/${esc(id)}">${esc(memberName(id))}</a>`;
   function offerBadge(b) {
     if (b.status === 'reserved') return `<span class="badge b-res">${esc(t('reserved'))}</span>`;
     if (b.status === 'gone') return `<span class="badge b-res">${esc(t('gone'))}</span>`;
@@ -104,10 +147,12 @@
       <div class="cover-title">${esc(b.title)}</div></div>`;
   }
   function bookCard(b, size) {
+    const loc = b.owner !== MINE && postalOf(b.owner) ? `<div class="book-loc">${icon('pin', 12)} ${esc(near(b.owner).label)}</div>` : '';
+    const wish = iWant(b) ? `<span class="wish-dot" title="${esc(t('onYourWishlist'))}">${icon('heart', 14)}</span>` : '';
     return `<a class="book-card book-${size}" href="#/book/${esc(b.id)}" aria-label="${esc(b.title)}">
-      ${cover(b, size === 'grid' ? 'm' : 's')}
+      ${cover(b, size === 'grid' ? 'm' : 's')}${wish}
       <div class="book-meta"><div class="book-title">${esc(b.title)}</div>
-      <div class="book-author">${esc(b.author)}</div>${offerBadge(b)}</div></a>`;
+      <div class="book-author">${esc(b.author)}</div>${offerBadge(b)}${loc}</div></a>`;
   }
 
   // ---------- views ----------
@@ -118,14 +163,34 @@
     return `<main class="onboard">
       <div class="logo-big">${icon('logo', 44)}</div>
       <h1>${esc(t('welcomeTitle'))}</h1>
+      ${S.me ? `<div class="notice warn">${esc(t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
       <div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(t('groupName'))}</div></div>
       <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
       <div class="field"><span class="label">${esc(t('interestedLangs'))}</span><div class="row-wrap">${interests}</div></div>
       <label class="field"><span class="label">${esc(t('yourName'))}</span>
-        <input id="onb-name" class="input" maxlength="40" autocomplete="nickname" value="${esc(ui.onbName)}" data-input="onbName" placeholder="${esc(t('yourNamePh'))}"></label>
-      <button class="btn primary big" data-action="join">${esc(t('join'))}</button>
+        <input id="onb-name" class="input" maxlength="40" autocomplete="nickname" value="${esc(ui.onbName || (S.me ? S.me.name : ''))}" data-input="onbName" placeholder="${esc(t('yourNamePh'))}"></label>
+      <label class="field"><span class="label">${esc(t('postal'))}</span>
+        <input id="onb-postal" class="input" maxlength="10" autocomplete="postal-code" inputmode="text" value="${esc(ui.onbPostal || (S.me ? S.me.postal || '' : ''))}" data-input="onbPostal" placeholder="${esc(t('postalPh'))}"></label>
+      <p class="muted small">${icon('pin', 14)} ${esc(t('postalHint'))}</p>
+      <div class="notice">${icon('shield', 20)} <span>${esc(t('p2pNote'))}</span></div>
+      <label class="toggle agree"><input id="onb-agree" type="checkbox" data-action="toggleAgree" ${ui.onbAgree ? 'checked' : ''}>
+        <span>${esc(t('acceptTerms'))} <a class="ulink" href="#/terms">${esc(t('termsLink'))}</a></span></label>
+      ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
+      <button class="btn primary big" data-action="join">${esc(S.me ? t('continue') : t('join'))}</button>
       <p class="muted small center">${esc(t('demoNote'))}</p>
+    </main>`;
+  }
+
+  function viewTerms() {
+    const T = TERMS[S.lang] || TERMS.en;
+    const contact = `<a class="ulink" href="${esc(TERMS.contact)}" target="_blank" rel="noopener noreferrer">${esc(TERMS.contact)}</a>`;
+    return `<main class="pad terms">
+      <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
+      <h1 class="h1">${esc(T.title)}</h1>
+      <p class="muted small">${esc(TERMS.version)}</p>
+      <p class="lead">${esc(T.intro)}</p>
+      ${T.sections.map((sec) => `<h2 class="h3">${esc(sec[0])}</h2><p>${esc(sec[1]).split('{contact}').join(contact)}</p>`).join('')}
     </main>`;
   }
 
@@ -154,18 +219,25 @@
       (ui.fLang === 'all' || b.lang === ui.fLang) &&
       (!ui.fTopic || b.topics.indexOf(ui.fTopic) >= 0) &&
       (!ui.fAge || b.age === ui.fAge) &&
-      (!q || (b.title + ' ' + b.author).toLowerCase().indexOf(q) >= 0));
+      (!q || (b.title + ' ' + b.author).toLowerCase().indexOf(q) >= 0) &&
+      (!ui.fNear || near(b.owner).rank < 2)).sort(byNear);
     const presentLangs = BOOK_LANGS.filter((c) => others.some((b) => b.lang === c));
     const langChips = ['all'].concat(presentLangs).map((c) => `<button class="pill ${ui.fLang === c ? 'on' : ''}" data-action="fLang" data-v="${c}">${esc(c === 'all' ? t('all') : langName(c))}</button>`).join('');
     const ageChips = AGES.map((a) => `<button class="pill ${ui.fAge === a ? 'on' : ''}" data-action="fAge" data-v="${a}">${esc(t('years', { a: a }))}</button>`).join('');
     const topics = TOPICS.map((tp) => `<button class="topic ${ui.fTopic === tp.id ? 'on' : ''}" data-action="fTopic" data-v="${tp.id}">
       <span class="topic-ic" style="background:${tp.color}">${icon(tp.icon, 32)}</span><span>${esc(topicName(tp.id))}</span></button>`).join('');
-    const anyFilter = q || ui.fLang !== 'all' || ui.fTopic || ui.fAge;
+    const anyFilter = q || ui.fLang !== 'all' || ui.fTopic || ui.fAge || ui.fNear;
     let body;
     if (!anyFilter) {
       const recent = others.filter((b) => Date.now() - b.added < 7 * 86400000).sort((a, b) => b.added - a.added);
-      body = (recent.length ? `<h2 class="h2 pad">${esc(t('rowNew'))}</h2><div class="hscroll">${recent.map((b) => bookCard(b, 'row')).join('')}</div>` : '') +
-        `<h2 class="h2 pad">${esc(t('rowAll'))}</h2><div class="grid pad">${others.map((b) => bookCard(b, 'grid')).join('')}</div>`;
+      const wishHits = others.filter((b) => b.status === 'available' && iWant(b)).sort(byNear);
+      const wanters = membersWantingMine();
+      body = (wishHits.length ? `<h2 class="h2 pad">${icon('heart', 20)} ${esc(t('fromWishlist'))}</h2><div class="hscroll">${wishHits.map((b) => bookCard(b, 'row')).join('')}</div>` : '') +
+        (wanters.length ? `<h2 class="h2 pad">${icon('swapArrows', 20)} ${esc(t('wantYourBooks'))}</h2><div class="hscroll">${wanters.map((w) => `<a class="member-chip" href="#/member/${esc(w.id)}">
+          <span class="avatar sm">${esc(memberName(w.id).slice(0, 1))}</span><span class="grow"><span class="bold block">${esc(firstName(w.id))}</span>
+          <span class="small block">${esc(t('wantsCount', { n: w.n }))}</span><span class="tiny muted block">${icon('pin', 11)} ${esc(near(w.id).label)}</span></span></a>`).join('')}</div>` : '') +
+        (recent.length ? `<h2 class="h2 pad">${esc(t('rowNew'))}</h2><div class="hscroll">${recent.map((b) => bookCard(b, 'row')).join('')}</div>` : '') +
+        `<h2 class="h2 pad">${esc(t('rowAll'))}</h2><div class="grid pad">${others.slice().sort(byNear).map((b) => bookCard(b, 'grid')).join('')}</div>`;
     } else {
       body = `<div class="pad row-between"><span class="muted bold">${esc(t('results', { n: filtered.length }))}</span>
         <button class="link" data-action="clearFilters">${esc(t('clearFilters'))}</button></div>` +
@@ -173,6 +245,7 @@
     }
     return `<main>
       <div class="pad"><label class="search">${icon('search', 20)}<input id="q" type="search" value="${esc(ui.q)}" placeholder="${esc(t('searchPh'))}" aria-label="${esc(t('searchPh'))}" data-input="q"></label></div>
+      <div class="pad near-row"><button class="pill ${ui.fNear ? 'on' : ''}" data-action="fNear" aria-pressed="${ui.fNear}">${icon('pin', 16)} ${esc(t('nearMe'))}${S.me.postal ? ' (' + esc(S.me.postal) + ')' : ''}</button></div>
       <div class="pad"><span class="label">${esc(t('bookLang'))}</span><div class="row-wrap">${langChips}</div></div>
       <div class="pad"><span class="label">${esc(t('topics'))}</span></div><div class="hscroll topics">${topics}</div>
       <div class="pad"><span class="label">${esc(t('ages'))}</span><div class="row-wrap">${ageChips}</div></div>
@@ -198,16 +271,57 @@
       <h1 class="h1 center">${esc(b.title)}</h1>
       <div class="muted center bold">${esc(b.author)}</div>
       <div class="row-wrap center-row">${offerBadge(b)} ${topics}</div>
+      ${iWant(b) ? `<div class="notice wish">${icon('heart', 20)} ${esc(t('onYourWishlist'))}</div>` : ''}
+      ${b.owner === MINE && wishersOf(b).length ? `<div class="notice wish">${icon('heart', 20)} <span>${esc(t('wantedBy'))} ${wishersOf(b).map(memberLink).join(', ')}</span></div>` : ''}
       <div class="actions">${actions}</div>
       <section class="card pad-m"><h2 class="h3">${esc(t('description'))}</h2><p class="desc">${esc(b.description || t('noDescription'))}</p></section>
       <dl class="details card pad-m">
-        <dt>${esc(t('owner'))}</dt><dd>${esc(memberName(b.owner))}</dd>
+        <dt>${esc(t('owner'))}</dt><dd>${b.owner === MINE ? esc(memberName(b.owner)) : memberLink(b.owner)}</dd>
+        ${b.owner !== MINE ? `<dt>${esc(t('location'))}</dt><dd>${icon('pin', 14)} ${esc(near(b.owner).label)}</dd>` : ''}
         <dt>${esc(t('language'))}</dt><dd>${esc(langName(b.lang))}</dd>
         <dt>${esc(t('age'))}</dt><dd>${esc(t('years', { a: b.age }))}</dd>
         <dt>${esc(t('condition'))}</dt><dd>${esc(t(condKey))}</dd>
         ${b.isbn ? `<dt>${esc(t('isbn'))}</dt><dd>${esc(b.isbn)}</dd>` : ''}
       </dl>
+      ${b.owner !== MINE ? `<a class="btn ghost big" href="#/member/${esc(b.owner)}">${icon('swapArrows')} ${esc(t('tailored'))}</a>` : ''}
       ${more.length && b.owner !== MINE ? `<h2 class="h2">${esc(t('moreFrom', { name: firstName(b.owner) }))}</h2><div class="hscroll flush">${more.map((x) => bookCard(x, 'row')).join('')}</div>` : ''}
+    </main>`;
+  }
+
+  function viewMember(id) {
+    if (!MEMBERS[id]) return `<main class="pad">${esc(t('noResults'))}</main>`;
+    const theirs = S.books.filter((b) => b.owner === id && b.status === 'available');
+    const mine = S.books.filter((b) => b.owner === MINE && b.status === 'available');
+    const wantFromMe = mine.filter((b) => theyWant(id, b));
+    const iWantFromThem = theirs.filter(iWant);
+    const ex = ui.ex[id] || (ui.ex[id] = { get: iWantFromThem.map((b) => b.id), give: wantFromMe.map((b) => b.id) });
+    const sortFirst = (pred) => (a, b) => (pred(b) ? 1 : 0) - (pred(a) ? 1 : 0);
+    const row = (b, side, flag) => `<label class="pick-row ${ex[side].indexOf(b.id) >= 0 ? 'on' : ''}">
+        <input type="checkbox" data-action="exToggle" data-m="${esc(id)}" data-side="${side}" data-v="${esc(b.id)}" ${ex[side].indexOf(b.id) >= 0 ? 'checked' : ''}>
+        ${cover(b, 'xs')}<span class="grow"><span class="bold block">${esc(b.title)}</span>${offerBadge(b)}
+        ${flag ? `<span class="badge b-wish">${icon('heart', 12)} ${esc(flag)}</span>` : ''}</span></label>`;
+    const theirWishes = S.wishes.filter((w) => w.owner === id);
+    return `<main class="pad">
+      <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
+      <div class="row-gap"><div class="avatar">${esc(memberName(id).slice(0, 1))}</div>
+        <div><h1 class="h1 tight">${esc(memberName(id))}</h1><div class="muted bold">${icon('pin', 14)} ${esc(near(id).label)}</div></div></div>
+      <section class="card bundle">
+        <div class="h3">${icon('swapArrows', 20)} ${esc(t('tailored'))}</div>
+        <div class="muted small">${esc(t('tailoredHint'))}</div>
+        <div class="label">${esc(t('youGet'))}</div>
+        ${theirs.length ? theirs.slice().sort(sortFirst(iWant)).map((b) => row(b, 'get', iWant(b) ? t('onYourWishlist') : '')).join('') : `<div class="muted">${esc(t('nothingHere'))}</div>`}
+        <div class="label">${esc(t('youGive'))}</div>
+        ${mine.length ? mine.slice().sort(sortFirst((b) => theyWant(id, b))).map((b) => row(b, 'give', theyWant(id, b) ? t('onTheirWishlist') : '')).join('') : `<div class="muted">${esc(t('nothingHere'))}</div>`}
+        <button class="btn primary big" data-action="propose" data-v="${esc(id)}">${icon('send')} ${esc(t('proposeExchange'))}</button>
+      </section>
+      <section class="card pad-m"><h2 class="h3">${icon('heart', 20)} ${esc(t('theirWishlist'))}</h2>
+        ${theirWishes.length ? `<ul class="wish-list">${theirWishes.map((w) => {
+          const have = mine.some((b) => wishMatches(w, b));
+          return `<li><span class="grow"><span class="bold">${esc(w.title)}</span> <span class="muted small">${esc(w.author || '')}</span></span>${have ? `<span class="badge b-give">${icon('check', 12)} ${esc(t('yourBook'))}</span>` : ''}</li>`;
+        }).join('')}</ul>` : `<div class="muted">${esc(t('nothingHere'))}</div>`}
+      </section>
+      <h2 class="h2">${esc(t('theirShelf'))}</h2>
+      ${theirs.length ? `<div class="grid">${theirs.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('nothingHere'))}</div>`}
     </main>`;
   }
 
@@ -225,13 +339,13 @@
       const sum = items.filter((b) => b.offer === 'sell').reduce((a, b) => a + Number(b.price || 0), 0);
       const offerOpen = ui.showOffer[owner] || meta.offered.length > 0;
       return `<section class="card bundle">
-        <div class="h3">${esc(t('fromName', { name: memberName(owner) }))}</div>
+        <div class="row-between"><a class="h3 ulink" href="#/member/${esc(owner)}">${esc(t('fromName', { name: memberName(owner) }))}</a><span class="muted small">${icon('pin', 12)} ${esc(near(owner).label)}</span></div>
         ${items.map((b) => `<div class="line-item">${cover(b, 'xs')}<div class="grow"><div class="bold">${esc(b.title)}</div>${offerBadge(b)}</div>
           <button class="icon-btn" data-action="removeCart" data-v="${esc(b.id)}" aria-label="${esc(t('remove'))}">${icon('x', 18)}</button></div>`).join('')}
         ${sum ? `<div class="bold">${esc(t('totalForSale', { sum: sum }))}</div>` : ''}
         ${mine.length ? `<label class="toggle"><input type="checkbox" data-action="toggleOffer" data-v="${esc(owner)}" ${offerOpen ? 'checked' : ''}> ${esc(t('offerInReturn'))}</label>` : ''}
-        ${offerOpen ? `<div class="muted small">${esc(t('pickYours'))}</div><div class="row-wrap">${mine.map((m) => `<label class="check-pill ${meta.offered.indexOf(m.id) >= 0 ? 'on' : ''}">
-          <input type="checkbox" data-action="toggleOffered" data-owner="${esc(owner)}" data-v="${esc(m.id)}" ${meta.offered.indexOf(m.id) >= 0 ? 'checked' : ''}> ${esc(m.title)}</label>`).join('')}</div>` : ''}
+        ${offerOpen ? `<div class="muted small">${esc(t('pickYours'))}</div><div class="row-wrap">${mine.slice().sort((a, b) => (theyWant(owner, b) ? 1 : 0) - (theyWant(owner, a) ? 1 : 0)).map((m) => `<label class="check-pill ${meta.offered.indexOf(m.id) >= 0 ? 'on' : ''}">
+          <input type="checkbox" data-action="toggleOffered" data-owner="${esc(owner)}" data-v="${esc(m.id)}" ${meta.offered.indexOf(m.id) >= 0 ? 'checked' : ''}> ${esc(m.title)}${theyWant(owner, m) ? ` <span class="heart-inline" title="${esc(t('onTheirWishlist'))}">${icon('heart', 14)}</span>` : ''}</label>`).join('')}</div>` : ''}
         <label class="sr" for="msg-${esc(owner)}">${esc(t('messagePh'))}</label>
         <textarea id="msg-${esc(owner)}" class="input" rows="3" maxlength="500" placeholder="${esc(t('messagePh'))}" data-input="cartMsg" data-owner="${esc(owner)}">${esc(meta.msg)}</textarea>
         <button class="btn primary big" data-action="sendRequest" data-v="${esc(owner)}">${icon('send')} ${esc(t('sendRequest'))}</button>
@@ -304,12 +418,13 @@
     const canChat = th.status !== 'declined';
     return `<main class="chat">
       <div class="chat-head pad"><button class="back" data-action="go" data-v="#/messages">${icon('back', 20)}</button>
-        <div class="grow"><div class="bold">${esc(memberName(th.with))}</div><span class="status st-${th.status}">${esc(t(STATUS[th.status]))}</span></div>
+        <div class="grow"><a class="bold ulink" href="#/member/${esc(th.with)}">${esc(memberName(th.with))}</a> <span class="muted small">${icon('pin', 12)} ${esc(near(th.with).label)}</span><br><span class="status st-${th.status}">${esc(t(STATUS[th.status]))}</span></div>
         <button class="icon-btn" data-action="report" aria-label="${esc(t('report'))}" title="${esc(t('report'))}">${icon('flag', 18)}</button></div>
       <section class="card bundle pinned">
         <div class="h3">${esc(isOwner ? t('theyWant', { name: other }) : t('youWant'))}</div>${bookLines}
         ${offered ? `<div class="h3">${esc(isOwner ? t('theyOffer') : t('youOffer'))}</div>${offered}` : ''}
         ${control}
+        <div class="safety">${icon('shield', 16)} <span>${esc(t('p2pNote'))} <a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></span></div>
       </section>
       <div class="msgs">${msgs}</div>
       ${canChat ? `<div class="quick">${['qr1', 'qr2', 'qr3'].map((k) => `<button class="pill" data-action="quick" data-thread="${esc(th.id)}" data-v="${k}">${esc(t(k))}</button>`).join('')}</div>
@@ -320,9 +435,20 @@
   }
 
   function viewAdd() {
+    if (ui.addStep === 'done' && ui.lastWish) {
+      const w = S.wishes.find((x) => x.id === ui.lastWish);
+      const avail = w ? S.books.filter((b) => b.owner !== MINE && b.status === 'available' && wishMatches(w, b)).sort(byNear) : [];
+      return `<main class="pad center-col"><div class="big-check wish">${icon('heart', 54)}</div>
+        <h1 class="h1 center">${esc(t('wishSavedTitle'))}</h1><p class="muted bold center">${esc(t('wishSavedText'))}</p>
+        ${avail.length ? `<div class="card pad-m full"><div class="h3">${esc(t('alreadyAvailable'))}</div><div class="grid">${avail.map((b) => bookCard(b, 'grid')).join('')}</div></div>` : ''}
+        <button class="btn primary big" data-action="restartAdd">${esc(t('addAnother'))}</button>
+        <a class="btn ghost big" href="#/profile">${esc(t('myWishlist'))}</a></main>`;
+    }
     if (ui.addStep === 'done' && ui.lastSaved) {
+      const nb = book(ui.lastSaved); const wishers = nb ? wishersOf(nb) : [];
       return `<main class="pad center-col"><div class="big-check">${icon('check', 58)}</div>
         <h1 class="h1">${esc(t('savedTitle'))}</h1><p class="muted bold">${esc(t('savedText'))}</p>
+        ${wishers.length ? `<div class="notice wish full">${icon('heart', 20)} <span>${esc(t('wantedBy'))} ${wishers.map(memberLink).join(', ')}</span></div>` : ''}
         <button class="btn primary big" data-action="restartAdd">${esc(t('addAnother'))}</button>
         <a class="btn ghost big" href="#/book/${esc(ui.lastSaved)}">${esc(t('viewBook'))}</a></main>`;
     }
@@ -334,6 +460,7 @@
       <span class="lang-tag static">${esc((r.lang || '').toUpperCase())}</span></button>`).join('');
     return `<main class="pad">
       <h1 class="h1">${esc(t('addTitle'))}</h1>
+      ${modeToggle()}
       <section class="card pad-m scan">
         <div class="h3">${icon('barcode', 22)} ${esc(t('scanTitle'))}</div>
         <p class="muted small">${esc(t('scanHint'))}</p>
@@ -355,14 +482,41 @@
     </main>`;
   }
 
+  function modeToggle() {
+    return `<div class="seg two" role="group">${[['shelf', 'addModeShelf', 'books'], ['wish', 'addModeWish', 'heart']].map((m) =>
+      `<button class="pill ${ui.addMode === m[0] ? 'on' : ''}" data-action="addMode" data-v="${m[0]}" aria-pressed="${ui.addMode === m[0]}">${icon(m[2], 18)} ${esc(t(m[1]))}</button>`).join('')}</div>`;
+  }
+
+  function viewWishDraft() {
+    const d = ui.draft;
+    const msg = ui.addMsg ? `<div class="notice ${ui.addMsgKind}">${esc(ui.addMsg)}</div>` : '';
+    return `<main class="pad">
+      <button class="back" data-action="restartAdd">${icon('back', 20)} ${esc(t('back'))}</button>
+      ${modeToggle()}${msg}
+      <h1 class="h1">${esc(t('addModeWish'))}</h1>
+      <div class="draft-top">
+        ${d.cover ? `<div class="photo-box has"><img src="${esc(d.cover)}" alt=""></div>` : ''}
+        <div class="grow col">
+          <label class="label" for="d-title">${esc(t('title'))}</label><input id="d-title" class="input" maxlength="150" value="${esc(d.title)}" data-input="draft" data-field="title">
+          <label class="label" for="d-author">${esc(t('author'))}</label><input id="d-author" class="input" maxlength="120" value="${esc(d.author)}" data-input="draft" data-field="author">
+        </div>
+      </div>
+      ${d.isbn ? `<div class="muted small">ISBN ${esc(d.isbn)}</div>` : ''}
+      <span class="label">${esc(t('language'))}</span>
+      <div class="row-wrap">${BOOK_LANGS.map((c) => `<button class="pill ${d.lang === c ? 'on' : ''}" data-action="dLang" data-v="${c}">${esc(langName(c))}</button>`).join('')}</div>
+      <button class="btn primary big" data-action="saveWish">${icon('heart')} ${esc(t('saveWish'))}</button>
+    </main>`;
+  }
+
   function viewDraft() {
+    if (ui.addMode === 'wish') return viewWishDraft();
     const d = ui.draft;
     const chip = (on) => `pill ${on ? 'on' : ''}`;
     const msg = ui.addMsg ? `<div class="notice ${ui.addMsgKind}">${esc(ui.addMsg)}</div>` : '';
     const img = d.photo || d.cover;
     return `<main class="pad">
       <button class="back" data-action="restartAdd">${icon('back', 20)} ${esc(t('back'))}</button>
-      ${msg}
+      ${modeToggle()}${msg}
       <h1 class="h1">${esc(t('review'))}</h1>
       <div class="draft-top">
         <label class="photo-box ${img ? 'has' : ''}">
@@ -413,19 +567,35 @@
       ['bStarter', mine.length >= 1], ['bFirst', doneSwaps >= 1], ['bPoly', Object.keys(langCount).length >= 3],
       ['bGiver', freeGiven >= 3], ['bTen', given.length >= 10]
     ].map((b) => `<span class="badge-big ${b[1] ? 'earned' : ''}">${icon('star', 26)}<span>${esc(t(b[0]))}</span></span>`).join('');
+    const myWishes = S.wishes.filter((w) => w.owner === MINE);
     const stat = (n, k) => `<div class="stat"><div class="stat-n">${esc(n)}</div><div class="stat-l">${esc(t(k))}</div></div>`;
     return `<main class="pad">
       <div class="row-gap"><div class="avatar">${esc((S.me.name || '?').slice(0, 1).toUpperCase())}</div>
-        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: t('groupName') }))}</div></div></div>
+        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: t('groupName') }))}</div><div class="muted small">${icon('pin', 12)} ${esc(S.me.postal || '')}</div></div></div>
       <div class="stats">${stat(mine.length, 'statListed')}${stat(given.length, 'statGiven')}${stat(S.received.length, 'statReceived')}${stat('€' + saved, 'statSaved')}</div>
       <div class="muted tiny">${esc(t('statsPrivate'))}</div>
       ${langBars ? `<section class="card pad-m"><h2 class="h3">${esc(t('langMix'))}</h2>${langBars}</section>` : ''}
       ${top ? `<section class="card pad-m"><h2 class="h3">${esc(t('topTopics'))}</h2><div class="row-wrap">${top}</div></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('badges'))}</h2><div class="badges">${badges}</div></section>
+      <section class="card pad-m"><h2 class="h3">${icon('pin', 20)} ${esc(t('location'))}</h2>
+        <div class="row-gap"><label class="sr" for="p-postal">${esc(t('postal'))}</label>
+          <input id="p-postal" class="input" maxlength="10" autocomplete="postal-code" value="${esc(S.me.postal || '')}">
+          <button class="btn primary" data-action="savePostal">${esc(t('savePostal'))}</button></div>
+        <div class="muted small">${esc(t('postalHint'))}</div></section>
+      <section class="card pad-m"><h2 class="h3">${icon('heart', 20)} ${esc(t('myWishlist'))}</h2>
+        ${myWishes.length ? `<ul class="wish-list">${myWishes.map((w) => {
+          const avail = S.books.filter((b) => b.owner !== MINE && b.status === 'available' && wishMatches(w, b));
+          return `<li><span class="grow"><span class="bold">${esc(w.title)}</span> <span class="muted small">${esc(w.author || '')}</span>
+            ${avail.length ? `<a class="badge b-give" href="#/book/${esc(avail[0].id)}">${icon('check', 12)} ${esc(t('alreadyAvailable'))} ${esc(firstName(avail[0].owner))}</a>` : ''}</span>
+            <button class="icon-btn" data-action="removeWish" data-v="${esc(w.id)}" aria-label="${esc(t('remove'))}">${icon('x', 16)}</button></li>`;
+        }).join('')}</ul>` : `<p class="muted">${esc(t('wishEmpty'))}</p>`}
+        <button class="btn ghost" data-action="addWish">${icon('plus', 20)} ${esc(t('addWish'))}</button></section>
       <h2 class="h2">${esc(t('myShelf'))}</h2>
       ${mine.length ? `<div class="grid">${mine.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('shelfEmpty'))}</div>`}
       <section class="card pad-m"><h2 class="h3">${esc(t('settings'))}</h2>
         <p class="muted small">${esc(t('privacy'))}</p>
+        <a class="btn ghost" href="#/terms">${icon('doc', 20)} ${esc(t('viewTerms'))}</a>
+        ${S.agreed ? `<p class="muted tiny center">${esc(t('acceptedOn', { date: fmtDate(new Date(S.agreed.at)) }))}</p>` : ''}
         <button class="btn ghost" data-action="exportData">${icon('download', 20)} ${esc(t('exportData'))}</button>
         <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(t('deleteAccount'))}</button></section>
     </main>`;
@@ -450,10 +620,10 @@
     // Keep the live camera view when the rest of the screen re-renders
     const liveReader = ui.scanner && typeof ui.scanner === 'object' && r.name === 'add' ? document.getElementById('reader') : null;
     let body;
-    if (!S.me) body = viewOnboarding();
+    if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : viewOnboarding();
     else {
       const v = { '': viewBrowse, book: () => viewBook(r.id), requests: viewRequests, messages: viewMessages,
-        chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile }[r.name] || viewBrowse;
+        chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms }[r.name] || viewBrowse;
       body = header() + v() + nav(r.name);
     }
     $app.innerHTML = body + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
@@ -659,14 +829,37 @@
   const A = {
     setLang: (el) => { S.lang = el.dataset.v; save(); render(); },
     toggleInterest: (el) => { const v = el.dataset.v; const i = S.interested.indexOf(v); if (i >= 0) S.interested.splice(i, 1); else S.interested.push(v); save(); render(); },
+    toggleAgree: (el) => { ui.onbAgree = el.checked; },
     join: () => {
       const name = (document.getElementById('onb-name').value || '').trim().slice(0, 40);
-      if (!name) { document.getElementById('onb-name').focus(); return; }
-      S.me = { name: name }; save(); go('#/');
+      const postal = (document.getElementById('onb-postal').value || '').trim().toUpperCase().slice(0, 10);
+      const fail = (msg, id) => { ui.onbError = msg; render(); const f = document.getElementById(id); if (f) f.focus(); };
+      if (!name) return fail(t('nameRequired'), 'onb-name');
+      if (!/^[A-Z0-9][A-Z0-9 -]{1,9}$/.test(postal)) return fail(t('postalRequired'), 'onb-postal');
+      if (!document.getElementById('onb-agree').checked) return fail(t('termsRequired'), 'onb-agree');
+      S.me = { name: name, postal: postal };
+      S.agreed = { version: TERMS.version, at: Date.now() };
+      ui.onbError = ''; save(); go('#/');
     },
     go: (el) => go(el.dataset.v),
     back: () => { if (history.length > 1) history.back(); else go('#/'); },
     fLang: (el) => { ui.fLang = el.dataset.v; render(); },
+    fNear: () => { ui.fNear = !ui.fNear; render(); },
+    exToggle: (el) => {
+      const ex = ui.ex[el.dataset.m]; const arr = ex[el.dataset.side]; const i = arr.indexOf(el.dataset.v);
+      if (i >= 0) arr.splice(i, 1); else arr.push(el.dataset.v); render();
+    },
+    propose: (el) => {
+      const id = el.dataset.v; const ex = ui.ex[id];
+      if (!ex || !ex.get.length) { toast(t('pickSomething')); return; }
+      ex.get.forEach((bid) => { if (S.cart.indexOf(bid) < 0) S.cart.push(bid); });
+      const titles = (ids) => ids.map((x) => (book(x) || {}).title).filter(Boolean).join(', ');
+      S.cartMeta[id] = { offered: ex.give.slice(),
+        msg: ex.give.length ? t('exchangeMsg', { give: titles(ex.give), get: titles(ex.get) }) : t('exchangeMsgPlain', { get: titles(ex.get) }) };
+      ui.showOffer[id] = ex.give.length > 0;
+      delete ui.ex[id];
+      save(); go('#/requests');
+    },
     fTopic: (el) => { ui.fTopic = ui.fTopic === el.dataset.v ? null : el.dataset.v; render(); },
     fAge: (el) => { ui.fAge = ui.fAge === el.dataset.v ? null : el.dataset.v; render(); },
     clearFilters: () => { ui.q = ''; ui.fLang = 'all'; ui.fTopic = null; ui.fAge = null; render(); },
@@ -727,7 +920,22 @@
         price: d.offer === 'sell' ? (Number(String(d.price).replace(',', '.')) || 0) : 0, owner: MINE, added: Date.now(),
         status: 'available', cover: d.cover, photo: d.photo };
       S.books.push(b); save();
-      ui.lastSaved = b.id; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; render();
+      ui.lastSaved = b.id; ui.lastWish = null; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; render();
+    },
+    addMode: (el) => { ui.addMode = el.dataset.v; render(); },
+    saveWish: () => {
+      const d = ui.draft;
+      if (!d.title.trim()) { ui.addMsg = t('required'); ui.addMsgKind = 'warn'; render(); return; }
+      const w = { id: uid('w'), owner: MINE, title: d.title.trim(), author: d.author.trim(), lang: d.lang, isbn: d.isbn || '' };
+      S.wishes.push(w); save();
+      ui.lastWish = w.id; ui.lastSaved = null; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; render();
+    },
+    addWish: () => { ui.addMode = 'wish'; ui.addStep = 'scan'; ui.draft = null; ui.addMsg = ''; ui.searchResults = []; go('#/add'); },
+    removeWish: (el) => { S.wishes = S.wishes.filter((w) => w.id !== el.dataset.v); save(); render(); },
+    savePostal: () => {
+      const v = (document.getElementById('p-postal').value || '').trim().toUpperCase().slice(0, 10);
+      if (!/^[A-Z0-9][A-Z0-9 -]{1,9}$/.test(v)) { toast(t('postalRequired')); return; }
+      S.me.postal = v; save(); toast(t('saved'));
     },
     exportData: () => {
       const blob = new Blob([JSON.stringify({ me: S.me, books: S.books.filter((b) => b.owner === MINE), threads: S.threads, received: S.received }, null, 2)], { type: 'application/json' });
@@ -761,6 +969,7 @@
   $app.addEventListener('input', (e) => {
     const el = e.target; const kind = el.dataset && el.dataset.input; if (!kind) return;
     if (kind === 'onbName') ui.onbName = el.value;
+    else if (kind === 'onbPostal') ui.onbPostal = el.value;
     else if (kind === 'q') { ui.q = el.value; clearTimeout(qTimer); qTimer = setTimeout(render, 250); }
     else if (kind === 'draft') { ui.draft[el.dataset.field] = el.value; }
     else if (kind === 'cartMsg') { const o = el.dataset.owner; (S.cartMeta[o] = S.cartMeta[o] || { offered: [], msg: '' }).msg = el.value; save(); }

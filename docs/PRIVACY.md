@@ -4,8 +4,8 @@
 
 ## Principles
 
-1. **Collect as little as possible.** We store a display name, an email for sign-in, books and messages. We never ask for addresses, phone numbers, children's names or birthdays.
-2. **Meet in person at a known place.** Handovers happen at school or another group meeting place, so nobody needs to share where they live.
+1. **Collect as little as possible.** We store a display name, a **postal code**, an email for sign-in, books, wish lists and messages. We never ask for street addresses, phone numbers, children's names or birthdays.
+2. **Neighbours, not addresses.** A postal code is enough to show who lives nearby and to avoid shipping. People agree on a public meeting place in the chat, so nobody needs to share their exact address.
 3. **Only your group sees you.** Listings and profiles are visible only to members of the same invite-only group.
 4. **Users stay in control.** They can export their data or delete their account from the app.
 
@@ -15,7 +15,10 @@
 |---|---|---|---|---|
 | Display name | So people know who they swap with | Group members | Device only | Server (EU region) |
 | Email | Sign-in links, notifications | Nobody else | Not collected | Server, never shown |
+| Postal code | Show who is nearby, avoid shipping | Group members | Device only | Server |
 | Interested book languages | Better browsing | Only you | Device only | Server |
+| Wish list (titles you're looking for) | Matching with other people's shelves | Group members | Device only | Server |
+| Terms acceptance (version + time) | Proof that the user accepted the terms | Only you / admins | Device only | Server |
 | Books (title, details, photo) | The listing itself | Group members | Device only | Server |
 | Requests & chat messages | Arranging the swap | The two people involved (+ organiser for a reported message) | Device only | Server |
 | Profile stats | Fun | Only you | Calculated on device | Calculated from the above |
@@ -25,6 +28,12 @@ Book lookups send **only the ISBN or the search text** to Google Books / Open Li
 ## Photos
 
 Phone photos often carry GPS coordinates in their EXIF metadata. The app redraws every photo on a canvas before saving, which removes all metadata. The production server will do the same again. Users are encouraged to photograph only the book.
+
+## Postal codes
+
+- Only the postal code is stored, never the street or house number. In big cities a postal code covers thousands of households.
+- In very small places a postal code can narrow things down to a few houses. Users can enter a nearby larger town's code if they prefer.
+- "Nearby" in the prototype is a rough guess based on numeric postal codes. The production version should use the centre point of each postal area, and never the user's real position.
 
 ## Children
 

@@ -21,6 +21,12 @@
 | Reserved / gone status | ✅ |
 | Profile stats + badges | ✅ |
 | Export / delete my data | ✅ (device only) |
+| Terms of use (LT/ES/EN), required at sign-up, re-accept on new version | ✅ |
+| Postal code at sign-up, shown on books & members, "Near me" filter, sorted by distance | ✅ |
+| Wish list (add by scan / search / manual), matched against shelves | ✅ |
+| "From your wish list" and "They want your books" rows | ✅ |
+| Member page with tailored offer: their books you want + your books they want, pre-ticked | ✅ |
+| "Wanted by …" on your own books, "On your wish list" on others' | ✅ |
 | Real accounts, shared database, invite-only groups | 🟠 |
 | Push + email notifications, handover reminder | 🟠 |
 | Report / block, organiser moderation | 🟠 (report button is mocked) |
@@ -29,7 +35,8 @@
 ## Finding books
 | Feature | Status |
 |---|---|
-| Wish list "Looking for", notification when listed | 🟠 |
+| Wish list notifications (push when a wished book is listed) | 🟠 |
+| Real distance from postal-code centre points | 🟠 |
 | Saved searches ("new Lithuanian books, 3–6") | ⚪ |
 | Series grouping ("4 of 9 available") | ⚪ |
 

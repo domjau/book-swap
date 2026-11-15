@@ -32,12 +32,13 @@ window.TOPICS = [
     keywords: ['science', 'education', 'learn', 'nonfiction', 'juvenile nonfiction', 'history', 'alphabet', 'counting', 'language'] }
 ];
 
+/* Sample members. Only a postal code is stored – never an address. */
 window.MEMBERS = {
-  ana: { name: 'Ana (García)' },
-  jonas: { name: 'Jonas (Petraičiai)' },
-  mette: { name: 'Mette (Jensen)' },
-  ruta: { name: 'Rūta (Kazlauskai)' },
-  sofia: { name: 'Sofía (Rodríguez)' }
+  ana: { name: 'Ana (García)', postal: '2400' },
+  jonas: { name: 'Jonas (Petraičiai)', postal: '2700' },
+  mette: { name: 'Mette (Jensen)', postal: '2720' },
+  ruta: { name: 'Rūta (Kazlauskai)', postal: '2100' },
+  sofia: { name: 'Sofía (Rodríguez)', postal: '2650' }
 };
 
 const D = (daysAgo) => Date.now() - daysAgo * 86400000;
@@ -75,4 +76,17 @@ window.SAMPLE_BOOKS = [
 window.SAMPLE_THREADS = [
   { id: 't1', with: 'mette', role: 'owner', books: ['b11'], offered: ['b7'], accepted: [], status: 'pending', handover: null,
     messages: [{ from: 'mette', text: 'Hi! My son loves dragons – could we swap Zog for Room on the Broom? Saturday at school?', at: D(0.2) }] }
+];
+
+/* Wish lists. Matching is by ISBN, or by title when there is no ISBN.
+   owner 'me' = the person using the app (a starting example they can remove). */
+window.SAMPLE_WISHES = [
+  { id: 'w1', owner: 'mette', title: 'Zog', author: 'Julia Donaldson', lang: 'en', isbn: '' },
+  { id: 'w2', owner: 'ana', title: 'El pollo Pepe', author: 'Nick Denchfield', lang: 'es', isbn: '' },
+  { id: 'w3', owner: 'ana', title: 'Mažasis princas', author: 'Antoine de Saint-Exupéry', lang: 'lt', isbn: '' },
+  { id: 'w4', owner: 'sofia', title: 'Zog', author: 'Julia Donaldson', lang: 'en', isbn: '' },
+  { id: 'w5', owner: 'jonas', title: 'The Gruffalo', author: 'Julia Donaldson', lang: 'en', isbn: '' },
+  { id: 'w6', owner: 'ruta', title: 'El pollo Pepe', author: 'Nick Denchfield', lang: 'es', isbn: '' },
+  { id: 'w7', owner: 'me', title: 'Room on the Broom', author: 'Julia Donaldson', lang: 'en', isbn: '' },
+  { id: 'w8', owner: 'me', title: 'Didžioji dinozaurų knyga', author: '', lang: 'lt', isbn: '' }
 ];

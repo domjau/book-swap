@@ -66,7 +66,10 @@ Why Supabase: a free tier that fits a few hundred families, Postgres with row-le
 groups        (id uuid pk, name text, created_by uuid, handover_place text, created_at)
 group_invites (id uuid pk, group_id fk, code_hash text, expires_at, revoked bool)
 members       (group_id fk, user_id fk → auth.users, role text check (role in ('member','organiser')),
-               display_name text, interested_langs text[], joined_at, primary key (group_id, user_id))
+               display_name text, postal_code text, interested_langs text[], joined_at, primary key (group_id, user_id))
+terms_acceptances (user_id fk, version text, accepted_at timestamptz, primary key (user_id, version))
+postcodes     (country text, postal_code text, lat numeric, lng numeric, primary key (country, postal_code))
+               -- public reference data (area centre points) for "nearby"; never user positions
 
 catalogue     (isbn text pk, title, author, description, lang, topics text[], cover_url, source, updated_at)
                -- shared, contains no personal data
@@ -84,6 +87,10 @@ request_items (request_id fk, book_id fk, side text check (side in ('requested',
                accepted bool default false, primary key (request_id, book_id))
 messages      (id bigint pk, request_id fk, sender_id fk null, kind text check (kind in ('user','system')),
                body text check (length(body) <= 1000), created_at)
+
+wishes        (id uuid pk, group_id fk, owner_id fk, isbn text null, title text, title_norm text,
+               author text, lang text, created_at)
+               -- match: same isbn, or same title_norm (lower-case, no accents/punctuation)
 
 reports       (id pk, group_id, reporter_id, target_type, target_id, reason, created_at, resolved_at)
 blocks        (blocker_id, blocked_id, primary key (blocker_id, blocked_id))
@@ -124,6 +131,12 @@ create policy msg_insert on messages for insert with check (
 ```
 
 Storage paths are `book-photos/{group_id}/{user_id}/{uuid}.jpg`. Uploading is only allowed into the caller's own `{user_id}` folder, and reading only for members of `{group_id}`.
+
+Wishes follow the same pattern as books: readable by group members (`is_member(group_id)`), and writable only by their owner.
+
+### Wish-list matching
+
+When a book is listed, the server looks for `wishes` in the same group with the same ISBN or the same normalised title, and notifies those members. When a wish is added, the member immediately sees matching available books. The member page's *tailored offer* is the intersection both ways: their available books ∩ my wishes, and my available books ∩ their wishes.
 
 ### Notifications
 

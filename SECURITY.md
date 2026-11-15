@@ -24,7 +24,7 @@ The prototype is therefore not a place to put real personal data. Anyone with ac
 | Content-Security-Policy | `script-src 'self'`: no inline scripts and no third-party scripts. `connect-src` only allows Google Books and Open Library, and `img-src` only allows the cover hosts. `object-src 'none'`, `base-uri 'self'` and `form-action 'self'` are also set. |
 | Supply chain | The only library (html5-qrcode 2.3.8, Apache-2.0) is **hosted in `vendor/`**, not loaded from a CDN. There is no build step and no npm dependency tree. |
 | Photo privacy | Photos are redrawn on a canvas and re-encoded as JPEG before saving. This **removes EXIF metadata, including GPS location**, and caps the size at 800 px. |
-| Data minimisation | Only a display name is asked for. No email, address or phone number is collected. |
+| Data minimisation | Only a display name and a postal code are asked for. No email, street address or phone number is collected. |
 | Referrer leakage | `<meta name="referrer" content="no-referrer">` is set, and lookups use `referrerPolicy: 'no-referrer'`. |
 | Input limits | Every text field has a `maxlength`. Lookups time out after 8 seconds. |
 | User control | Profile → *Download my data* (JSON) and *Delete account and data*. |
