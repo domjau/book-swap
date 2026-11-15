@@ -13,34 +13,34 @@ const DEFAULT_PREFS = { email_types: ['request_new', 'message', 'request_answere
 
 export const TEXT = {
   en: {
-    subjectOne: 'Book Swap: {text}', subjectMany: 'Book Swap: {n} new notifications', hello: 'Hi {name},', open: 'Open Book Swap',
-    footer: 'You get these emails because of your notification settings. Change them in Book Swap → Profile → Notifications.',
+    subjectOne: 'Seku Seku: {text}', subjectMany: 'Seku Seku: {n} new notifications', hello: 'Hi {name},', open: 'Open Seku Seku',
+    footer: 'You get these emails because of your notification settings. Change them in Seku Seku → Profile → Notifications.',
     request_new: '{name} asks for your book(s)', message: 'New message from {name}', message_many: '{n} new messages from {name}',
     request_accepted: '{name} accepted your request', request_declined: '{name} declined your request',
     handover_set: 'Handover with {name}: {when}, {where}', handover_reminder: 'Reminder: handover with {name} tomorrow – {where}',
     exchange_done: 'Exchange with {name} is done – leave a review', wish_match: '"{title}" from your wish list was listed by {name}',
-    wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From Book Swap: {text}',
-    report_new: 'New report on Book Swap', member_joined: '{name} joined the group'
+    wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From Seku Seku: {text}',
+    report_new: 'New report on Seku Seku', member_joined: '{name} joined the group'
   },
   lt: {
-    subjectOne: 'Knygų keitykla: {text}', subjectMany: 'Knygų keitykla: {n} nauji pranešimai', hello: 'Labas, {name},', open: 'Atidaryti Knygų keityklą',
-    footer: 'Šiuos laiškus gaunate pagal savo pranešimų nustatymus. Juos galite pakeisti: Knygų keitykla → Profilis → Pranešimai.',
+    subjectOne: 'Seku Seku: {text}', subjectMany: 'Seku Seku: {n} nauji pranešimai', hello: 'Labas, {name},', open: 'Atidaryti Seku Seku',
+    footer: 'Šiuos laiškus gaunate pagal savo pranešimų nustatymus. Juos galite pakeisti: Seku Seku → Profilis → Pranešimai.',
     request_new: '{name} prašo jūsų knygos(-ų)', message: 'Nauja žinutė nuo {name}', message_many: '{n} naujos žinutės nuo {name}',
     request_accepted: '{name} priėmė jūsų prašymą', request_declined: '{name} atmetė jūsų prašymą',
     handover_set: 'Perdavimas su {name}: {when}, {where}', handover_reminder: 'Priminimas: rytoj perdavimas su {name} – {where}',
     exchange_done: 'Mainai su {name} baigti – įvertinkite', wish_match: '„{title}“ iš jūsų norų sąrašo pasiūlė {name}',
-    wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'Knygų keitykla praneša: {text}',
-    report_new: 'Naujas pranešimas apie problemą Knygų keitykloje', member_joined: '{name} prisijungė prie grupės'
+    wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'Seku Seku praneša: {text}',
+    report_new: 'Naujas pranešimas apie problemą Seku Seku platformoje', member_joined: '{name} prisijungė prie grupės'
   },
   es: {
-    subjectOne: 'Intercambio de libros: {text}', subjectMany: 'Intercambio de libros: {n} notificaciones nuevas', hello: 'Hola, {name}:', open: 'Abrir Intercambio de libros',
-    footer: 'Recibes estos correos por tus ajustes de notificaciones. Cámbialos en Intercambio de libros → Perfil → Notificaciones.',
+    subjectOne: 'Seku Seku: {text}', subjectMany: 'Seku Seku: {n} notificaciones nuevas', hello: 'Hola, {name}:', open: 'Abrir Seku Seku',
+    footer: 'Recibes estos correos por tus ajustes de notificaciones. Cámbialos en Seku Seku → Perfil → Notificaciones.',
     request_new: '{name} te pide libro(s)', message: 'Nuevo mensaje de {name}', message_many: '{n} mensajes nuevos de {name}',
     request_accepted: '{name} ha aceptado tu pedido', request_declined: '{name} ha rechazado tu pedido',
     handover_set: 'Entrega con {name}: {when}, {where}', handover_reminder: 'Recordatorio: mañana entrega con {name} – {where}',
     exchange_done: 'Intercambio con {name} completado: deja tu valoración', wish_match: '{name} ha anunciado «{title}», de tu lista de deseos',
-    wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'De Intercambio de libros: {text}',
-    report_new: 'Nueva denuncia en Intercambio de libros', member_joined: '{name} se ha unido al grupo'
+    wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'De Seku Seku: {text}',
+    report_new: 'Nueva denuncia en Seku Seku', member_joined: '{name} se ha unido al grupo'
   }
 };
 
@@ -66,17 +66,39 @@ export function linkFor(n, appUrl) {
   return appUrl + '#/notifications';
 }
 
+// Branded frame shared by every email (seku seku palette B). Tables + inline styles so Gmail, Outlook and Apple Mail agree.
+export function emailShell(lang, appUrl, inner, footer) {
+  const logo = appUrl + 'brand/email/seku-email-logo.png';
+  return `<!doctype html><html lang="${escHtml(lang)}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
+<body style="margin:0;padding:0;background:#F7F3E8">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F3E8"><tr><td align="center" style="padding:32px 16px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;font-family:Outfit,'Segoe UI',Arial,sans-serif;color:#2E2E2A">
+    <tr><td style="padding:0 4px 20px"><a href="${escHtml(appUrl)}"><img src="${escHtml(logo)}" width="180" height="36" alt="seku seku" style="display:block;border:0;width:180px;height:auto"></a></td></tr>
+    <tr><td style="background:#FFFDF8;border-radius:18px;padding:28px 28px 24px">${inner}
+    </td></tr>
+    <tr><td style="padding:20px 4px 0;font-size:12px;line-height:1.5;color:#66625A">${escHtml(footer)}</td></tr>
+  </table>
+</td></tr></table></body></html>`;
+}
+
 // Build one email for one person from their pending notifications.
 export function buildEmail(items, lang, recipientName, names, appUrl) {
   const T = TEXT[lang] || TEXT.en;
   const lines = items.map((n) => ({ text: lineFor(n, lang, names), link: linkFor(n, appUrl) }));
   const subject = lines.length === 1 ? fill(T.subjectOne, { text: lines[0].text }).slice(0, 140) : fill(T.subjectMany, { n: lines.length });
   const text = [fill(T.hello, { name: recipientName }), '', ...lines.map((l) => '• ' + l.text + '\n  ' + l.link), '', T.open + ': ' + appUrl, '', T.footer].join('\n');
-  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1F2A44;max-width:520px">
-    <p>${escHtml(fill(T.hello, { name: recipientName }))}</p>
-    <ul style="padding-left:18px">${lines.map((l) => `<li style="margin:8px 0"><a href="${escHtml(l.link)}" style="color:#1D4E89">${escHtml(l.text)}</a></li>`).join('')}</ul>
-    <p><a href="${escHtml(appUrl)}" style="display:inline-block;background:#FF8A3D;color:#1F2A44;padding:10px 16px;border-radius:10px;text-decoration:none;font-weight:bold">${escHtml(T.open)}</a></p>
-    <p style="color:#5B5446;font-size:12px">${escHtml(T.footer)}</p></div>`;
+  const html = emailShell(lang, appUrl, `
+      <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#2E2E2A">${escHtml(fill(T.hello, { name: recipientName }))}</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${lines.map((l) => `
+        <tr><td style="padding:12px 0;border-top:1px solid #E6DFCF">
+          <a href="${escHtml(l.link)}" style="color:#2E2E2A;text-decoration:none;font-size:15px;line-height:1.45">${escHtml(l.text)}</a>
+          <span style="color:#43604A;font-size:15px">&nbsp;&rarr;</span>
+        </td></tr>`).join('')}
+      </table>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 4px"><tr>
+        <td style="border-radius:12px;background:#5C7A61"><a href="${escHtml(appUrl)}" style="display:inline-block;padding:13px 22px;font-family:Outfit,'Segoe UI',Arial,sans-serif;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:12px">${escHtml(T.open)}</a></td>
+      </tr></table>`, T.footer);
   return { subject, text, html };
 }
 

@@ -1,0 +1,26 @@
+<!doctype html>
+<!-- seku seku – Supabase auth email template. Paste into Authentication → Emails → Templates.
+     If the site moves to its own domain, change the logo URL below. -->
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Your sign-in code</title>
+<meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head>
+<body style="margin:0;padding:0;background:#F7F3E8">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F7F3E8"><tr><td align="center" style="padding:32px 16px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;font-family:Outfit,'Segoe UI',Arial,sans-serif;color:#2E2E2A">
+    <tr><td style="padding:0 4px 20px"><img src="https://domjau.github.io/book-swap/brand/email/seku-email-logo.png" width="180" height="36" alt="seku seku" style="display:block;border:0;width:180px;height:auto"></td></tr>
+    <tr><td style="background:#FFFDF8;border-radius:18px;padding:28px">
+      <p style="margin:0 0 16px;font-size:20px;font-weight:600">Prisijungimo kodas · Sign-in code · Código</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 20px"><tr>
+        <td align="center" style="background:#E4EBE2;border-radius:14px;padding:18px 12px;font-size:32px;font-weight:600;letter-spacing:8px;color:#2E2E2A">{{ .Token }}</td>
+      </tr></table>
+      <p style="margin:0 0 6px;font-size:15px;line-height:1.5"><span style="display:inline-block;min-width:28px;font-size:11px;font-weight:600;letter-spacing:1px;color:#8E4A3D">LT</span>Įveskite šį kodą programėlėje.</p>
+      <p style="margin:0 0 6px;font-size:15px;line-height:1.5"><span style="display:inline-block;min-width:28px;font-size:11px;font-weight:600;letter-spacing:1px;color:#8E4A3D">EN</span>Type this code in the app.</p>
+      <p style="margin:0 0 6px;font-size:15px;line-height:1.5"><span style="display:inline-block;min-width:28px;font-size:11px;font-weight:600;letter-spacing:1px;color:#8E4A3D">ES</span>Escribe este código en la app.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:18px 0 0"><tr>
+        <td style="border-radius:12px;background:#5C7A61"><a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 22px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:12px">Prisijungti · Sign in · Entrar</a></td>
+      </tr></table>
+    </td></tr>
+    <tr><td style="padding:20px 4px 0;font-size:12px;line-height:1.5;color:#66625A">
+      Jei to neprašėte, šį laišką galite ignoruoti. · If you didn't ask for this, you can ignore this email. · Si no lo has pedido, ignora este correo.
+    </td></tr>
+  </table>
+</td></tr></table></body></html>

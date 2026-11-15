@@ -6,7 +6,7 @@
 2. Open **SQL Editor → New query**, paste the whole of [`migrations/001_init.sql`](migrations/001_init.sql) and click **Run**. It should finish with "Success. No rows returned". Then do the same with [`002_reviews_avatars.sql`](migrations/002_reviews_avatars.sql) (reviews and profile pictures) and [`003_notifications_admin.sql`](migrations/003_notifications_admin.sql) (notifications, moderation tools), then [`005_open_network.sql`](migrations/005_open_network.sql) (one open network for everyone, moderated by admins). Always run the migrations in number order, each one once.
 3. **Authentication → URL Configuration**: set **Site URL** to the app's address, e.g. `https://domjau.github.io/book-swap/`, and add the same under **Redirect URLs**.
 4. **Authentication → Emails → SMTP Settings**: connect an email provider (e.g. Brevo, Resend or your domain's mailbox). Until then, sign-in emails only reach members of your Supabase team.
-   Then, under **Authentication → Emails → Templates**, add the code to the **Magic Link** and **Confirm signup** templates, for example `<p>Your code: <strong>{{ .Token }}</strong></p>`. On phones, typing the code is more reliable than the link, because email apps often open links in a different browser.
+   Then, under **Authentication → Emails → Templates**, paste the branded templates from [`email-templates/`](email-templates/README.md) (they show the code, `{{ .Token }}`, in large type). On phones, typing the code is more reliable than the link, because email apps often open links in a different browser.
 5. Put the **Project URL** and the **publishable key** in `config.js`. **Never** put the secret / service_role key in the app.
 
 ## Notification emails (optional, recommended)
@@ -21,7 +21,7 @@ In-app notifications (the bell) work as soon as migration 003 has run. To also s
    | `SMTP_PORT` | `465` |
    | `SMTP_USER` | `pasakabookswap@gmail.com` |
    | `SMTP_PASS` | the Gmail **app password** |
-   | `SMTP_FROM` | `Knygų keitykla <pasakabookswap@gmail.com>` |
+   | `SMTP_FROM` | `seku seku <pasakabookswap@gmail.com>` |
    | `APP_URL` | `https://domjau.github.io/book-swap/` |
    | `CRON_SECRET` | a long random text you make up (e.g. 40 letters and numbers) |
 3. **Schedule it.** Under **Database → Extensions**, enable **pg_cron** and **pg_net**. Then open [`migrations/004_schedules.sql`](migrations/004_schedules.sql), replace `YOUR_CRON_SECRET` (twice) with your secret, and run it in the SQL editor. This sets up:

@@ -1,11 +1,42 @@
 {
-  "name": "Book Swap",
-  "short_name": "Book Swap",
-  "description": "Swap, sell or give away children's books within your community.",
+  "name": "Seku Seku",
+  "short_name": "Seku Seku",
+  "description": "Swap, sell or give away children's books with families near you.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#FFF8EE",
-  "theme_color": "#FFF8EE",
-  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "background_color": "#F7F3E8",
+  "theme_color": "#F7F3E8",
+  "icons": [
+    {
+      "src": "brand/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "brand/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "brand/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "brand/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "brand/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }

@@ -1,0 +1,57 @@
+/* seku seku – brand tokens (palette B "Summer meadow")
+   Import on any page:  <link rel="stylesheet" href="brand/tokens.css">
+   Font:                <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet"> */
+:root {
+  /* core palette */
+  --seku-cream:      #F7F3E8;  /* page background */
+  --seku-paper:      #FFFDF8;  /* cards, sheets, inputs */
+  --seku-sage:       #5C7A61;  /* brand colour: logo line, primary buttons */
+  --seku-honey:      #E3C16F;  /* highlight: counts, badges, stars – never text on light */
+  --seku-rosehip:    #C77B6A;  /* warm accent: wish list, hearts, illustrations */
+  --seku-ink:        #2E2E2A;  /* text */
+
+  /* supporting shades (text-safe on cream/paper and on their tints) */
+  --seku-sage-deep:  #43604A;  /* links, pressed buttons, focus ring */
+  --seku-sage-tint:  #E4EBE2;
+  --seku-honey-deep: #7A5B14;
+  --seku-honey-tint: #F6EBCB;
+  --seku-rose-deep:  #8E4A3D;
+  --seku-rose-tint:  #F3E0DA;
+  --seku-muted:      #66625A;  /* secondary text */
+  --seku-line:       #E6DFCF;  /* dividers */
+  --seku-line-strong:#D3CAB6;  /* input borders */
+
+  /* type */
+  --seku-font: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --seku-weight-regular: 400; --seku-weight-medium: 500; --seku-weight-semibold: 600;
+  --seku-text-xs: 12px; --seku-text-sm: 14px; --seku-text-md: 16px; --seku-text-lg: 20px;
+  --seku-text-xl: 26px; --seku-text-2xl: 34px;
+  --seku-leading: 1.5; --seku-leading-tight: 1.15;
+  --seku-tracking-caps: 0.3em;   /* for small uppercase labels like BOOK SWAP */
+
+  /* space (4-px grid), radius, shadow */
+  --seku-space-1: 4px; --seku-space-2: 8px; --seku-space-3: 12px; --seku-space-4: 16px;
+  --seku-space-5: 24px; --seku-space-6: 32px; --seku-space-7: 48px; --seku-space-8: 64px;
+  --seku-radius-sm: 8px; --seku-radius-md: 12px; --seku-radius-lg: 18px; --seku-radius-pill: 999px;
+  --seku-shadow: 0 1px 3px rgba(46, 46, 42, .14);
+  --seku-line-weight: 1.5px;  /* borders echo the single-line logo */
+}
+
+/* optional base + components for simple pages (landing, help, terms) */
+.seku-page { margin: 0; background: var(--seku-cream); color: var(--seku-ink); font-family: var(--seku-font); font-size: var(--seku-text-md); line-height: var(--seku-leading); }
+.seku-page a { color: var(--seku-sage-deep); text-underline-offset: 3px; }
+.seku-page :focus-visible { outline: 3px solid var(--seku-sage-deep); outline-offset: 2px; }
+.seku-h1 { font-size: var(--seku-text-2xl); font-weight: 600; line-height: var(--seku-leading-tight); letter-spacing: -0.01em; margin: 0 0 var(--seku-space-3); }
+.seku-h2 { font-size: var(--seku-text-xl); font-weight: 600; line-height: var(--seku-leading-tight); margin: var(--seku-space-6) 0 var(--seku-space-3); }
+.seku-eyebrow { font-size: var(--seku-text-xs); font-weight: 500; letter-spacing: var(--seku-tracking-caps); text-transform: uppercase; color: var(--seku-rose-deep); }
+.seku-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: var(--seku-radius-md); border: 0; font: 500 15px/1 var(--seku-font); text-decoration: none; cursor: pointer; }
+.seku-btn--primary { background: var(--seku-sage); color: #FFFFFF; }
+.seku-btn--primary:hover { background: var(--seku-sage-deep); }
+.seku-btn--secondary { background: transparent; color: var(--seku-ink); border: var(--seku-line-weight) solid var(--seku-ink); }
+.seku-btn--highlight { background: var(--seku-honey); color: var(--seku-ink); }
+.seku-card { background: var(--seku-paper); border-radius: var(--seku-radius-lg); padding: var(--seku-space-5); }
+.seku-input { width: 100%; min-height: 46px; padding: 10px 12px; border-radius: var(--seku-radius-md); border: var(--seku-line-weight) solid var(--seku-line-strong); background: var(--seku-paper); font: 400 16px var(--seku-font); color: var(--seku-ink); }
+.seku-badge { display: inline-block; padding: 3px 10px; border-radius: var(--seku-radius-pill); font-size: 12px; font-weight: 500; }
+.seku-badge--swap { background: var(--seku-sage-tint); color: #3F5A45; }
+.seku-badge--give { background: var(--seku-honey-tint); color: var(--seku-honey-deep); }
+.seku-badge--sell { background: var(--seku-rose-tint); color: var(--seku-rose-deep); }

@@ -4,9 +4,9 @@
 
 ## Why swapping and selling physical books is fine
 
-When a physical copy of a book has been sold in the EU/EEA with the rights holder's consent, the right to control *further distribution of that copy* is "exhausted" (EU Copyright Directive 2001/29/EC, art. 4(2)). In plain words: you may give away, swap or resell **your own physical copy**. That is all Book Swap is for.
+When a physical copy of a book has been sold in the EU/EEA with the rights holder's consent, the right to control *further distribution of that copy* is "exhausted" (EU Copyright Directive 2001/29/EC, art. 4(2)). In plain words: you may give away, swap or resell **your own physical copy**. That is all Seku Seku is for.
 
-What is **not** allowed is copying the content: scanning or photographing pages, sharing PDFs or e-books, or sending files and links. That would infringe the author's and publisher's rights, so Book Swap must not become a channel for it.
+What is **not** allowed is copying the content: scanning or photographing pages, sharing PDFs or e-books, or sending files and links. That would infringe the author's and publisher's rights, so Seku Seku must not become a channel for it.
 
 ## How the app prevents it
 
