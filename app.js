@@ -1351,8 +1351,15 @@
   }
 
   async function boot() {
+    // If we arrived from a sign-in link, the result (or the reason it failed) is in the address.
+    const hp = new URLSearchParams((location.hash || '').replace(/^#\/?/, '') + '&' + location.search.slice(1));
+    const linkError = hp.get('error_code') || hp.get('error_description') || hp.get('error');
+    const cameFromLink = hp.has('access_token') || !!linkError;
     try {
       const s = await Backend.session();
+      if (cameFromLink && !s) {
+        ui.onbError = /expired|invalid|otp/i.test(linkError || '') ? t('linkExpired') : t('linkFailed') + (linkError ? ' (' + String(linkError).slice(0, 80) + ')' : '');
+      }
       live.uid = s ? s.user.id : null; live.email = s ? s.user.email : '';
       if (live.uid) { await loadMembership(); await refreshAll(); }
     } catch (e) { ui.toast = friendlyError(e); }

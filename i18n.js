@@ -430,3 +430,6 @@ Object.assign(window.STRINGS.en, {
   errOffline: 'No connection. Check your internet.',
   removeListing: 'Remove listing', confirmRemove: 'Remove this book from your shelf?'
 });
+Object.assign(window.STRINGS.lt, { linkExpired: 'Ši prisijungimo nuoroda nebegalioja arba jau buvo panaudota (kartais el. pašto programos ją atidaro automatiškai). Paprašykite naujos ir atidarykite ją iškart.', linkFailed: 'Prisijungti per nuorodą nepavyko.' });
+Object.assign(window.STRINGS.es, { linkExpired: 'Este enlace ha caducado o ya se usó (a veces la app de correo lo abre automáticamente). Pide uno nuevo y ábrelo enseguida.', linkFailed: 'No se pudo entrar con el enlace.' });
+Object.assign(window.STRINGS.en, { linkExpired: 'This sign-in link has expired or was already used (some email apps open links automatically). Ask for a new one and open it straight away.', linkFailed: "Signing in with the link didn't work." });
