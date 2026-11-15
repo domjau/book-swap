@@ -441,7 +441,7 @@
     document.documentElement.lang = S.lang;
     document.title = t('appName');
     const r = route();
-    if (lastRoute && lastRoute !== r.name && ui.scanner) stopCamera();
+    if (ui.scanner && r.name !== 'add') stopCamera();
     const routeChanged = lastRoute !== r.name + '/' + r.id;
     lastRoute = r.name + '/' + r.id;
     const active = document.activeElement;
