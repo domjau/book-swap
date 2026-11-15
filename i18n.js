@@ -351,3 +351,17 @@ Object.assign(window.STRINGS.en, { copyBlocked: "Sharing copies or files of book
 Object.assign(window.STRINGS.lt, { photoAdd: 'Pridėti nuotrauką' });
 Object.assign(window.STRINGS.es, { photoAdd: 'Añadir foto' });
 Object.assign(window.STRINGS.en, { photoAdd: 'Add photo' });
+
+/* Description and notes about this copy */
+Object.assign(window.STRINGS.lt, {
+  copyNotes: 'Apie šį egzempliorių', copyNotesPh: 'Pvz. nuplėštas aplanko kampas, keli pieštuko brūkšniai',
+  descPh: 'Apie ką ši knyga? (užpildoma automatiškai, jei randama)', noDescFound: 'Aprašymo neradome – galite parašyti trumpai patys.'
+});
+Object.assign(window.STRINGS.es, {
+  copyNotes: 'Sobre este ejemplar', copyNotesPh: 'Ej. esquina de la cubierta doblada, algo de lápiz',
+  descPh: '¿De qué trata el libro? (se rellena solo si lo encontramos)', noDescFound: 'No hemos encontrado descripción; puedes escribir una breve.'
+});
+Object.assign(window.STRINGS.en, {
+  copyNotes: 'About this copy', copyNotesPh: 'e.g. torn corner on the cover, a few pencil marks',
+  descPh: 'What is the book about? (filled in automatically when we find one)', noDescFound: "We didn't find a description – you can write a short one."
+});

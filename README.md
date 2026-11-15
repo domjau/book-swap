@@ -29,7 +29,7 @@ The camera only works over HTTPS or on `localhost`.
 - **Chat for each request:** the books are pinned at the top. The owner ticks which books to accept, then the two people agree on a date and place for the handover and mark it as handed over. Includes quick replies and a report button.
   - The prototype simulates the other person accepting your request after about 2 seconds.
   - One sample incoming request (from Mette) lets you try the owner's side.
-- **Add a book, scan first:** scan the ISBN barcode with the phone camera (full-resolution frames are decoded by the phone's built-in BarcodeDetector where available, otherwise by ZXing in WebAssembly; autofocus and 2× zoom where supported), take a photo of the barcode as a backup, type the ISBN, or search by title. Details are filled in from:
+- **Add a book, scan first:** scan the ISBN barcode with the phone camera (full-resolution frames are decoded by the phone's built-in BarcodeDetector where available, otherwise by ZXing in WebAssembly; autofocus and 2× zoom where supported), take a photo of the barcode as a backup, type the ISBN, or search by title. Title, author, language, topics and a **description** are filled in. The official cover is never used, only your own photos. There's an optional *About this copy* note for wear and tear. Details are filled in from:
   1. books already in the app (the shared catalogue, which is the best source for Lithuanian books),
   2. Google Books (description, cover, language, categories),
   3. Open Library (fills in any gaps).

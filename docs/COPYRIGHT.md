@@ -19,7 +19,8 @@ What is **not** allowed is copying the content: scanning or photographing pages,
 | Chat blocks messages with e-book or document files (`.pdf`, `.epub`, `.mobi`…) and file-sharing or shadow-library links (Google Drive, Dropbox, WeTransfer, MEGA, LibGen, Z-Library, Anna's Archive, Telegram…) | `looksLikeCopySharing()` in `app.js` |
 | Links in chat are shown as plain text, never as clickable links | Chat rendering |
 | Terms of use §6 (physical books, photos show cover and condition only), §6a (no copies) and §11 (copyright complaints) | `terms.js`, [TERMS.md](../TERMS.md) |
-| Catalogue covers come from Google Books / Open Library and are only shown as a thumbnail to identify the edition | Lookup |
+| **No official covers**: catalogue cover images are never fetched or shown. Every image in the app is the owner's own photo, and the CSP (`img-src 'self' data: blob:`) blocks outside images | Lookup, `index.html` |
+| Book descriptions from catalogues are short publisher blurbs that identify the book, never its content | Lookup |
 
 The chat filter is a speed bump, not a guarantee: people can still spell a link differently. The real safeguards are the reporting button and the organiser's moderation.
 

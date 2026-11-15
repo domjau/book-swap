@@ -52,7 +52,7 @@
   function fresh() {
     return {
       v: 1, lang: detectLang(), me: null, interested: ['lt', 'es', 'en'],
-      books: clone(SAMPLE_BOOKS).map((b) => Object.assign({ status: 'available', isbn: '', cover: '' }, b)),
+      books: clone(SAMPLE_BOOKS).map((b) => Object.assign({ status: 'available', isbn: '' }, b)),
       cart: [], cartMeta: {}, threads: clone(SAMPLE_THREADS).map((t) => Object.assign({ unread: true }, t)),
       received: [], wishes: clone(SAMPLE_WISHES), agreed: null
     };
@@ -177,7 +177,8 @@
   }
   function cover(b, size) {
     const tp = TOPIC[b.topics && b.topics[0]] || TOPICS[0];
-    const img = b.photo || b.cover;
+    // Only the owner's own photos are shown – never a catalogue cover.
+    const img = b.photo || (b.photos && b.photos[0]) || '';
     const lang = `<span class="lang-tag">${esc((b.lang || '').toUpperCase() || '·')}</span>`;
     if (img) {
       return `<div class="cover cover-${size}">${lang}<img src="${esc(img)}" alt="" loading="lazy"></div>`;
@@ -318,6 +319,7 @@
       ${iWant(b) ? `<div class="notice wish">${icon('heart', 20)} ${esc(t('onYourWishlist'))}</div>` : ''}
       ${b.owner === MINE && wishersOf(b).length ? `<div class="notice wish">${icon('heart', 20)} <span>${esc(t('wantedBy'))} ${wishersOf(b).map(memberLink).join(', ')}</span></div>` : ''}
       <div class="actions">${actions}</div>
+      ${b.notes ? `<section class="card pad-m"><h2 class="h3">${esc(t('copyNotes'))}</h2><p class="desc">${esc(b.notes)}</p></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('description'))}</h2><p class="desc">${esc(b.description || t('noDescription'))}</p></section>
       <dl class="details card pad-m">
         <dt>${esc(t('owner'))}</dt><dd>${b.owner === MINE ? esc(memberName(b.owner)) : memberLink(b.owner)}</dd>
@@ -499,7 +501,7 @@
     if (ui.addStep === 'form' && ui.draft) return viewDraft();
     const msg = ui.addMsg ? `<div class="notice ${ui.addMsgKind}">${esc(ui.addMsg)}</div>` : '';
     const results = ui.searchResults.map((r, i) => `<button class="result" data-action="pickResult" data-v="${i}">
-      ${r.cover ? `<img src="${esc(r.cover)}" alt="">` : `<span class="ph">${icon('logo', 20)}</span>`}
+      <span class="ph">${icon('logo', 20)}</span>
       <span class="grow"><span class="bold block">${esc(r.title)}</span><span class="muted small block">${esc(r.author)}</span></span>
       <span class="lang-tag static">${esc((r.lang || '').toUpperCase())}</span></button>`).join('');
     return `<main class="pad">
@@ -542,7 +544,6 @@
       ${modeToggle()}${msg}
       <h1 class="h1">${esc(t('addModeWish'))}</h1>
       <div class="draft-top">
-        ${d.cover ? `<div class="photo-box has"><img src="${esc(d.cover)}" alt=""></div>` : ''}
         <div class="grow col">
           <label class="label" for="d-title">${esc(t('title'))}</label><input id="d-title" class="input" maxlength="150" value="${esc(d.title)}" data-input="draft" data-field="title">
           <label class="label" for="d-author">${esc(t('author'))}</label><input id="d-author" class="input" maxlength="120" value="${esc(d.author)}" data-input="draft" data-field="author">
@@ -569,7 +570,6 @@
       ${modeToggle()}${msg}
       <h1 class="h1">${esc(t('review'))}</h1>
       <div class="draft-top">
-        ${d.cover ? `<div class="cat-cover"><img src="${esc(d.cover)}" alt=""><span class="tiny bold">${esc(t('coverFromSource'))}</span></div>` : ''}
         <div class="grow col">
           <label class="label" for="d-title">${esc(t('title'))}</label><input id="d-title" class="input" maxlength="150" value="${esc(d.title)}" data-input="draft" data-field="title">
           <label class="label" for="d-author">${esc(t('author'))}</label><input id="d-author" class="input" maxlength="120" value="${esc(d.author)}" data-input="draft" data-field="author">
@@ -579,8 +579,10 @@
       <div class="ph-strip">${photoTiles}${addTile}</div>
       <p class="muted small ph-hint">${icon('shield', 14)} ${esc(t('photosHint'))}</p>
       ${d.photos.length ? `<div class="muted tiny">${icon('check', 12)} ${esc(t('photoClean'))}</div>` : ''}
+      <label class="label" for="d-notes">${esc(t('copyNotes'))}</label>
+      <textarea id="d-notes" class="input" rows="2" maxlength="300" placeholder="${esc(t('copyNotesPh'))}" data-input="draft" data-field="notes">${esc(d.notes || '')}</textarea>
       <label class="label" for="d-desc">${esc(t('description'))}</label>
-      <textarea id="d-desc" class="input" rows="4" maxlength="2000" data-input="draft" data-field="description">${esc(d.description)}</textarea>
+      <textarea id="d-desc" class="input" rows="5" maxlength="3000" placeholder="${esc(t('descPh'))}" data-input="draft" data-field="description">${esc(d.description)}</textarea>
       ${d.isbn ? `<div class="muted small">ISBN ${esc(d.isbn)}</div>` : ''}
       <span class="label">${esc(t('language'))}</span>
       <div class="row-wrap">${BOOK_LANGS.map((c) => `<button class="${chip(d.lang === c)}" data-action="dLang" data-v="${c}">${esc(langName(c))}</button>`).join('')}</div>
@@ -770,16 +772,15 @@
     const hit = (k) => { k = norm(k); return k.length <= 4 ? new RegExp(' ' + k + '(s|es)? ').test(s) : s.indexOf(' ' + k) >= 0; };
     return TOPICS.filter((tp) => tp.keywords.some(hit)).slice(0, 3).map((tp) => tp.id);
   }
-  function httpsImg(u) { return u ? String(u).replace(/^http:/, 'https:').replace('&edge=curl', '') : ''; }
   function fromGoogle(item) {
     const v = item.volumeInfo || {};
     const ids = v.industryIdentifiers || [];
     const isbn = (ids.find((x) => x.type === 'ISBN_13') || ids.find((x) => x.type === 'ISBN_10') || {}).identifier || '';
     return {
       isbn: cleanIsbn(isbn), title: [v.title, v.subtitle].filter(Boolean).join(': '), author: (v.authors || []).join(', '),
-      description: v.description || '', lang: mapLang(v.language),
+      description: htmlToText(v.description || ''), lang: mapLang(v.language),
       topics: suggestTopics((v.categories || []).join(' ') + ' ' + (v.title || '') + ' ' + (v.description || '')),
-      cover: httpsImg(v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail)), source: 'Google Books'
+      id: item.id || '', source: 'Google Books'
     };
   }
   async function fetchJson(url) {
@@ -817,7 +818,7 @@
     const o = await tryJson('https://openlibrary.org/api/books?format=json&jscmd=data&bibkeys=' + keys.join(','));
     const d = o && (o[keys[0]] || o[keys[1]]);
     // b) the search index (much larger coverage, has languages and the work id for a description)
-    const sr = await tryJson('https://openlibrary.org/search.json?limit=1&fields=key,title,subtitle,author_name,language,subject,cover_i&q=isbn:' + isbn13);
+    const sr = await tryJson('https://openlibrary.org/search.json?limit=1&fields=key,title,subtitle,author_name,language,subject&q=isbn:' + isbn13);
     const doc = sr && sr.docs && sr.docs[0];
     if (!d && !doc) return null;
     const subjects = ((d && d.subjects) || []).map((x) => x.name).concat((doc && doc.subject) || []).slice(0, 40).join(' ');
@@ -825,19 +826,47 @@
     const author = (d && d.authors ? d.authors.map((a) => a.name).join(', ') : '') || (doc && doc.author_name ? doc.author_name.slice(0, 3).join(', ') : '');
     const langs = (doc && doc.language) || [];
     const lang = langs.length === 1 && OL_LANG[langs[0]] ? OL_LANG[langs[0]] : 'other';
-    let cover = httpsImg(d && d.cover && (d.cover.medium || d.cover.large));
-    if (!cover && doc && doc.cover_i) cover = 'https://covers.openlibrary.org/b/id/' + Number(doc.cover_i) + '-M.jpg';
+    // Description: the edition record first, then the work record.
     let description = '';
-    if (doc && doc.key && /^\/works\/OL\d+W$/.test(doc.key)) {
+    const ed = await tryJson('https://openlibrary.org/isbn/' + isbn13 + '.json');
+    if (ed && ed.description) description = typeof ed.description === 'string' ? ed.description : (ed.description.value || '');
+    if (!description && doc && doc.key && /^\/works\/OL\d+W$/.test(doc.key)) {
       const w = await tryJson('https://openlibrary.org' + doc.key + '.json');
       if (w && w.description) description = typeof w.description === 'string' ? w.description : (w.description.value || '');
     }
-    return { title: title, author: author, description: description, lang: lang, topics: suggestTopics(subjects + ' ' + title), cover: cover, source: 'Open Library' };
+    return { title: title, author: author, description: description, lang: lang, topics: suggestTopics(subjects + ' ' + title), source: 'Open Library' };
   }
+  // Google's full volume record often has a longer description (as HTML) than search results.
+  // HTML is turned into plain text with DOMParser, which never runs scripts.
+  function htmlToText(html) {
+    if (!html || !/[<&]/.test(html)) return html || '';
+    const doc = new DOMParser().parseFromString(String(html).replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n'), 'text/html');
+    doc.querySelectorAll('script,style,noscript,template').forEach((n) => n.remove());
+    return (doc.body.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  async function findDescription(found) {
+    if (!found || found.description) return found;
+    // a) the full Google record for the same volume
+    if (found.id) {
+      const v = await tryJson('https://www.googleapis.com/books/v1/volumes/' + encodeURIComponent(found.id));
+      const d = v && v.volumeInfo && v.volumeInfo.description;
+      if (d) { found.description = htmlToText(d); return found; }
+    }
+    // b) another edition of the same title and author – same language first
+    if (found.title) {
+      const q = 'intitle:"' + found.title.split(':')[0].replace(/"/g, '') + '"' + (found.author ? '+inauthor:"' + found.author.split(',')[0].replace(/"/g, '') + '"' : '');
+      const g = await tryJson('https://www.googleapis.com/books/v1/volumes?maxResults=10&printType=books&q=' + encodeURIComponent(q));
+      const items = ((g && g.items) || []).filter((it) => it.volumeInfo && it.volumeInfo.description);
+      const same = items.find((it) => mapLang(it.volumeInfo.language) === found.lang) || items[0];
+      if (same) { found.description = htmlToText(same.volumeInfo.description); found.descFromOther = true; }
+    }
+    return found;
+  }
+
   function mergeFound(a, b) {
     if (!a) return b; if (!b) return a;
     const out = Object.assign({}, a);
-    ['title', 'author', 'description', 'cover'].forEach((k) => { if (!out[k]) out[k] = b[k]; });
+    ['title', 'author', 'description'].forEach((k) => { if (!out[k]) out[k] = b[k]; });
     if (out.lang === 'other' && b.lang !== 'other') out.lang = b.lang;
     if (!out.topics.length) out.topics = b.topics;
     out.source = a.source + ' + ' + b.source;
@@ -853,18 +882,18 @@
     const local = S.books.find((b) => b.isbn && (b.isbn === isbn || b.isbn === isbn10));
     if (local) {
       // Copy the book details – never another family's own photos.
-      startDraft({ isbn: isbn, title: local.title, author: local.author, description: local.description, lang: local.lang, topics: local.topics.slice(), cover: local.cover || '', age: local.age });
+      startDraft({ isbn: isbn, title: local.title, author: local.author, description: local.description, lang: local.lang, topics: local.topics.slice(), age: local.age });
       ui.addMsg = t('foundLocalIsbn', { isbn: isbn }); ui.addMsgKind = 'ok'; render(); return;
     }
     ui.busy = true; ui.busyIsbn = isbn; ui.addMsg = ''; render();
     // 2. Google Books and Open Library at the same time; combine what they know.
     const results = await Promise.all([googleByIsbn(isbn, isbn10).catch(() => null), openLibraryByIsbn(isbn, isbn10).catch(() => null)]);
-    const found = mergeFound(results[0], results[1]);
+    const found = await findDescription(mergeFound(results[0], results[1])).catch(() => mergeFound(results[0], results[1]));
     ui.busy = false; ui.busyIsbn = '';
     if (found && found.title) {
       found.isbn = isbn;
       startDraft(found);
-      ui.addMsg = t('foundIsbn', { isbn: isbn, src: found.source }); ui.addMsgKind = 'ok';
+      ui.addMsg = t('foundIsbn', { isbn: isbn, src: found.source }) + (found.description ? '' : ' ' + t('noDescFound')); ui.addMsgKind = 'ok';
     } else {
       startDraft({ isbn: isbn });
       ui.addMsg = t('notFoundIsbn', { isbn: isbn }); ui.addMsgKind = 'warn';
@@ -878,14 +907,15 @@
       const g = await fetchJson('https://www.googleapis.com/books/v1/volumes?maxResults=8&printType=books&q=' + encodeURIComponent(q));
       ui.searchResults = (g.items || []).map(fromGoogle);
       const localHits = S.books.filter((b) => (b.title + ' ' + b.author).toLowerCase().indexOf(q.toLowerCase()) >= 0)
-        .map((b) => ({ isbn: b.isbn, title: b.title, author: b.author, description: b.description, lang: b.lang, topics: b.topics.slice(), cover: b.cover || '', source: 'local' }));
+        .map((b) => ({ isbn: b.isbn, title: b.title, author: b.author, description: b.description, lang: b.lang, topics: b.topics.slice(), source: 'local' }));
       ui.searchResults = localHits.concat(ui.searchResults).slice(0, 10);
       if (!ui.searchResults.length) { ui.addMsg = t('notFound'); ui.addMsgKind = 'warn'; }
     } catch (e) { ui.addMsg = t('notFound'); ui.addMsgKind = 'warn'; }
     ui.busy = false; render();
   }
   function startDraft(p) {
-    ui.draft = Object.assign({ isbn: '', title: '', author: '', description: '', lang: S.interested[0] || 'lt', topics: [], age: '3–6', cond: 'good', offer: 'swap', price: '3', cover: '', photos: [] }, p || {});
+    ui.draft = Object.assign({ isbn: '', title: '', author: '', description: '', lang: S.interested[0] || 'lt', topics: [], age: '3–6', cond: 'good', offer: 'swap', price: '3', notes: '', photos: [] }, p || {});
+    delete ui.draft.cover;
     ui.draft.photos = [];
     if (ui.draft.lang === 'other' && !p.title) ui.draft.lang = S.interested[0] || 'lt';
     ui.addStep = 'form';
@@ -1134,7 +1164,7 @@
       const b = { id: uid('b'), isbn: d.isbn, title: d.title.trim(), author: d.author.trim() || '—', description: d.description.trim(),
         lang: d.lang, topics: d.topics.length ? d.topics.slice() : ['learning'], age: d.age, cond: d.cond, offer: d.offer,
         price: d.offer === 'sell' ? (Number(String(d.price).replace(',', '.')) || 0) : 0, owner: MINE, added: Date.now(),
-        status: 'available', cover: d.cover, photos: d.photos.slice(0, MAX_PHOTOS), photo: d.photos[0] };
+        status: 'available', notes: (d.notes || '').trim(), photos: d.photos.slice(0, MAX_PHOTOS), photo: d.photos[0] };
       S.books.push(b); save();
       ui.lastSaved = b.id; ui.lastWish = null; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; render();
     },

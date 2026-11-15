@@ -45,6 +45,10 @@ scan barcode / type ISBN / search title
    Open Library   → books API (edition), search index (bigger coverage,
                     language, subjects), then the work record for a description
    → results are merged; missing fields are filled from the other source
+   Description, if still missing: Google's full volume record (HTML → plain text,
+   scripts removed), the Open Library edition and work records, then another
+   edition of the same title and author (same language first)
+   Covers are never fetched – only the owner's photos are used
         │ nothing
         ▼
 4. Manual entry (title + photo is enough). The ISBN is still saved,
