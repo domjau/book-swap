@@ -1,4 +1,4 @@
-/* Seku Seku prototype – plain JavaScript, no build step.
+/* seku seku prototype – plain JavaScript, no build step.
    All data lives in localStorage on this device. Every piece of user text is
    escaped before it is put on the page (see esc()). */
 (function () {
@@ -256,7 +256,7 @@
     const interests = BOOK_LANGS.filter((c) => c !== 'other').map((c) => `<label class="check-pill ${S.interested.indexOf(c) >= 0 ? 'on' : ''}">
       <input type="checkbox" data-action="toggleInterest" data-v="${c}" ${S.interested.indexOf(c) >= 0 ? 'checked' : ''}> ${esc(langName(c))}</label>`).join('');
     return `<main class="onboard">
-      <div class="logo-big">${icon('seku', 48)}</div>
+      <div class="lockup"><div class="logo-big">${icon('seku', 48)}</div><span class="wordmark">seku seku</span></div>
       <h1>${esc(t('welcomeTitle'))}</h1>
       ${S.me ? `<div class="notice warn">${esc(S.agreed && S.agreed.version === TERMS.version ? t('profileIncomplete') : t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
@@ -296,7 +296,7 @@
     const langs = UI_LANGS.map((c) => `<button class="pill ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}">${esc(STRINGS[c].langNames[c])}</button>`).join('');
     const step = live.authStep;
     return `<main class="onboard">
-      <div class="logo-big">${icon('seku', 48)}</div>
+      <div class="lockup"><div class="logo-big">${icon('seku', 48)}</div><span class="wordmark">seku seku</span></div>
       <h1>${esc(t('welcomeTitle'))}</h1>
       <p class="lead">${esc(t('welcomeText'))}</p>
       <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
@@ -320,7 +320,7 @@
   }
 
   function viewLoading() {
-    return `<main class="onboard center-col"><div class="logo-big">${icon('seku', 48)}</div><p class="muted bold">${esc(t('loading'))}</p></main>`;
+    return `<main class="onboard center-col"><div class="lockup"><div class="logo-big">${icon('seku', 48)}</div><span class="wordmark">seku seku</span></div><p class="muted bold">${esc(t('loading'))}</p></main>`;
   }
 
   function viewTerms() {

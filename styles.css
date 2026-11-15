@@ -193,6 +193,9 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .onboard { padding: calc(32px + env(safe-area-inset-top)) 20px 24px; }
 .onboard h1 { font-size: 32px; font-weight: 600; margin: 16px 0 6px; }
 .lead { font-size: 17px; font-weight: 500; color: var(--muted); line-height: 1.45; margin: 0 0 12px; }
+.lockup { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.center-col .lockup { align-items: center; }
+.wordmark { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; color: var(--ink); }
 .logo-big { width: 76px; height: 76px; border-radius: 22px; background: var(--sage); color: var(--ground); display: flex; align-items: center; justify-content: center; }
 .invite { padding: 14px 16px; }
 .field { display: block; }

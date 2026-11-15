@@ -4,7 +4,7 @@ window.UI_LANGS = ['lt', 'es', 'en'];
 
 window.STRINGS = {
   lt: {
-    appName: 'Seku Seku',
+    appName: 'seku seku',
     groupName: 'Šeštadieninė mokyklėlė',
     // onboarding
     welcomeTitle: 'Sveiki atvykę!',
@@ -82,7 +82,7 @@ window.STRINGS = {
   },
 
   es: {
-    appName: 'Seku Seku',
+    appName: 'seku seku',
     groupName: 'Escuela de los sábados',
     welcomeTitle: '¡Bienvenidos!',
     welcomeText: 'Comparte libros infantiles con otras familias de tu comunidad: intercambia, vende o regala.',
@@ -150,7 +150,7 @@ window.STRINGS = {
   },
 
   en: {
-    appName: 'Seku Seku',
+    appName: 'seku seku',
     groupName: 'Saturday School',
     welcomeTitle: 'Welcome!',
     welcomeText: "Share children's books with other families in your community – swap, sell or give them away.",
@@ -225,7 +225,7 @@ Object.assign(window.STRINGS.lt, {
   postalRequired: 'Įveskite pašto kodą.', nameRequired: 'Įveskite vardą.',
   acceptTerms: 'Perskaičiau ir sutinku su', termsLink: 'naudojimosi sąlygomis', termsRequired: 'Norėdami tęsti, sutikite su sąlygomis.',
   termsUpdated: 'Atnaujinome naudojimosi sąlygas. Peržiūrėkite ir sutikite, kad galėtumėte tęsti.',
-  p2pNote: 'Seku Seku tik padeda susirasti. Sandoris yra tarp jūsų – patikrinkite knygą prieš mokėdami.',
+  p2pNote: 'seku seku tik padeda susirasti. Sandoris yra tarp jūsų – patikrinkite knygą prieš mokėdami.',
   continue: 'Tęsti', viewTerms: 'Naudojimosi sąlygos', acceptedOn: 'Sutikote {date}',
   nearMe: 'Netoli manęs', sameArea: 'jūsų rajone', nearby: 'netoliese', location: 'Vieta', savePostal: 'Išsaugoti', saved: 'Išsaugota',
   fromWishlist: 'Iš jūsų norų sąrašo', wantYourBooks: 'Nori jūsų knygų', wantsCount: 'Nori {n} iš jūsų lentynos',
@@ -246,7 +246,7 @@ Object.assign(window.STRINGS.es, {
   postalRequired: 'Escribe tu código postal.', nameRequired: 'Escribe tu nombre.',
   acceptTerms: 'He leído y acepto las', termsLink: 'condiciones de uso', termsRequired: 'Para continuar, acepta las condiciones.',
   termsUpdated: 'Hemos actualizado las condiciones de uso. Revísalas y acéptalas para continuar.',
-  p2pNote: 'Seku Seku solo os pone en contacto. El trato es entre vosotros: revisa el libro antes de pagar.',
+  p2pNote: 'seku seku solo os pone en contacto. El trato es entre vosotros: revisa el libro antes de pagar.',
   continue: 'Continuar', viewTerms: 'Condiciones de uso', acceptedOn: 'Aceptadas el {date}',
   nearMe: 'Cerca de mí', sameArea: 'tu zona', nearby: 'cerca', location: 'Ubicación', savePostal: 'Guardar', saved: 'Guardado',
   fromWishlist: 'De tu lista de deseos', wantYourBooks: 'Quieren tus libros', wantsCount: 'Quiere {n} de tu estantería',
@@ -267,7 +267,7 @@ Object.assign(window.STRINGS.en, {
   postalRequired: 'Please enter your postal code.', nameRequired: 'Please enter your name.',
   acceptTerms: 'I have read and accept the', termsLink: 'Terms of use', termsRequired: 'Please accept the terms to continue.',
   termsUpdated: 'We have updated the terms of use. Please review and accept them to continue.',
-  p2pNote: 'Seku Seku only puts you in touch. The deal is between you – check the book before you pay.',
+  p2pNote: 'seku seku only puts you in touch. The deal is between you – check the book before you pay.',
   continue: 'Continue', viewTerms: 'Terms of use', acceptedOn: 'Accepted on {date}',
   nearMe: 'Near me', sameArea: 'your area', nearby: 'nearby', location: 'Location', savePostal: 'Save', saved: 'Saved',
   fromWishlist: 'From your wish list', wantYourBooks: 'They want your books', wantsCount: 'Wants {n} from your shelf',
@@ -342,7 +342,7 @@ Object.assign(window.STRINGS.en, {
   notFoundIsbn: 'ISBN {isbn} could not be found – no problem, add a few details.',
   foundLocalIsbn: 'ISBN {isbn}: another family already added this book – details copied.',
   photosLabel: 'Photos of your copy (1–{max})', photoN: 'Photo {n}', removePhoto: 'Remove photo',
-  photosHint: 'Photograph the cover and any wear and tear. Do not photograph the inside pages – Seku Seku is for physical books, not copies.',
+  photosHint: 'Photograph the cover and any wear and tear. Do not photograph the inside pages – seku seku is for physical books, not copies.',
   photoRequired: 'Please add at least one photo of your own copy.', maxPhotos: 'Up to {max} photos.'
 });
 Object.assign(window.STRINGS.lt, { copyBlocked: 'Knygų kopijomis ir failais dalintis negalima – tik popierinėmis knygomis.' });
@@ -569,10 +569,10 @@ Object.assign(window.STRINGS.en, {
   adminsTitle: 'Admins', adminsHint: 'Admins see reports and hidden listings, can remove or block members and send announcements to everyone. The person must have signed up first.',
   adminEmailPh: 'Email of the new admin', addAdmin: 'Add', adminAdded: 'Admin added.', removeAdmin: 'Remove', youLabel: '(you)',
   confirmRemoveAdmin: 'Remove admin rights from {name}?',
-  errBlocked: 'This account has been blocked. Contact Seku Seku if you think this is a mistake.',
+  errBlocked: 'This account has been blocked. Contact seku seku if you think this is a mistake.',
   errNoAccount: 'No account with that email yet – ask them to sign up first.', errLastAdmin: 'There must always be at least one admin.',
-  tl_announcement: 'News from Seku Seku', n_announcement: 'From Seku Seku: {text}', tl_report_new: 'New reports (admins)', tl_member_joined: 'New members (admins)',
-  reported: 'Reported to the Seku Seku admins.', handoverPh: 'Library or café nearby',
+  tl_announcement: 'News from seku seku', n_announcement: 'From seku seku: {text}', tl_report_new: 'New reports (admins)', tl_member_joined: 'New members (admins)',
+  reported: 'Reported to the seku seku admins.', handoverPh: 'Library or café nearby',
   defaultMsg: 'Hi! I would love these books. Where and when would suit you?',
   privacy: 'We only store your name, country, postal code and books. No addresses or phone numbers – you agree on a public place to meet.'
 });
@@ -583,10 +583,10 @@ Object.assign(window.STRINGS.lt, {
   adminsTitle: 'Administratoriai', adminsHint: 'Administratoriai mato pranešimus apie problemas ir paslėptus skelbimus, gali pašalinti ar užblokuoti narius ir siųsti pranešimus visiems. Žmogus pirmiausia turi užsiregistruoti.',
   adminEmailPh: 'Naujo administratoriaus el. paštas', addAdmin: 'Pridėti', adminAdded: 'Administratorius pridėtas.', removeAdmin: 'Pašalinti', youLabel: '(jūs)',
   confirmRemoveAdmin: 'Atimti administratoriaus teises iš {name}?',
-  errBlocked: 'Ši paskyra užblokuota. Jei manote, kad tai klaida, susisiekite su Seku Seku.',
+  errBlocked: 'Ši paskyra užblokuota. Jei manote, kad tai klaida, susisiekite su seku seku.',
   errNoAccount: 'Su šiuo el. paštu paskyros dar nėra – paprašykite pirmiausia užsiregistruoti.', errLastAdmin: 'Visada turi likti bent vienas administratorius.',
-  tl_announcement: 'Seku Seku naujienos', n_announcement: 'Seku Seku praneša: {text}', tl_report_new: 'Nauji pranešimai apie problemas (administratoriams)', tl_member_joined: 'Nauji nariai (administratoriams)',
-  reported: 'Pranešta Seku Seku administratoriams.', handoverPh: 'Biblioteka ar kavinė netoliese',
+  tl_announcement: 'seku seku naujienos', n_announcement: 'seku seku praneša: {text}', tl_report_new: 'Nauji pranešimai apie problemas (administratoriams)', tl_member_joined: 'Nauji nariai (administratoriams)',
+  reported: 'Pranešta seku seku administratoriams.', handoverPh: 'Biblioteka ar kavinė netoliese',
   defaultMsg: 'Labas! Norėčiau šių knygų. Kur ir kada jums patogu?',
   privacy: 'Saugome tik vardą, šalį, pašto kodą ir knygas. Jokių adresų ar telefonų – susitariate susitikti viešoje vietoje.'
 });
@@ -597,10 +597,10 @@ Object.assign(window.STRINGS.es, {
   adminsTitle: 'Administradores', adminsHint: 'Los administradores ven las denuncias y los anuncios ocultos, pueden eliminar o bloquear miembros y enviar avisos a todos. La persona debe haberse registrado antes.',
   adminEmailPh: 'Correo del nuevo administrador', addAdmin: 'Añadir', adminAdded: 'Administrador añadido.', removeAdmin: 'Quitar', youLabel: '(tú)',
   confirmRemoveAdmin: '¿Quitar los permisos de administrador a {name}?',
-  errBlocked: 'Esta cuenta está bloqueada. Contacta con Seku Seku si crees que es un error.',
+  errBlocked: 'Esta cuenta está bloqueada. Contacta con seku seku si crees que es un error.',
   errNoAccount: 'Aún no hay ninguna cuenta con ese correo: pídele que se registre primero.', errLastAdmin: 'Siempre debe haber al menos un administrador.',
-  tl_announcement: 'Novedades de Seku Seku', n_announcement: 'De Seku Seku: {text}', tl_report_new: 'Nuevas denuncias (administradores)', tl_member_joined: 'Nuevos miembros (administradores)',
-  reported: 'Denunciado a los administradores de Seku Seku.', handoverPh: 'Biblioteca o cafetería cercana',
+  tl_announcement: 'Novedades de seku seku', n_announcement: 'De seku seku: {text}', tl_report_new: 'Nuevas denuncias (administradores)', tl_member_joined: 'Nuevos miembros (administradores)',
+  reported: 'Denunciado a los administradores de seku seku.', handoverPh: 'Biblioteca o cafetería cercana',
   defaultMsg: '¡Hola! Me gustarían estos libros. ¿Dónde y cuándo te viene bien?',
   privacy: 'Solo guardamos tu nombre, país, código postal y libros. Sin direcciones ni teléfonos: quedáis en un lugar público.'
 });

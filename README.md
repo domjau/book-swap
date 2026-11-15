@@ -1,4 +1,4 @@
-# Seku Seku – book swap (prototype)
+# seku seku – book swap (prototype)
 
 A small web app for diaspora communities (starting with a Lithuanian Saturday school) to **swap, sell or give away children's books**. Families browse each other's shelves by book language, topic and age, bundle several books from the same person into one request, agree on the details in a chat, and hand the books over at school.
 
@@ -9,7 +9,7 @@ There are two modes:
 
 ## Brand
 
-The app is called **Seku Seku** (logo always lowercase: *seku seku*), from the Lithuanian tale opening *"Seku seku pasaką…"*. Logos, app icons, favicons, the share image and the email logo are in [`brand/`](brand/); colours, type and spacing are in [`brand/tokens.css`](brand/tokens.css) and mirrored in `styles.css`.
+The app is called **seku seku**, always written in lowercase (also at the start of a sentence), from the Lithuanian tale opening *"Seku seku pasaką…"*. Logos, app icons, favicons, the share image and the email logo are in [`brand/`](brand/); colours, type and spacing are in [`brand/tokens.css`](brand/tokens.css) and mirrored in `styles.css`.
 
 - Colours (palette "Summer meadow"): cream `#F7F3E8`, paper `#FFFDF8`, sage `#5C7A61`, honey `#E3C16F`, rosehip `#C77B6A`, ink `#2E2E2A`.
 - Font: [Outfit](https://fonts.google.com/specimen/Outfit) 400/500/600.
@@ -50,7 +50,7 @@ The camera only works over HTTPS or on `localhost`.
 - **No piracy:** only physical books. The chat blocks e-book files and file-sharing links, and the terms forbid sharing copies. See [docs/COPYRIGHT.md](docs/COPYRIGHT.md).
 - **Wish lists and tailored exchanges:** add books you're looking for (scan, search or type). See "From your wish list" and "They want your books" on the home screen. A member's page pre-ticks a fair swap: their books you want, and your books they want.
 - **Neighbours first:** members give their country and postal code, never an address. The country list is shown in the app language, and postal codes are checked for common countries (DK, LT, ES, DE, UK, NL…). Books show the owner's area, a *Near me* filter is available, and lists are sorted nearest first to avoid shipping.
-- **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that Seku Seku is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
+- **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that seku seku is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
 - **Reviews with little books:** after a handover, each side rates the other 1–5 little books, with an optional comment. Ratings appear on profiles, member pages and book pages.
 - **Profile pictures** and **sold / donated / exchanged** counts for every member.
 - **Notifications:** a bell with the latest updates. At sign-up and in the profile, each person chooses which of 10 types they get in the app and/or by email, and whether emails come right away, once a day, or never.
