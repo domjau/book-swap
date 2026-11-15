@@ -83,6 +83,8 @@ Why Supabase: a free tier that fits a few hundred families, Postgres with row-le
 ### Data model
 
 ```sql
+-- Since migration 005 there is a single open network: one row in groups (network_id()),
+-- everyone joins it with join_network(), and moderation is done by platform_admins.
 groups        (id uuid pk, name text, created_by uuid, handover_place text, created_at)
 group_invites (id uuid pk, group_id fk, code_hash text, expires_at, revoked bool)
 members       (group_id fk, user_id fk → auth.users, role text check (role in ('member','organiser')),

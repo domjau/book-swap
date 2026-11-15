@@ -32,15 +32,14 @@
 | "From your wish list" and "They want your books" rows | ✅ |
 | Member page with tailored offer: their books you want + your books they want, pre-ticked | ✅ |
 | "Wanted by …" on your own books, "On your wish list" on others' | ✅ |
-| Real accounts, shared database, invite-only groups | 🟠 |
-| In-app notifications (bell) for 10 member types + 2 organiser types, chat notifications bundled | ✅ |
+| Real accounts, shared database, one open network with open sign-up | ✅ |
+| In-app notifications (bell) for 10 member types + 2 admin types, chat notifications bundled | ✅ |
 | Notification choices per type (app / email) at sign-up and in profile; email right away / daily / never | ✅ |
 | Email notifications in the member's language (Edge Function, scheduled) | ✅ (needs setup) |
 | Handover reminder the day before | ✅ (needs schedule) |
 | Push notifications on the phone | ⚪ |
 | Reports with reasons (didn't show up, inappropriate, piracy, spam, safety, other) on chats, listings and members | ✅ |
-| Organiser panel: stats, announcements, members (roles, remove, block), reports (read reported chat, hide listing, resolve), invites (create, revoke), group settings, moderation log | ✅ |
-| Platform admin: all groups, all open reports, delete group | ✅ |
+| Admin panel: stats, announcements to everyone, members (remove, block), reports (read reported chat, hide listing, resolve), admins (add by email, remove), moderation log | ✅ |
 | Installable PWA with offline shell | 🟠 (manifest done) |
 
 ## Finding books
@@ -63,7 +62,7 @@
 | Feature | Status |
 |---|---|
 | Group stats ("120 books swapped this year") | ⚪ |
-| Book of the month (organiser pick) | ⚪ |
+| Book of the month (admin pick) | ⚪ |
 | Short reviews / "my kids loved this" | ⚪ |
 | Swap-day events: mark what you'll bring | ⚪ |
 | Yearly recap card | ⚪ |
@@ -72,7 +71,6 @@
 ## Later / bigger
 | Feature | Status |
 |---|---|
-| Members in several groups (school + playgroup) | ⚪ |
 | Auto-translate chat messages | ⚪ |
 | AI-written description when none is found | ⚪ |
 | Payment link (MobilePay / Bizum / PayPal handle) | ⚪ |

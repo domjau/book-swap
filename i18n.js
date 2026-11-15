@@ -560,3 +560,47 @@ Object.assign(window.STRINGS.es, {
 Object.assign(window.STRINGS.en, { booksN: 'books' });
 Object.assign(window.STRINGS.lt, { booksN: 'knygos' });
 Object.assign(window.STRINGS.es, { booksN: 'libros' });
+
+/* Open network: no communities or organisers; moderation by admins */
+Object.assign(window.STRINGS.en, {
+  tagline: 'Swap books in your language',
+  welcomeText: "Share children's books with other families nearby – swap, sell or give them away.",
+  adminTitle: 'Admin panel', openAdmin: 'Admin panel', tabAdmins: 'Admins', tabLog: 'Log',
+  adminsTitle: 'Admins', adminsHint: 'Admins see reports and hidden listings, can remove or block members and send announcements to everyone. The person must have signed up first.',
+  adminEmailPh: 'Email of the new admin', addAdmin: 'Add', adminAdded: 'Admin added.', removeAdmin: 'Remove', youLabel: '(you)',
+  confirmRemoveAdmin: 'Remove admin rights from {name}?',
+  errBlocked: 'This account has been blocked. Contact Book Swap if you think this is a mistake.',
+  errNoAccount: 'No account with that email yet – ask them to sign up first.', errLastAdmin: 'There must always be at least one admin.',
+  tl_announcement: 'News from Book Swap', n_announcement: 'From Book Swap: {text}', tl_report_new: 'New reports (admins)', tl_member_joined: 'New members (admins)',
+  reported: 'Reported to the Book Swap admins.', handoverPh: 'Library or café nearby',
+  defaultMsg: 'Hi! I would love these books. Where and when would suit you?',
+  privacy: 'We only store your name, country, postal code and books. No addresses or phone numbers – you agree on a public place to meet.'
+});
+Object.assign(window.STRINGS.lt, {
+  tagline: 'Keiskis knygomis savo kalba',
+  welcomeText: 'Dalinkitės vaikiškomis knygomis su šeimomis netoliese – mainykite, parduokite ar padovanokite.',
+  adminTitle: 'Administravimas', openAdmin: 'Administravimas', tabAdmins: 'Administratoriai', tabLog: 'Žurnalas',
+  adminsTitle: 'Administratoriai', adminsHint: 'Administratoriai mato pranešimus apie problemas ir paslėptus skelbimus, gali pašalinti ar užblokuoti narius ir siųsti pranešimus visiems. Žmogus pirmiausia turi užsiregistruoti.',
+  adminEmailPh: 'Naujo administratoriaus el. paštas', addAdmin: 'Pridėti', adminAdded: 'Administratorius pridėtas.', removeAdmin: 'Pašalinti', youLabel: '(jūs)',
+  confirmRemoveAdmin: 'Atimti administratoriaus teises iš {name}?',
+  errBlocked: 'Ši paskyra užblokuota. Jei manote, kad tai klaida, susisiekite su Knygų keitykla.',
+  errNoAccount: 'Su šiuo el. paštu paskyros dar nėra – paprašykite pirmiausia užsiregistruoti.', errLastAdmin: 'Visada turi likti bent vienas administratorius.',
+  tl_announcement: 'Knygų keityklos naujienos', n_announcement: 'Knygų keitykla praneša: {text}', tl_report_new: 'Nauji pranešimai apie problemas (administratoriams)', tl_member_joined: 'Nauji nariai (administratoriams)',
+  reported: 'Pranešta Knygų keityklos administratoriams.', handoverPh: 'Biblioteka ar kavinė netoliese',
+  defaultMsg: 'Labas! Norėčiau šių knygų. Kur ir kada jums patogu?',
+  privacy: 'Saugome tik vardą, šalį, pašto kodą ir knygas. Jokių adresų ar telefonų – susitariate susitikti viešoje vietoje.'
+});
+Object.assign(window.STRINGS.es, {
+  tagline: 'Intercambia libros en tu idioma',
+  welcomeText: 'Comparte libros infantiles con familias cercanas: intercambia, vende o regala.',
+  adminTitle: 'Panel de administración', openAdmin: 'Panel de administración', tabAdmins: 'Administradores', tabLog: 'Registro',
+  adminsTitle: 'Administradores', adminsHint: 'Los administradores ven las denuncias y los anuncios ocultos, pueden eliminar o bloquear miembros y enviar avisos a todos. La persona debe haberse registrado antes.',
+  adminEmailPh: 'Correo del nuevo administrador', addAdmin: 'Añadir', adminAdded: 'Administrador añadido.', removeAdmin: 'Quitar', youLabel: '(tú)',
+  confirmRemoveAdmin: '¿Quitar los permisos de administrador a {name}?',
+  errBlocked: 'Esta cuenta está bloqueada. Contacta con Intercambio de libros si crees que es un error.',
+  errNoAccount: 'Aún no hay ninguna cuenta con ese correo: pídele que se registre primero.', errLastAdmin: 'Siempre debe haber al menos un administrador.',
+  tl_announcement: 'Novedades de Intercambio de libros', n_announcement: 'De Intercambio de libros: {text}', tl_report_new: 'Nuevas denuncias (administradores)', tl_member_joined: 'Nuevos miembros (administradores)',
+  reported: 'Denunciado a los administradores de Intercambio de libros.', handoverPh: 'Biblioteca o cafetería cercana',
+  defaultMsg: '¡Hola! Me gustarían estos libros. ¿Dónde y cuándo te viene bien?',
+  privacy: 'Solo guardamos tu nombre, país, código postal y libros. Sin direcciones ni teléfonos: quedáis en un lugar público.'
+});

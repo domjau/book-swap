@@ -39,9 +39,9 @@ The prototype is therefore not a place to put real personal data. Anyone with ac
 ## Live version (Supabase)
 
 - `config.js` contains only the **publishable** key, which is designed to be public. All access control is in the database (see `supabase/migrations/001_init.sql`): RLS on every table, column-level grants, and status changes only through checked functions. The `service_role` / secret key is never used by the app.
-- `supabase/tests/rls_test.sh` runs 107 cross-user and cross-group checks, and all pass.
+- `supabase/tests/rls_test.sh` runs 107 cross-user and cross-group checks, and `supabase/tests/network_test.sh` runs 46 checks for the open network and admin powers; all pass.
 - Photos are in a private bucket and displayed via signed URLs that expire after 1 hour.
-- Organiser and platform-admin powers exist only as checked database functions, and every organiser action is written to a moderation log. Organisers can read a chat only after it has been reported.
+- Admin powers exist only as checked database functions (`is_platform_admin()`), and every admin action is written to a moderation log. Admins can read a conversation only after it has been reported. Admins are added only by another admin, and the last admin can't be removed.
 - The email sender (Edge Function) uses the service-role key **on the server only**, is protected by its own secret, and HTML-escapes everything it puts in an email.
 - Sign-in is passwordless (email OTP). The sign-in tokens are removed from the address bar right after login.
 
@@ -51,17 +51,17 @@ The production version adds a backend (planned: Supabase with Postgres, auth, st
 
 ### Accounts and access
 - [ ] **Passwordless sign-in**: email magic link or passkeys. No passwords to leak or reuse.
-- [ ] **Invite-only groups**: invite codes are random, stored hashed, expire, and can be revoked by the organiser.
+- [x] **Open sign-up, signed-in only**: anyone can join with their email, but nothing is visible without signing in and accepting the terms. Blocked accounts can't rejoin.
 - [ ] **Row-level security (RLS) on every table**, so members can only read their own group's books and their own requests and messages. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#row-level-security) for the policies.
 - [ ] **Automated tests for RLS**: a user from group A must not be able to read group B's books or anyone else's messages.
 - [ ] Status changes (accept, schedule handover, mark done) go through server-side functions that check who may do what. The client cannot simply set `status = 'done'`.
 - [ ] The `service_role` key and other secrets are **never** shipped in client code and are kept only in server-side environment variables.
 
 ### Abuse and safety
-- [ ] Report and block in chat, with reports going to the group organiser.
+- [ ] Report and block in chat, with reports going to the admins.
 - [ ] Rate limits on messages, requests and sign-in emails.
 - [ ] Links in chat are shown as text (or need an extra tap), to blunt phishing.
-- [ ] The organiser can hide listings and remove members.
+- [x] Admins can hide listings and remove or block members.
 
 ### Files
 - [ ] The photo bucket is **private**, and photos are served only through short-lived signed URLs.

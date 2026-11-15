@@ -19,8 +19,8 @@ export const TEXT = {
     request_accepted: '{name} accepted your request', request_declined: '{name} declined your request',
     handover_set: 'Handover with {name}: {when}, {where}', handover_reminder: 'Reminder: handover with {name} tomorrow – {where}',
     exchange_done: 'Exchange with {name} is done – leave a review', wish_match: '"{title}" from your wish list was listed by {name}',
-    wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From your organiser: {text}',
-    report_new: 'New report in your group', member_joined: '{name} joined the group'
+    wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From Book Swap: {text}',
+    report_new: 'New report on Book Swap', member_joined: '{name} joined the group'
   },
   lt: {
     subjectOne: 'Knygų keitykla: {text}', subjectMany: 'Knygų keitykla: {n} nauji pranešimai', hello: 'Labas, {name},', open: 'Atidaryti Knygų keityklą',
@@ -29,8 +29,8 @@ export const TEXT = {
     request_accepted: '{name} priėmė jūsų prašymą', request_declined: '{name} atmetė jūsų prašymą',
     handover_set: 'Perdavimas su {name}: {when}, {where}', handover_reminder: 'Priminimas: rytoj perdavimas su {name} – {where}',
     exchange_done: 'Mainai su {name} baigti – įvertinkite', wish_match: '„{title}“ iš jūsų norų sąrašo pasiūlė {name}',
-    wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'Organizatorius praneša: {text}',
-    report_new: 'Naujas pranešimas apie problemą jūsų grupėje', member_joined: '{name} prisijungė prie grupės'
+    wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'Knygų keitykla praneša: {text}',
+    report_new: 'Naujas pranešimas apie problemą Knygų keitykloje', member_joined: '{name} prisijungė prie grupės'
   },
   es: {
     subjectOne: 'Intercambio de libros: {text}', subjectMany: 'Intercambio de libros: {n} notificaciones nuevas', hello: 'Hola, {name}:', open: 'Abrir Intercambio de libros',
@@ -39,8 +39,8 @@ export const TEXT = {
     request_accepted: '{name} ha aceptado tu pedido', request_declined: '{name} ha rechazado tu pedido',
     handover_set: 'Entrega con {name}: {when}, {where}', handover_reminder: 'Recordatorio: mañana entrega con {name} – {where}',
     exchange_done: 'Intercambio con {name} completado: deja tu valoración', wish_match: '{name} ha anunciado «{title}», de tu lista de deseos',
-    wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'Del organizador: {text}',
-    report_new: 'Nueva denuncia en tu grupo', member_joined: '{name} se ha unido al grupo'
+    wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'De Intercambio de libros: {text}',
+    report_new: 'Nueva denuncia en Intercambio de libros', member_joined: '{name} se ha unido al grupo'
   }
 };
 

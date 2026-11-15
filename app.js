@@ -103,7 +103,7 @@
   const langName = (code) => (STRINGS[S.lang].langNames[code] || STRINGS[S.lang].langNames.other);
   const topicName = (id) => (TOPIC[id] ? (TOPIC[id].names[S.lang] || TOPIC[id].names.en) : id);
   const memberName = (id) => (id === MINE ? (S.me ? S.me.name : '') : (MEMBERS[id] ? MEMBERS[id].name : '—'));
-  const groupLabel = () => (LIVE && live.group && live.group.name ? live.group.name : t('groupName'));
+  const groupLabel = () => t('tagline'); // one open network – no community names
   const firstName = (id) => memberName(id).split(' (')[0];
   const fmtDate = (d) => new Intl.DateTimeFormat(S.lang, { weekday: 'short', day: 'numeric', month: 'short' }).format(d);
   const fmtTime = (ms) => new Intl.DateTimeFormat(S.lang, { hour: '2-digit', minute: '2-digit' }).format(new Date(ms));
@@ -259,8 +259,7 @@
       <h1>${esc(t('welcomeTitle'))}</h1>
       ${S.me ? `<div class="notice warn">${esc(S.agreed && S.agreed.version === TERMS.version ? t('profileIncomplete') : t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
-      ${LIVE ? (live.group ? `<div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(groupLabel())}</div></div>` : onbGroupSection())
-        : `<div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(t('groupName'))}</div></div>`}
+
       <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
       <div class="field"><span class="label">${esc(t('interestedLangs'))}</span><div class="row-wrap">${interests}</div></div>
       <label class="field"><span class="label">${esc(t('yourName'))}</span>
@@ -276,7 +275,7 @@
       <label class="toggle agree"><input id="onb-agree" type="checkbox" data-action="toggleAgree" ${ui.onbAgree ? 'checked' : ''}>
         <span>${esc(t('acceptTerms'))} <a class="ulink" href="#/terms">${esc(t('termsLink'))}</a></span></label>
       ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
-      <button class="btn primary big" data-action="join" ${LIVE && live.busy ? 'disabled' : ''}>${esc(LIVE && live.busy ? t('loading') : (S.me ? t('continue') : (LIVE && ui.onbMode === 'start' ? t('startGroup') : t('join'))))}</button>
+      <button class="btn primary big" data-action="join" ${LIVE && live.busy ? 'disabled' : ''}>${esc(LIVE && live.busy ? t('loading') : (S.me ? t('continue') : t('join')))}</button>
       ${LIVE ? `<p class="muted small center">${esc(t('signedInAs', { email: live.email }))} · <button class="link small" data-action="signOut">${esc(t('signOut'))}</button></p>` : `<p class="muted small center">${esc(t('demoNote'))}</p>`}
     </main>`;
   }
@@ -569,7 +568,7 @@
     } else if (th.status === 'accepted') {
       control = `<div class="handover"><div class="h3">${icon('calendar', 20)} ${esc(t('handover'))}</div>
         <div class="row-gap"><label class="sr" for="hdate">${esc(t('handover'))}</label><input id="hdate" type="date" class="input" value="${nextSaturdayISO()}">
-        <label class="sr" for="hwhere">${esc(t('handoverPh'))}</label><input id="hwhere" class="input grow" maxlength="60" value="${esc((LIVE && live.group && live.group.handover_place) || (S.groupSettings && S.groupSettings.handover_place) || t('handoverPh'))}"></div>
+        <label class="sr" for="hwhere">${esc(t('handoverPh'))}</label><input id="hwhere" class="input grow" maxlength="60" value="${esc(t('handoverPh'))}"></div>
         <button class="btn primary" data-action="confirmHandover" data-v="${esc(th.id)}">${esc(t('confirmHandover'))}</button>
         <div class="muted small">${esc(t('reminderNote'))}</div></div>`;
     } else if (th.status === 'scheduled') {
@@ -746,7 +745,7 @@
     return `<main class="pad">
       <div class="row-gap"><label class="avatar-edit" title="${esc(t('changeAvatar'))}">${avatarHtml(MINE)}<span class="avatar-cam">${icon('camera', 14)}</span>
           <input type="file" accept="image/*" class="sr" data-change="avatar" aria-label="${esc(t('changeAvatar'))}"></label>
-        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: groupLabel() }))}</div><div class="muted small">${icon('pin', 12)} ${esc((S.me.postal || '') + ', ' + countryName(S.me.country))}</div></div></div>
+        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted small">${icon('pin', 12)} ${esc((S.me.postal || '') + ', ' + countryName(S.me.country))}</div></div></div>
       ${!S.me.avatar ? `<p class="muted small">${icon('camera', 14)} ${esc(t('avatarHint'))}</p>` : ''}
       <div class="my-rating">${ratingHtml(MINE, 18)}</div>
       <div class="stats six">${stat(mine.length, 'statListed')}${stat(dealCounts(MINE).sold, 'statSold')}${stat(dealCounts(MINE).donated, 'statDonated')}${stat(dealCounts(MINE).swapped, 'statSwapped')}${stat(S.received.length, 'statReceived')}${stat('€' + saved, 'statSaved')}</div>
@@ -755,12 +754,6 @@
       ${langBars ? `<section class="card pad-m"><h2 class="h3">${esc(t('langMix'))}</h2>${langBars}</section>` : ''}
       ${top ? `<section class="card pad-m"><h2 class="h3">${esc(t('topTopics'))}</h2><div class="row-wrap">${top}</div></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('badges'))}</h2><div class="badges">${badges}</div></section>
-      ${LIVE && live.group && live.group.role === 'organiser' ? `<section class="card pad-m invite-card"><h2 class="h3">${icon('user', 20)} ${esc(t('inviteTitle'))}</h2>
-        ${live.newInvite ? `<div class="invite-code">${esc(live.newInvite)}</div>
-          <p class="muted small">${esc(t('inviteShare'))}</p>
-          <button class="btn primary" data-action="copyInvite">${icon('send', 20)} ${esc(t('copyLink'))}</button>`
-        : `<p class="muted small">${esc(t('inviteHint'))}</p><button class="btn ghost" data-action="createInvite">${icon('plus', 20)} ${esc(t('createInvite'))}</button>`}
-      </section>` : ''}
       <section class="card pad-m"><h2 class="h3">${icon('pin', 20)} ${esc(t('location'))}</h2>
         <label class="label" for="p-country">${esc(t('country'))}</label>
         <select id="p-country" class="input" autocomplete="country">${countryOptions(S.me.country)}</select>
@@ -779,7 +772,6 @@
       <section class="card pad-m" id="notif-settings"><h2 class="h3">${esc(t('notifSettings'))}</h2><p class="muted small">${esc(t('notifSettingsHint'))}</p>${prefsEditor(isOrganiser())}
         <button class="btn primary" data-action="savePrefs">${esc(t('saveSettings'))}</button></section>
       ${isOrganiser() ? `<a class="btn ghost big" href="#/admin">${icon('shield', 20)} ${esc(t('openAdmin'))}</a>` : ''}
-      ${(LIVE && live.isAdmin) ? `<a class="btn ghost big" href="#/platform">${icon('shield', 20)} ${esc(t('openPlatform'))}</a>` : ''}
       <h2 class="h2">${esc(t('myShelf'))}</h2>
       ${mine.length ? `<div class="grid">${mine.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('shelfEmpty'))}</div>`}
       <section class="card pad-m"><h2 class="h3">${esc(t('settings'))}</h2>
@@ -821,7 +813,7 @@
     else {
       const v = { '': viewBrowse, book: () => viewBook(r.id), requests: viewRequests, messages: viewMessages,
         chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms,
-        notifications: viewNotifications, admin: () => viewAdmin(r.id), platform: viewPlatform }[r.name] || viewBrowse;
+        notifications: viewNotifications, admin: () => viewAdmin(r.id), platform: () => viewAdmin('admins') }[r.name] || viewBrowse;
       body = header() + v() + nav(r.name);
     }
     $app.innerHTML = body + reportSheet() + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
@@ -1381,6 +1373,9 @@
     if (/rate limit|only request this/i.test(m)) return t('errRateLimit');
     if (/token.*(expired|invalid)|otp/i.test(m)) return t('codeInvalid');
     if (/not authorized|not allowed for this/i.test(m)) return t('errEmailNotAllowed');
+    if (/blocked/i.test(m)) return t('errBlocked');
+    if (/sign up first/i.test(m)) return t('errNoAccount');
+    if (/at least one admin/i.test(m)) return t('errLastAdmin');
     if (/failed to fetch|network/i.test(m)) return t('errOffline');
     if (m === 'groupNameRequired' || m === 'inviteRequired') return t(m);
     return t('errGeneric') + ' (' + m.slice(0, 120) + ')';
@@ -1521,19 +1516,12 @@
       if (live.group) {
         await Backend.updateProfile(live.group.id, live.uid, { display_name: name, country: country, postal_code: postal, interested_langs: S.interested });
         await Backend.acceptTerms(live.group.id, TERMS.version);
-      } else if (ui.onbMode === 'start') {
-        p.groupName = String(ui.onbGroup || '').trim();
-        if (p.groupName.length < 2) throw new Error('groupNameRequired');
-        const r = await Backend.createGroup(p);
-        live.newInvite = r && r.invite_code;
       } else {
-        p.code = String(live.invite || '').trim();
-        if (!p.code) throw new Error('inviteRequired');
-        await Backend.joinGroup(p);
+        await Backend.joinNetwork(p); // open sign-up: everyone joins the one network
       }
       await Backend.savePrefs(live.uid, Object.assign({ lang: S.lang }, S.notifPrefs)).catch(() => {});
       await loadMembership(); await refreshAll();
-      location.hash = live.newInvite ? '#/admin/invites' : '#/';
+      location.hash = '#/';
     } catch (e) { ui.onbError = friendlyError(e); }
     finally { live.busy = false; render(); }
   }
@@ -1649,7 +1637,7 @@
   if (!S.notifPrefs) S.notifPrefs = DEFAULT_PREFS();
   if (!S.notifications) S.notifications = LIVE ? [] : clone(window.SAMPLE_NOTIFS || []);
   if (!S.reports) S.reports = LIVE ? [] : clone(window.SAMPLE_REPORTS || []);
-  const isOrganiser = () => (LIVE ? !!(live.group && live.group.role === 'organiser') : true);
+  const isOrganiser = () => (LIVE ? !!live.isAdmin : true); // moderation is done by platform admins
 
   function notifText(n) {
     const d = n.data || {};
@@ -1727,7 +1715,7 @@
       stats: { members: Object.keys(MEMBERS).length + 1, books_available: S.books.filter((b) => b.status === 'available' && !b.hidden).length,
         books_gone_year: S.books.filter((b) => b.status === 'gone').length, requests_open: S.threads.filter((x) => ['pending', 'accepted', 'scheduled'].indexOf(x.status) >= 0).length,
         reports_open: S.reports.filter((r) => !r.resolved).length, hidden_books: S.books.filter((b) => b.hidden).length },
-      invites: S.demoInvites || (S.demoInvites = [{ id: 'i1', created_at: now - 5 * 864e5, expires_at: now + 25 * 864e5, revoked: false }]),
+      admins: S.demoAdmins || (S.demoAdmins = [{ id: MINE, email: 'you@example.com', name: S.me ? S.me.name : '', self: true }]),
       reports: S.reports, log: S.modLog || (S.modLog = []), bans: S.demoBans || (S.demoBans = []) };
   }
   async function loadAdmin() {
@@ -1736,9 +1724,9 @@
     try {
       if (LIVE) {
         const g = live.group.id;
-        const res = await Promise.all([Backend.orgStats(g), Backend.orgInvites(g), Backend.orgReports(g), Backend.orgLog(g), Backend.orgBans(g)]);
+        const res = await Promise.all([Backend.orgStats(g), Backend.adminList(), Backend.orgReports(g), Backend.orgLog(g), Backend.orgBans(g)]);
         ui.adm = { loaded: true, ctx: ui.adm.ctx || {}, stats: res[0],
-          invites: res[1].map((i) => ({ id: i.id, created_at: Date.parse(i.created_at), expires_at: i.expires_at ? Date.parse(i.expires_at) : 0, revoked: i.revoked })),
+          admins: res[1].map((x) => ({ id: x.user_id, email: x.email, name: x.display_name, self: x.user_id === live.uid })),
           reports: res[2].map((r) => ({ id: r.id, from: r.reporter_id === live.uid ? MINE : r.reporter_id, type: r.target_type, target: r.target_id, cat: r.category, text: r.reason,
             at: Date.parse(r.created_at), resolved: !!r.resolved_at, resolution: r.resolution })),
           log: res[3].map((l) => ({ actor: l.actor_id === live.uid ? MINE : l.actor_id, action: l.action, target: l.target, reason: l.reason, at: Date.parse(l.created_at) })),
@@ -1756,7 +1744,7 @@
     if (!isOrganiser()) return `<main class="pad">${esc(t('noResults'))}</main>`;
     if (!ui.adm || !ui.adm.loaded) { setTimeout(loadAdmin, 0); return `<main class="pad"><h1 class="h1">${esc(t('adminTitle'))}</h1><p class="muted">${esc(t('loading'))}</p></main>`; }
     const a = ui.adm; tab = tab || 'overview';
-    const tabs = ['overview', 'members', 'reports', 'invites', 'settings'].map((k) => `<a class="pill ${tab === k ? 'on' : ''}" href="#/admin/${k}">${esc(t('tab' + k[0].toUpperCase() + k.slice(1)))}${k === 'reports' && a.stats && a.stats.reports_open ? ` <span class="count-inline">${a.stats.reports_open}</span>` : ''}</a>`).join('');
+    const tabs = ['overview', 'members', 'reports', 'admins', 'log'].map((k) => `<a class="pill ${tab === k ? 'on' : ''}" href="#/admin/${k}">${esc(t('tab' + k[0].toUpperCase() + k.slice(1)))}${k === 'reports' && a.stats && a.stats.reports_open ? ` <span class="count-inline">${a.stats.reports_open}</span>` : ''}</a>`).join('');
     let body = '';
     if (a.error) body = `<div class="notice warn">${esc(a.error)}</div>`;
     else if (tab === 'overview') {
@@ -1768,13 +1756,12 @@
           <button class="btn primary" data-action="admAnnounce">${icon('send', 20)} ${esc(t('announceSend'))}</button></section>`;
     } else if (tab === 'members') {
       const ids = [MINE].concat(Object.keys(MEMBERS));
-      const role = (id) => (id === MINE ? (LIVE ? live.group.role : 'organiser') : ((MEMBERS[id] && MEMBERS[id].role) || 'member'));
+      const role = () => 'member';
       body = `<div class="adm-list">${ids.map((id) => {
         const r = role(id); const listed = S.books.filter((b) => b.owner === id && b.status === 'available').length;
         return `<div class="adm-row">${avatarHtml(id, 'sm')}<div class="grow"><div class="bold">${id === MINE ? esc(memberName(id)) : memberLink(id)} ${r === 'organiser' ? `<span class="badge b-swap">${esc(t('roleOrganiser'))}</span>` : ''}</div>
           <div class="muted small">${icon('pin', 12)} ${esc(near(id).label || (S.me && S.me.postal) || '')} · ${listed} ${esc(t('booksN'))}</div>${ratingHtml(id, 12)}</div>
-          ${id === MINE ? '' : `<div class="adm-actions"><button class="btn ghost sm" data-action="admRole" data-v="${esc(id)}" data-role="${r === 'organiser' ? 'member' : 'organiser'}">${esc(t(r === 'organiser' ? 'makeMember' : 'makeOrganiser'))}</button>
-            <button class="btn danger sm" data-action="admRemove" data-v="${esc(id)}">${esc(t('removeMember'))}</button></div>`}</div>`;
+          ${id === MINE ? '' : `<div class="adm-actions"><button class="btn danger sm" data-action="admRemove" data-v="${esc(id)}">${esc(t('removeMember'))}</button></div>`}</div>`;
       }).join('')}</div>
       ${a.bans && a.bans.length ? `<h2 class="h3">${esc(t('bannedTitle'))}</h2><div class="adm-list">${a.bans.map((b) => `<div class="adm-row"><div class="grow"><div class="bold">${esc(b.name || b.user.slice(0, 8))}</div><div class="muted small">${esc(b.reason)}</div></div><button class="btn ghost sm" data-action="admUnban" data-v="${esc(b.user)}">${esc(t('unban'))}</button></div>`).join('')}</div>` : ''}`;
     } else if (tab === 'reports') {
@@ -1793,25 +1780,19 @@
       body = (open.length ? `<h2 class="h3">${esc(t('openReports'))}</h2>${open.map(card).join('')}` : `<div class="card pad-m empty">${esc(t('noReports'))}</div>`) +
         (hidden.length ? `<h2 class="h3">${esc(t('hiddenListings'))}</h2><div class="adm-list">${hidden.map((b) => `<div class="adm-row">${cover(b, 'xs')}<div class="grow"><a class="bold ulink" href="#/book/${esc(b.id)}">${esc(b.title)}</a><div class="muted small">${esc(memberName(b.owner))}</div></div><button class="btn ghost sm" data-action="admHide" data-v="${esc(b.id)}" data-hide="0">${esc(t('unhideListing'))}</button></div>`).join('')}</div>` : '') +
         (done.length ? `<h2 class="h3">${esc(t('resolvedReports'))}</h2>${done.map(card).join('')}` : '');
-    } else if (tab === 'invites') {
-      const now = Date.now();
-      body = `<section class="card pad-m invite-card">${live.newInvite ? `<div class="invite-code">${esc(live.newInvite)}</div><p class="muted small">${esc(t('inviteShare'))}</p><button class="btn primary" data-action="copyInvite">${icon('send', 20)} ${esc(t('copyLink'))}</button>`
-          : `<p class="muted small">${esc(t('inviteHint'))}</p><button class="btn primary" data-action="createInvite">${icon('plus', 20)} ${esc(t('createInvite'))}</button>`}</section>
-        <h2 class="h3">${esc(t('invitesTitle'))}</h2><div class="adm-list">${(a.invites || []).map((i) => {
-          const status = i.revoked ? t('inviteRevoked') : (i.expires_at && i.expires_at < now ? t('inviteExpired') : t('inviteExpires', { date: fmtDate(new Date(i.expires_at)) }));
-          return `<div class="adm-row"><div class="grow"><div class="small bold">${esc(fmtDate(new Date(i.created_at)))}</div><div class="muted small">${esc(status)}</div></div>${!i.revoked && (!i.expires_at || i.expires_at > now) ? `<button class="btn ghost sm" data-action="admRevoke" data-v="${esc(i.id)}">${esc(t('revoke'))}</button>` : ''}</div>`;
-        }).join('')}</div>`;
-    } else if (tab === 'settings') {
-      const g = LIVE ? live.group : (S.groupSettings || (S.groupSettings = { name: t('groupName'), handover_place: t('handoverPh'), handover_day: 'sat' }));
-      body = `<section class="card pad-m"><h2 class="h3">${esc(t('groupSettings'))}</h2>
-          <label class="label" for="gs-name">${esc(t('groupNameLabel'))}</label><input id="gs-name" class="input" maxlength="80" value="${esc(g.name || '')}">
-          <label class="label" for="gs-place">${esc(t('handoverPlace'))}</label><input id="gs-place" class="input" maxlength="80" value="${esc(g.handover_place || '')}">
-          <label class="label" for="gs-day">${esc(t('handoverDay'))}</label><select id="gs-day" class="input"><option value="">${esc(t('anyDay'))}</option>${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((d) => `<option value="${d}"${g.handover_day === d ? ' selected' : ''}>${esc(t('days')[d])}</option>`).join('')}</select>
-          <button class="btn primary" data-action="admSaveGroup">${esc(t('saveSettings'))}</button></section>
-        <section class="card pad-m"><h2 class="h3">${esc(t('modLog'))}</h2>${(a.log || []).length ? `<ul class="reviews">${a.log.map((l) => `<li><div class="small"><b>${esc(firstName(l.actor))}</b> · ${esc(l.action)}${l.reason ? ' – ' + esc(l.reason) : ''}</div><div class="muted tiny">${esc(fmtDate(new Date(l.at)))}</div></li>`).join('')}</ul>` : `<p class="muted">${esc(t('noLog'))}</p>`}</section>`;
+    } else if (tab === 'admins') {
+      const list = a.admins || [];
+      body = `<section class="card pad-m"><h2 class="h3">${icon('shield', 20)} ${esc(t('adminsTitle'))}</h2><p class="muted small">${esc(t('adminsHint'))}</p>
+          <div class="adm-list">${list.map((x) => `<div class="adm-row"><div class="grow"><div class="bold">${esc(x.name || '—')}${x.self ? ' ' + esc(t('youLabel')) : ''}</div><div class="muted small">${esc(x.email || '')}</div></div>
+            ${list.length > 1 ? `<button class="btn ghost sm" data-action="admRemoveAdmin" data-v="${esc(x.id)}" data-name="${esc(x.name || x.email || '')}">${esc(t('removeAdmin'))}</button>` : ''}</div>`).join('')}</div>
+          <form class="row-gap" data-action-submit="addAdmin"><label class="sr" for="adm-email">${esc(t('emailLabel'))}</label>
+            <input id="adm-email" class="input grow" type="email" maxlength="200" placeholder="${esc(t('adminEmailPh'))}">
+            <button class="btn primary" type="submit">${esc(t('addAdmin'))}</button></form></section>`;
+    } else if (tab === 'log') {
+      body = `<section class="card pad-m"><h2 class="h3">${esc(t('modLog'))}</h2>${(a.log || []).length ? `<ul class="reviews">${a.log.map((l) => `<li><div class="small"><b>${esc(firstName(l.actor))}</b> · ${esc(l.action)}${l.reason ? ' – ' + esc(l.reason) : ''}</div><div class="muted tiny">${esc(fmtDate(new Date(l.at)))}</div></li>`).join('')}</ul>` : `<p class="muted">${esc(t('noLog'))}</p>`}</section>`;
     }
     return `<main class="pad"><button class="back" data-action="go" data-v="#/profile">${icon('back', 20)} ${esc(t('back'))}</button>
-      <h1 class="h1">${esc(t('adminTitle'))}</h1><p class="muted bold">${esc(groupLabel())}</p><div class="row-wrap tabs">${tabs}</div>${body}</main>`;
+      <h1 class="h1">${esc(t('adminTitle'))}</h1><div class="row-wrap tabs">${tabs}</div>${body}</main>`;
   }
 
   // ----- platform admin (all groups) -----
@@ -1924,6 +1905,11 @@
       } catch (e) { toast(friendlyError(e)); }
       render();
     },
+    admRemoveAdmin: (el) => {
+      if (!window.confirm(t('confirmRemoveAdmin', { name: el.dataset.name }))) return;
+      if (LIVE) admDo(async () => { await Backend.adminRemove(el.dataset.v); live.isAdmin = await Backend.isPlatformAdmin(); }, t('saved2'));
+      else { S.demoAdmins = S.demoAdmins.filter((x) => x.id !== el.dataset.v); demoLog('remove_admin', el.dataset.v); admDo(() => {}, t('saved2')); }
+    },
     admRevoke: (el) => {
       if (LIVE) admDo(() => Backend.orgRevokeInvite(el.dataset.v), t('saved2'));
       else { const i = S.demoInvites.find((x) => x.id === el.dataset.v); if (i) i.revoked = true; demoLog('revoke_invite', el.dataset.v); admDo(() => {}, t('saved2')); }
@@ -1965,6 +1951,11 @@
       const th = S.threads.find((x) => x.id === f.dataset.v);
       if (LIVE) { box.value = ''; liveAct(() => Backend.sendMessage(th.id, live.uid, text)); return; }
       th.messages.push({ from: MINE, text: text, at: Date.now() }); box.value = ''; save(); render();
+    } else if (kind === 'addAdmin') {
+      const email = (document.getElementById('adm-email').value || '').trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast(t('emailInvalid')); return; }
+      if (LIVE) admDo(() => Backend.adminAdd(email), t('adminAdded'));
+      else { S.demoAdmins.push({ id: uid('a'), email: email, name: '', self: false }); demoLog('add_admin', email); admDo(() => {}, t('adminAdded')); }
     } else if (kind === 'sendCode') liveSendCode(document.getElementById('si-email').value);
     else if (kind === 'verifyCode') liveVerify(document.getElementById('si-code').value);
     else if (kind === 'lookupTyped') lookupIsbn(document.getElementById('isbn').value);

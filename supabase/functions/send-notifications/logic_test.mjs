@@ -33,7 +33,7 @@ ok('email in Lithuanian', m.subject === 'Knygų keitykla: 2 nauji pranešimai' &
 ok('email links to the chat', m.text.includes('#/chat/r1'));
 ok('collapsed message count shown', m.text.includes('3 naujos žinutės nuo Ben'));
 const e2 = buildEmail(daily.send.get('ben'), 'es', 'Ben', names, 'https://x/');
-ok('Spanish single-item subject', e2.subject === 'Intercambio de libros: Del organizador: Swap day!', e2.subject);
+ok('Spanish single-item subject', e2.subject === 'Intercambio de libros: De Intercambio de libros: Swap day!', e2.subject);
 const xss = buildEmail([{ type: 'announcement', data: { text: '<script>alert(1)</script>' } }], 'en', 'A', {}, 'https://x/');
 ok('HTML is escaped', !xss.html.includes('<script>') && xss.html.includes('&lt;script&gt;'));
 ok('declined wording', lineFor({ type: 'request_answered', data: { actor: 'ana', status: 'declined' } }, 'en', names) === 'Ana declined your request');

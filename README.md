@@ -4,7 +4,7 @@ A small web app for diaspora communities (starting with a Lithuanian Saturday sc
 
 There are two modes:
 
-- **Live** (default): real accounts and shared data via [Supabase](https://supabase.com). Sign-in is by emailed link or 6-digit code (no passwords), and you join a group with an invite code or start a new one. Books, photos, wish lists, requests and chat are shared, and chat updates live. See [supabase/README.md](supabase/README.md) for setup.
+- **Live** (default): real accounts and shared data via [Supabase](https://supabase.com). Sign-in is by emailed link or 6-digit code (no passwords), and anyone can sign up: there is one open network, where people find books near them by postal code and book language. Books, photos, wish lists, requests and chat are shared, and chat updates live. See [supabase/README.md](supabase/README.md) for setup.
 - **Demo**: add `?demo=1` to the address (e.g. https://domjau.github.io/book-swap/?demo=1). This is an offline version with sample families, where everything is stored only on your device. It's good for showing the idea.
 
 ## Try it
@@ -46,7 +46,7 @@ The camera only works over HTTPS or on `localhost`.
 - **Reviews with little books:** after a handover, each side rates the other 1–5 little books, with an optional comment. Ratings appear on profiles, member pages and book pages.
 - **Profile pictures** and **sold / donated / exchanged** counts for every member.
 - **Notifications:** a bell with the latest updates. At sign-up and in the profile, each person chooses which of 10 types they get in the app and/or by email, and whether emails come right away, once a day, or never.
-- **Organiser panel:** stats, announcements to all members, member roles, removing and blocking members, reports with reasons (including reading a *reported* chat), hiding listings, invite codes and group settings. Every action is logged. There's also a **platform admin** view across all groups.
+- **Admin panel:** stats, announcements to everyone, removing and blocking members, reports with reasons (including reading a *reported* chat), hiding listings, and adding or removing other admins by email. Every action is logged.
 - **Profile stats:** books listed, given away and received, money saved, a book-language mix, favourite topics and badges.
 - **Settings:** export my data (JSON) and delete everything.
 
@@ -70,7 +70,7 @@ The camera only works over HTTPS or on `localhost`.
 
 | Doc | What's in it |
 |---|---|
-| [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) | How organisers and members use the app, step by step |
+| [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) | How members and admins use the app, step by step |
 | [docs/FEATURES.md](docs/FEATURES.md) | What's built, what's next (MVP) and later ideas |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Prototype structure, book lookup pipeline, production design, data model, row-level security |
 | [TERMS.md](TERMS.md) | Terms of use (P2P disclaimer, limitation of liability) and notes for maintainers |
@@ -91,8 +91,8 @@ The camera only works over HTTPS or on `localhost`.
 
 The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [SECURITY.md](SECURITY.md). In short:
 
-1. A backend (e.g. Supabase): email magic-link sign-in, Postgres with **row-level security** so members only see their own group, storage for photos, and realtime for chat.
-2. Invite-only groups with an expiring invite link per school or community, plus organiser/admin tools.
+1. A backend (e.g. Supabase): email magic-link sign-in, Postgres with **row-level security** so only signed-in members see listings and only the two people involved see a chat, storage for photos, and realtime for chat.
+2. One open network with open sign-up, moderated by admins (done).
 3. Push and email notifications for requests, messages and the reminder the day before a handover.
 4. Wish lists ("looking for"), "still available?" checks, and bulk adding books.
 5. Privacy notice, data export and account deletion (GDPR).

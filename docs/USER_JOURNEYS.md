@@ -1,17 +1,16 @@
 # User journeys
 
-There is one kind of user: a **member** (in practice usually a parent). Any member can list, browse, request and chat. A group also has one or more **organisers**, who set the group up and look after it.
+There is one kind of user: a **member**. Any member can list, browse, request and chat. Everyone is in **one open network**: there are no communities or invite codes, and people find books near them by postal code and book language. A few **admins** (the people running the service) moderate.
 
-## 1. Organiser: set up a group (once)
+## 1. Admin: look after the network
 
-1. Creates the group: name (e.g. "Lithuanian Saturday School, Copenhagen"), app languages, and the book languages the group cares about.
-2. Sets the usual handover place and time, e.g. "Saturday at school".
-3. Shares an **invite link / QR code** in the parents' group chat or on a poster.
-4. Afterwards, steps in only occasionally: reviews reports, hides listings, removes members, or revokes an invite link.
+1. The first admin signs up like everyone else and is made admin once in the database (see `supabase/README.md`).
+2. To add another admin, they ask the person to sign up, then go to **Profile → Admin panel → Admins** and add them by email. They can remove admins there too.
+3. Day to day, admins step in only when needed: they get a notification for each new report, read the reported conversation, hide a listing, remove or block a member, and resolve the report. They can send an announcement to everyone. Every action goes into the moderation log.
 
 ## 2. Joining
 
-1. Opens the invite link and picks the app language.
+1. Opens the app link (shared e.g. in the school's parents' chat or on a poster) and picks the app language.
 2. Signs in with an emailed link (no password).
 3. Enters a display name, e.g. "Ana (García family)", a **country and postal code** (never an address; the country is guessed from the phone and the postal code is checked against that country's format) and the book languages they're looking for.
 4. Reads and **accepts the terms of use**. Book Swap is a peer-to-peer noticeboard and is not responsible for the deals between members.
@@ -60,6 +59,6 @@ There is one kind of user: a **member** (in practice usually a parent). Any memb
 
 ## 7. Safety paths
 
-- **Report** (flag icon in chat) sends the conversation to the organiser.
+- **Report** (flag icon in chat) sends the conversation to the admins.
 - **Block** stops the other person from requesting your books or messaging you (production).
 - **Delete account** removes profile, books and messages.

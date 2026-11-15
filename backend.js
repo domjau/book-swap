@@ -73,6 +73,12 @@
     async joinGroup(p) {
       return check(await sb.rpc('join_group', { p_code: p.code, p_display_name: p.name, p_country: p.country, p_postal: p.postal, p_langs: p.langs, p_terms: p.terms }));
     },
+    async joinNetwork(p) {
+      return check(await sb.rpc('join_network', { p_display_name: p.name, p_country: p.country, p_postal: p.postal, p_langs: p.langs, p_terms: p.terms }));
+    },
+    async adminList() { return check(await sb.rpc('admin_list')); },
+    async adminAdd(email) { check(await sb.rpc('admin_add', { p_email: email })); },
+    async adminRemove(uid) { check(await sb.rpc('admin_remove', { p_user: uid })); },
     async acceptTerms(groupId, version) { check(await sb.rpc('accept_terms', { p_group: groupId, p_terms: version })); },
     async updateProfile(groupId, uid, fields) {
       check(await sb.from('members').update(fields).eq('group_id', groupId).eq('user_id', uid));
