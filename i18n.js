@@ -302,3 +302,17 @@ Object.assign(window.STRINGS.en, {
   postalHint: 'Only your country and postal code are shown – never your address. It helps you find neighbours and avoid shipping.',
   profileIncomplete: 'Please complete your profile: add your country and postal code.'
 });
+
+/* Scanner help */
+Object.assign(window.STRINGS.lt, {
+  scanTips: 'Laikykite 15–25 cm atstumu, brūkšninis kodas – horizontaliai per visą rėmelį. Gera šviesa padeda.',
+  photoOfBarcode: 'Nufotografuoti brūkšninį kodą', photoScanFail: 'Nuotraukoje kodo neradome. Fotografuokite iš arčiau, kad kodas būtų ryškus, arba įveskite ISBN.'
+});
+Object.assign(window.STRINGS.es, {
+  scanTips: 'Sujétalo a 15–25 cm, con el código de barras en horizontal ocupando el recuadro. Con buena luz funciona mejor.',
+  photoOfBarcode: 'Hacer foto del código de barras', photoScanFail: 'No encontramos el código en la foto. Hazla más cerca y nítida, o escribe el ISBN.'
+});
+Object.assign(window.STRINGS.en, {
+  scanTips: 'Hold it 15–25 cm away, with the barcode horizontal and filling the frame. Good light helps.',
+  photoOfBarcode: 'Take a photo of the barcode', photoScanFail: "We couldn't find a barcode in the photo. Take it closer and in focus, or type the ISBN."
+});

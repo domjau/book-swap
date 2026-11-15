@@ -21,8 +21,8 @@ The prototype is therefore not a place to put real personal data. Anyone with ac
 | Area | Protection |
 |---|---|
 | Cross-site scripting (XSS) | Every piece of user or API text is HTML-escaped (`esc()` in `app.js`) before it is put on the page. Chat messages are rendered as plain text, never as HTML. |
-| Content-Security-Policy | `script-src 'self'`: no inline scripts and no third-party scripts. `connect-src` only allows Google Books and Open Library, and `img-src` only allows the cover hosts. `object-src 'none'`, `base-uri 'self'` and `form-action 'self'` are also set. |
-| Supply chain | The only library (html5-qrcode 2.3.8, Apache-2.0) is **hosted in `vendor/`**, not loaded from a CDN. There is no build step and no npm dependency tree. |
+| Content-Security-Policy | `script-src 'self' 'wasm-unsafe-eval'`: no inline scripts and no third-party scripts. Only our own WebAssembly barcode decoder may be compiled, and `eval` stays blocked. `connect-src` only allows Google Books and Open Library, and `img-src` only allows the cover hosts. `object-src 'none'`, `base-uri 'self'` and `form-action 'self'` are also set. |
+| Supply chain | The only library (zxing-wasm 3.1.6, MIT: barcode decoder) is **hosted in `vendor/`**, not loaded from a CDN. There is no build step and no npm dependency tree. |
 | Photo privacy | Photos are redrawn on a canvas and re-encoded as JPEG before saving. This **removes EXIF metadata, including GPS location**, and caps the size at 800 px. |
 | Data minimisation | Only a display name, country and postal code are asked for. No email, street address or phone number is collected. |
 | Referrer leakage | `<meta name="referrer" content="no-referrer">` is set, and lookups use `referrerPolicy: 'no-referrer'`. |
@@ -31,7 +31,7 @@ The prototype is therefore not a place to put real personal data. Anyone with ac
 
 ### Known limitations of the prototype
 
-- `style-src` allows `'unsafe-inline'` because the scanner library and the topic colours use inline styles. Styles cannot run script, so the risk is low, but a production build should use classes or nonces.
+- `style-src` allows `'unsafe-inline'` because the topic colours use inline styles. Styles cannot run script, so the risk is low, but a production build should use classes or nonces.
 - CSP is set with a `<meta>` tag, because GitHub Pages cannot set HTTP headers. Some directives (e.g. `frame-ancestors`) only work as real headers.
 - Google Fonts is loaded from Google's servers, which shows visitors' IP addresses to Google. Hosting the font locally would avoid this.
 

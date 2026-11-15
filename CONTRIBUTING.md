@@ -26,6 +26,7 @@ There is no build step and no npm install. To reset the demo, use Profile → *D
 
 - Translate into a new language (see [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md)).
 - Add topic keywords in more languages to improve topic suggestions.
+- Add a torch (flashlight) button to the scanner where `torch` is supported.
 - Host the Nunito font locally instead of loading it from Google Fonts.
 - Add a service worker for an offline app shell.
 

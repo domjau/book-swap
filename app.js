@@ -506,10 +506,13 @@
       <section class="card pad-m scan">
         <div class="h3">${icon('barcode', 22)} ${esc(t('scanTitle'))}</div>
         <p class="muted small">${esc(t('scanHint'))}</p>
-        <div id="reader" class="reader ${ui.scanner ? 'live' : ''}"></div>
+        <div id="reader" class="reader ${ui.scanner ? 'live' : ''}"><div class="guide" aria-hidden="true"></div></div>
+        ${ui.scanner ? `<p class="muted small center scan-tip">${esc(t('scanTips'))}</p>` : ''}
         ${ui.scanner
           ? `<button class="btn ghost big" data-action="stopCamera">${esc(t('stopCamera'))}</button>`
           : `<button class="btn primary big" data-action="startCamera">${icon('camera')} ${esc(t('startCamera'))}</button>`}
+        <label class="btn ghost big file-btn">${icon('barcode', 20)} ${esc(t('photoOfBarcode'))}
+          <input type="file" accept="image/*" capture="environment" class="sr" data-change="barcodePhoto"></label>
       </section>
       ${msg}
       ${ui.busy ? `<div class="notice">${esc(t('searching'))}</div>` : ''}
@@ -661,8 +664,6 @@
     const active = document.activeElement;
     const focusId = active && active.id;
     const sel = focusId && active.setSelectionRange ? [active.selectionStart, active.selectionEnd] : null;
-    // Keep the live camera view when the rest of the screen re-renders
-    const liveReader = ui.scanner && typeof ui.scanner === 'object' && r.name === 'add' ? document.getElementById('reader') : null;
     let body;
     if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : viewOnboarding();
     else {
@@ -679,8 +680,10 @@
       window.scrollTo(0, 0);
       if (r.name === 'chat') { const m = document.querySelector('.msgs'); if (m) m.lastElementChild && m.lastElementChild.scrollIntoView({ block: 'end' }); }
     }
-    if (liveReader) { const slot = document.getElementById('reader'); if (slot) slot.replaceWith(liveReader); }
-    if (r.name === 'add' && ui.scanner) remountScanner();
+    if (scan.video && r.name === 'add') {
+      const slot = document.getElementById('reader');
+      if (slot) { slot.prepend(scan.video); scan.video.play().catch(() => {}); }
+    }
   }
   window.addEventListener('hashchange', render);
 
@@ -834,24 +837,129 @@
     stopCamera();
   }
 
-  // ---------- camera ----------
-  function startCamera() {
-    if (!window.Html5Qrcode) { ui.addMsg = t('cameraError'); ui.addMsgKind = 'warn'; render(); return; }
-    ui.scanner = 'starting'; ui.addMsg = ''; render();
+  // ---------- camera barcode scanner ----------
+  // Full-resolution frames from the camera are decoded by the phone's built-in BarcodeDetector
+  // when available (Android Chrome), otherwise by ZXing compiled to WebAssembly (iPhone Safari etc.).
+  const READER_OPTS = { formats: ['EAN13', 'EAN8', 'UPCA', 'UPCE'], tryHarder: true, maxNumberOfSymbols: 1 };
+  const scan = { stream: null, video: null, timer: null, busy: false, detector: null, canvas: null, zxingReady: false };
+  const isIsbnLike = (text) => { const c = cleanIsbn(text); return (c.length === 13 && /^97[89]/.test(c)) || c.length === 10; };
+
+  function prepareZXing() {
+    if (scan.zxingReady || !window.ZXingWASM) return;
+    scan.zxingReady = true;
+    window.ZXingWASM.prepareZXingModule({
+      overrides: { locateFile: (path, prefix) => (path.endsWith('.wasm') ? new URL('vendor/zxing_reader.wasm', location.href).href : prefix + path) },
+      fireImmediately: true
+    });
   }
-  function remountScanner() {
-    if (ui.scanner !== 'starting') return;
-    const F = window.Html5QrcodeSupportedFormats;
-    const sc = new window.Html5Qrcode('reader', { verbose: false, formatsToSupport: [F.EAN_13, F.EAN_8, F.UPC_A],
-      experimentalFeatures: { useBarCodeDetectorIfSupported: true } });
-    ui.scanner = sc;
-    sc.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 260, height: 120 } },
-      (text) => { if (/^97[89]/.test(text) || text.length === 10) { stopCamera(); lookupIsbn(text); } },
-      () => {}).catch(() => { ui.scanner = null; ui.addMsg = t('cameraError'); ui.addMsgKind = 'warn'; render(); });
+  async function setupDetector() {
+    if (scan.detector !== null || !('BarcodeDetector' in window)) return;
+    try {
+      const fmts = await window.BarcodeDetector.getSupportedFormats();
+      if (fmts.indexOf('ean_13') >= 0) scan.detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'].filter((f) => fmts.indexOf(f) >= 0) });
+    } catch (e) { /* fall back to ZXing */ }
+  }
+  async function decodeSource(source, w, h) {
+    // source: canvas (live) or ImageBitmap / Blob (photo)
+    if (scan.detector) {
+      try { const r = await scan.detector.detect(source); if (r && r[0]) return r[0].rawValue; } catch (e) { /* try ZXing */ }
+    }
+    if (!window.ZXingWASM) return null;
+    let input = source;
+    if (source instanceof HTMLCanvasElement) input = source.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, w, h);
+    const res = await window.ZXingWASM.readBarcodes(input, READER_OPTS);
+    return res && res[0] ? res[0].text : null;
+  }
+  async function startCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { ui.addMsg = t('cameraError'); ui.addMsgKind = 'warn'; render(); return; }
+    prepareZXing(); setupDetector();
+    ui.scanner = 'starting'; ui.addMsg = ''; render();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: false,
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+      if (ui.scanner !== 'starting') { stream.getTracks().forEach((tr) => tr.stop()); return; }
+      const v = document.createElement('video');
+      v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.muted = true; v.autoplay = true; v.srcObject = stream;
+      scan.stream = stream; scan.video = v; ui.scanner = 'live';
+      render();
+      tuneTrack(stream.getVideoTracks()[0]);
+      scanLoop();
+    } catch (e) {
+      ui.scanner = null; ui.addMsg = t('cameraError'); ui.addMsgKind = 'warn'; render();
+    }
+  }
+  // Continuous autofocus, and a little zoom so the phone can be held further away
+  // (many phones cannot focus closer than ~10–15 cm).
+  function tuneTrack(track) {
+    try {
+      const caps = track && track.getCapabilities ? track.getCapabilities() : {};
+      const adv = {};
+      if (caps.focusMode && caps.focusMode.indexOf('continuous') >= 0) adv.focusMode = 'continuous';
+      if (caps.zoom && caps.zoom.max >= 1.5) adv.zoom = Math.min(2, caps.zoom.max);
+      if (Object.keys(adv).length) track.applyConstraints({ advanced: [adv] }).catch(() => {});
+    } catch (e) { /* not supported – fine */ }
+  }
+  function grabFrame() {
+    const v = scan.video;
+    if (!v || !v.videoWidth) return null;
+    // The centre band of the picture (matches the guide box on screen), at full resolution.
+    const vw = v.videoWidth; const vh = v.videoHeight;
+    const cw = Math.round(vw * 0.9); const ch = Math.round(vh * 0.6);
+    const c = scan.canvas || (scan.canvas = document.createElement('canvas'));
+    if (c.width !== cw) c.width = cw;
+    if (c.height !== ch) c.height = ch;
+    c.getContext('2d', { willReadFrequently: true }).drawImage(v, Math.round((vw - cw) / 2), Math.round((vh - ch) / 2), cw, ch, 0, 0, cw, ch);
+    return c;
+  }
+  function scanLoop() {
+    if (ui.scanner !== 'live') return;
+    if (!scan.busy) {
+      const frame = grabFrame();
+      if (frame) {
+        scan.busy = true;
+        decodeSource(frame, frame.width, frame.height).then((text) => {
+          scan.busy = false;
+          if (text && isIsbnLike(text) && ui.scanner === 'live') {
+            if (navigator.vibrate) navigator.vibrate(80);
+            stopCamera(); lookupIsbn(text);
+          }
+        }).catch(() => { scan.busy = false; });
+      }
+    }
+    scan.timer = setTimeout(scanLoop, 150);
   }
   function stopCamera() {
-    const sc = ui.scanner; ui.scanner = null;
-    if (sc && sc.stop) { sc.stop().then(() => sc.clear()).catch(() => {}); }
+    clearTimeout(scan.timer);
+    if (scan.stream) scan.stream.getTracks().forEach((tr) => tr.stop());
+    if (scan.video) { scan.video.srcObject = null; scan.video.remove(); }
+    scan.stream = null; scan.video = null; scan.busy = false; ui.scanner = null;
+  }
+  // Backup: decode a still photo of the barcode (the phone's own camera app focuses well).
+  function scanPhoto(file) {
+    if (!file) return;
+    prepareZXing(); stopCamera();
+    ui.busy = true; ui.addMsg = ''; render();
+    setupDetector().then(() => shrinkImage(file, 2000)).then(async (img) => {
+      let text = null;
+      if (scan.detector) { try { const bmp = await createImageBitmap(img); text = await decodeSource(bmp); } catch (e) { text = null; } }
+      if (!text && window.ZXingWASM) { const r = await window.ZXingWASM.readBarcodes(img, READER_OPTS); text = r && r[0] ? r[0].text : null; }
+      ui.busy = false;
+      if (text && isIsbnLike(text)) lookupIsbn(text);
+      else { ui.addMsg = t('photoScanFail'); ui.addMsgKind = 'warn'; render(); }
+    }).catch(() => { ui.busy = false; ui.addMsg = t('photoScanFail'); ui.addMsgKind = 'warn'; render(); });
+  }
+  function shrinkImage(file, max) {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file); const img = new Image();
+      img.onload = () => {
+        const sc = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+        c.toBlob((b) => resolve(b || file), 'image/jpeg', 0.92);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
   }
 
   // ---------- photo (resized + metadata stripped by redrawing on a canvas) ----------
@@ -949,7 +1057,7 @@
       th.messages.push({ from: MINE, text: t(el.dataset.v), at: Date.now() }); save(); render();
     },
     report: () => toast(t('reported')),
-    startCamera: startCamera,
+    startCamera: () => { startCamera(); },
     stopCamera: () => { stopCamera(); render(); },
     manual: () => { startDraft({}); ui.addMsg = ''; render(); },
     pickResult: (el) => { const r = ui.searchResults[Number(el.dataset.v)]; if (r) { startDraft(r); ui.addMsg = r.source === 'local' ? t('foundLocal') : t('foundIn', { src: r.source }); ui.addMsgKind = 'ok'; render(); } },
@@ -1026,6 +1134,7 @@
     const el = e.target; if (!el.dataset) return;
     if (el.dataset.change === 'photo' && el.files && el.files[0]) handlePhoto(el.files[0]);
     else if (el.dataset.change === 'onbCountry') ui.onbCountry = el.value;
+    else if (el.dataset.change === 'barcodePhoto' && el.files && el.files[0]) scanPhoto(el.files[0]);
   });
 
   initCountry();

@@ -221,3 +221,10 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .terms .h3 { margin-top: 20px; }
 .tight-top { margin-top: 0; }
 select.input { appearance: auto; }
+.file-btn { cursor: pointer; }
+.scan-tip { margin: 6px 0 0; }
+.reader { position: relative; }
+.reader video { width: 100%; display: block; }
+.reader .guide { display: none; }
+.reader.live .guide { display: block; position: absolute; left: 5%; right: 5%; top: 20%; bottom: 20%; border: 3px solid var(--accent); border-radius: 12px; box-shadow: 0 0 0 999px rgba(0,0,0,.35); pointer-events: none; }
+.reader.live .guide::after { content: ''; position: absolute; left: 6%; right: 6%; top: 50%; height: 2px; background: #FF5A5A; }

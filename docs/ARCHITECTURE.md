@@ -8,7 +8,7 @@ Browser (phone)
  ├─ app.js            screens, routing (#/…), state, actions
  ├─ i18n.js           UI strings: lt / es / en
  ├─ data.js           topics, sample members and books
- ├─ vendor/html5-qrcode.min.js   camera barcode scanner
+ ├─ vendor/zxing-reader.js + zxing_reader.wasm   barcode decoder (WebAssembly)
  └─ localStorage["bookswap-v1"]  all data, this device only
         │
         └── fetch (read-only, anonymous)
@@ -20,6 +20,15 @@ Browser (phone)
 - **Routing:** hash routes. `#/` browse, `#/book/:id`, `#/requests`, `#/messages`, `#/chat/:id`, `#/add`, `#/profile`.
 - **Rendering:** each view is a function that returns an HTML string. All dynamic values go through `esc()`. Clicks are handled once on the root using `data-action` attributes, so no inline handlers are needed and the strict CSP is possible.
 - **Simulation:** a sent request is "accepted" by the other member after about 2.5 s. One sample incoming request lets you try the owner's side.
+
+### Barcode scanning
+
+The camera is opened with `getUserMedia` at up to 1920×1080. Continuous autofocus and up to 2× zoom are applied where the phone supports them. About 6–7 times a second, the centre band of the full-resolution frame (the guide box on screen) is decoded:
+
+1. by the browser's **BarcodeDetector** if it supports EAN-13 (Android Chrome), otherwise
+2. by **ZXing C++ compiled to WebAssembly** (`tryHarder`). This also works in iPhone Safari.
+
+We deliberately don't scale the frame down before decoding: thin barcode lines disappear when the image is shrunk to the size of the on-screen box. The backup is *Take a photo of the barcode*: the phone's own camera app focuses better close up, and the still photo is decoded the same way.
 
 ### Add-a-book lookup pipeline
 
