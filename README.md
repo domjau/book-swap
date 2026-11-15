@@ -2,7 +2,10 @@
 
 A small web app for diaspora communities (starting with a Lithuanian Saturday school) to **swap, sell or give away children's books**. Families browse each other's shelves by book language, topic and age, bundle several books from the same person into one request, agree on the details in a chat, and hand the books over at school.
 
-This is a **clickable prototype**. It runs entirely in the browser and keeps its data in `localStorage` on the device. There is no server and no shared database yet.
+There are two modes:
+
+- **Live** (default): real accounts and shared data via [Supabase](https://supabase.com). Sign-in is by emailed link or 6-digit code (no passwords), and you join a group with an invite code or start a new one. Books, photos, wish lists, requests and chat are shared, and chat updates live. See [supabase/README.md](supabase/README.md) for setup.
+- **Demo**: add `?demo=1` to the address (e.g. https://domjau.github.io/book-swap/?demo=1). This is an offline version with sample families, where everything is stored only on your device. It's good for showing the idea.
 
 ## Try it
 
@@ -49,6 +52,10 @@ The camera only works over HTTPS or on `localhost`.
 |---|---|
 | `index.html` | Page shell and Content-Security-Policy |
 | `app.js` | All screens and logic (plain JS, no build step) |
+| `backend.js` | The only file that talks to Supabase (auth, data, photos, realtime), so the backend can be swapped later |
+| `config.js` | Supabase project URL and **publishable** key (public by design; access is enforced by RLS) |
+| `supabase/` | Database schema, row-level security, functions, storage rules and security tests |
+| `vendor/supabase.js` | supabase-js 2.119.0 (MIT), hosted locally |
 | `i18n.js` | Translations. To add a language, copy the `en` block and add its code to `UI_LANGS` |
 | `data.js` | Topics, sample members (with postal codes), sample books and wish lists |
 | `terms.js` | Terms of use in LT/ES/EN and the current version |

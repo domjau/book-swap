@@ -4,7 +4,9 @@
 (function () {
   'use strict';
 
-  const KEY = 'bookswap-v1';
+  // LIVE = real accounts and shared data via Supabase (see backend.js / config.js); otherwise offline demo.
+  const LIVE = !!(window.Backend && window.Backend.enabled);
+  const KEY = LIVE ? 'bookswap-live-v1' : 'bookswap-v1';
   const $app = document.getElementById('app');
   const MINE = 'me';
   const MAX_PHOTOS = 4;
@@ -50,6 +52,10 @@
     return UI_LANGS.indexOf(n) >= 0 ? n : 'en';
   }
   function fresh() {
+    if (LIVE) {
+      return { v: 2, lang: detectLang(), me: null, interested: ['lt', 'es', 'en'], books: [], cart: [], cartMeta: {},
+        threads: [], received: [], wishes: [], agreed: null };
+    }
     return {
       v: 1, lang: detectLang(), me: null, interested: ['lt', 'es', 'en'],
       books: clone(SAMPLE_BOOKS).map((b) => Object.assign({ status: 'available', isbn: '' }, b)),
@@ -67,10 +73,17 @@
   function load() {
     try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
-  let S = migrate(load()) || fresh();
+  let S = LIVE ? Object.assign(fresh(), pickPrefs(load() || {})) : (migrate(load()) || fresh());
+  function pickPrefs(o) {
+    const out = {};
+    ['lang', 'interested', 'cart', 'cartMeta'].forEach((k) => { if (o[k] !== undefined) out[k] = o[k]; });
+    return out;
+  }
+  if (LIVE) Object.keys(MEMBERS).forEach((k) => delete MEMBERS[k]); // members come from the server
   const initCountry = () => { ui.onbCountry = (S.me && S.me.country) || guessCountry(); };
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Storage full – try removing a photo.'); }
+    // In live mode only device preferences are stored locally; everything else is on the server.
+    try { localStorage.setItem(KEY, JSON.stringify(LIVE ? pickPrefs(S) : S)); } catch (e) { toast('Storage full – try removing a photo.'); }
   }
 
   const ui = {
@@ -88,7 +101,8 @@
   }
   const langName = (code) => (STRINGS[S.lang].langNames[code] || STRINGS[S.lang].langNames.other);
   const topicName = (id) => (TOPIC[id] ? (TOPIC[id].names[S.lang] || TOPIC[id].names.en) : id);
-  const memberName = (id) => (id === MINE ? (S.me ? S.me.name : '') : (MEMBERS[id] ? MEMBERS[id].name : id));
+  const memberName = (id) => (id === MINE ? (S.me ? S.me.name : '') : (MEMBERS[id] ? MEMBERS[id].name : '—'));
+  const groupLabel = () => (LIVE && live.group && live.group.name ? live.group.name : t('groupName'));
   const firstName = (id) => memberName(id).split(' (')[0];
   const fmtDate = (d) => new Intl.DateTimeFormat(S.lang, { weekday: 'short', day: 'numeric', month: 'short' }).format(d);
   const fmtTime = (ms) => new Intl.DateTimeFormat(S.lang, { hour: '2-digit', minute: '2-digit' }).format(new Date(ms));
@@ -206,7 +220,8 @@
       <h1>${esc(t('welcomeTitle'))}</h1>
       ${S.me ? `<div class="notice warn">${esc(S.agreed && S.agreed.version === TERMS.version ? t('profileIncomplete') : t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
-      <div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(t('groupName'))}</div></div>
+      ${LIVE ? (live.group ? `<div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(groupLabel())}</div></div>` : onbGroupSection())
+        : `<div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(t('groupName'))}</div></div>`}
       <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
       <div class="field"><span class="label">${esc(t('interestedLangs'))}</span><div class="row-wrap">${interests}</div></div>
       <label class="field"><span class="label">${esc(t('yourName'))}</span>
@@ -221,9 +236,51 @@
       <label class="toggle agree"><input id="onb-agree" type="checkbox" data-action="toggleAgree" ${ui.onbAgree ? 'checked' : ''}>
         <span>${esc(t('acceptTerms'))} <a class="ulink" href="#/terms">${esc(t('termsLink'))}</a></span></label>
       ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
-      <button class="btn primary big" data-action="join">${esc(S.me ? t('continue') : t('join'))}</button>
-      <p class="muted small center">${esc(t('demoNote'))}</p>
+      <button class="btn primary big" data-action="join" ${LIVE && live.busy ? 'disabled' : ''}>${esc(LIVE && live.busy ? t('loading') : (S.me ? t('continue') : (LIVE && ui.onbMode === 'start' ? t('startGroup') : t('join'))))}</button>
+      ${LIVE ? `<p class="muted small center">${esc(t('signedInAs', { email: live.email }))} · <button class="link small" data-action="signOut">${esc(t('signOut'))}</button></p>` : `<p class="muted small center">${esc(t('demoNote'))}</p>`}
     </main>`;
+  }
+
+  function onbGroupSection() {
+    const mode = ui.onbMode || 'join';
+    return `<div class="seg two" role="group">${[['join', 'joinWithCode'], ['start', 'startGroup']].map((m) =>
+      `<button class="pill ${mode === m[0] ? 'on' : ''}" data-action="onbMode" data-v="${m[0]}" aria-pressed="${mode === m[0]}">${esc(t(m[1]))}</button>`).join('')}</div>
+      ${mode === 'join'
+        ? `<label class="field"><span class="label">${esc(t('inviteCode'))}</span>
+            <input id="onb-code" class="input code-input" maxlength="12" autocomplete="off" autocapitalize="characters" value="${esc(live.invite || '')}" data-input="onbCode" placeholder="${esc(t('inviteCodePh'))}"></label>`
+        : `<label class="field"><span class="label">${esc(t('groupNameLabel'))}</span>
+            <input id="onb-group" class="input" maxlength="80" value="${esc(ui.onbGroup || '')}" data-input="onbGroup" placeholder="${esc(t('groupNamePh'))}"></label>`}`;
+  }
+
+  function viewSignIn() {
+    const langs = UI_LANGS.map((c) => `<button class="pill ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}">${esc(STRINGS[c].langNames[c])}</button>`).join('');
+    const step = live.authStep;
+    return `<main class="onboard">
+      <div class="logo-big">${icon('logo', 44)}</div>
+      <h1>${esc(t('welcomeTitle'))}</h1>
+      <p class="lead">${esc(t('welcomeText'))}</p>
+      <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
+      ${step === 'email' ? `
+        <form data-action-submit="sendCode">
+          <label class="field"><span class="label">${esc(t('emailLabel'))}</span>
+            <input id="si-email" class="input" type="email" required maxlength="200" autocomplete="email" inputmode="email" value="${esc(live.authEmail)}" placeholder="${esc(t('emailPh'))}"></label>
+          <button class="btn primary big" type="submit" ${live.busy ? 'disabled' : ''}>${esc(live.busy ? t('loading') : t('sendCode'))}</button>
+        </form>
+        <p class="muted small">${esc(t('noPassword'))}</p>` : `
+        <div class="notice ok">${icon('check', 20)} <span>${esc(t('checkEmail', { email: live.authEmail }))}</span></div>
+        <form data-action-submit="verifyCode">
+          <label class="field"><span class="label">${esc(t('codeLabel'))}</span>
+            <input id="si-code" class="input code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456"></label>
+          <button class="btn primary big" type="submit" ${live.busy ? 'disabled' : ''}>${esc(live.busy ? t('loading') : t('verify'))}</button>
+        </form>
+        <div class="row-between"><button class="link" data-action="otherEmail">${esc(t('otherEmail'))}</button><button class="link" data-action="resendCode">${esc(t('resend'))}</button></div>`}
+      ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
+      <p class="muted small center"><a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></p>
+    </main>`;
+  }
+
+  function viewLoading() {
+    return `<main class="onboard center-col"><div class="logo-big">${icon('logo', 44)}</div><p class="muted bold">${esc(t('loading'))}</p></main>`;
   }
 
   function viewTerms() {
@@ -241,7 +298,7 @@
   function header() {
     const langs = UI_LANGS.map((c) => `<button class="lang-btn ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}" aria-label="${esc(STRINGS[c].langNames[c])}">${c.toUpperCase()}</button>`).join('');
     return `<header class="top"><a class="brand" href="#/">${'<span class="logo">' + icon('logo', 20) + '</span>'}
-      <span><span class="brand-name">${esc(t('appName'))}</span><span class="brand-group">${esc(t('groupName'))}</span></span></a>
+      <span><span class="brand-name">${esc(t('appName'))}</span><span class="brand-group">${esc(groupLabel())}</span></span></a>
       <div class="langs">${langs}</div></header>`;
   }
 
@@ -301,7 +358,7 @@
     if (!b) return `<main class="pad">${esc(t('noResults'))}</main>`;
     const inCart = S.cart.indexOf(b.id) >= 0;
     let actions;
-    if (b.owner === MINE) actions = `<div class="notice">${esc(t('yourBook'))}</div>`;
+    if (b.owner === MINE) actions = `<div class="notice">${esc(t('yourBook'))}</div>` + (b.status !== 'reserved' ? `<button class="btn ghost big" data-action="removeBook" data-v="${esc(b.id)}">${icon('trash', 20)} ${esc(t('removeListing'))}</button>` : '');
     else if (b.status !== 'available') actions = `<div class="notice">${offerBadge(b)}</div>`;
     else if (inCart) actions = `<a class="btn ok big" href="#/requests">${icon('check')} ${esc(t('inRequest'))}</a>`;
     else actions = `<button class="btn primary big" data-action="addCart" data-v="${esc(b.id)}">${icon('bag')} ${esc(t('addToRequest'))}</button>
@@ -424,7 +481,7 @@
   function viewChat(id) {
     const th = S.threads.find((x) => x.id === id);
     if (!th) return `<main class="pad">${esc(t('messagesEmpty'))}</main>`;
-    if (th.unread) { th.unread = false; save(); }
+    if (th.unread) { th.unread = false; save(); if (LIVE) Backend.markRead(th.id); }
     const isOwner = th.role === 'owner';
     const other = firstName(th.with);
     const ticks = ui.ticks[th.id] || (ui.ticks[th.id] = th.books.slice());
@@ -623,12 +680,18 @@
     const stat = (n, k) => `<div class="stat"><div class="stat-n">${esc(n)}</div><div class="stat-l">${esc(t(k))}</div></div>`;
     return `<main class="pad">
       <div class="row-gap"><div class="avatar">${esc((S.me.name || '?').slice(0, 1).toUpperCase())}</div>
-        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: t('groupName') }))}</div><div class="muted small">${icon('pin', 12)} ${esc((S.me.postal || '') + ', ' + countryName(S.me.country))}</div></div></div>
+        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: groupLabel() }))}</div><div class="muted small">${icon('pin', 12)} ${esc((S.me.postal || '') + ', ' + countryName(S.me.country))}</div></div></div>
       <div class="stats">${stat(mine.length, 'statListed')}${stat(given.length, 'statGiven')}${stat(S.received.length, 'statReceived')}${stat('€' + saved, 'statSaved')}</div>
       <div class="muted tiny">${esc(t('statsPrivate'))}</div>
       ${langBars ? `<section class="card pad-m"><h2 class="h3">${esc(t('langMix'))}</h2>${langBars}</section>` : ''}
       ${top ? `<section class="card pad-m"><h2 class="h3">${esc(t('topTopics'))}</h2><div class="row-wrap">${top}</div></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('badges'))}</h2><div class="badges">${badges}</div></section>
+      ${LIVE && live.group && live.group.role === 'organiser' ? `<section class="card pad-m invite-card"><h2 class="h3">${icon('user', 20)} ${esc(t('inviteTitle'))}</h2>
+        ${live.newInvite ? `<div class="invite-code">${esc(live.newInvite)}</div>
+          <p class="muted small">${esc(t('inviteShare'))}</p>
+          <button class="btn primary" data-action="copyInvite">${icon('send', 20)} ${esc(t('copyLink'))}</button>`
+        : `<p class="muted small">${esc(t('inviteHint'))}</p><button class="btn ghost" data-action="createInvite">${icon('plus', 20)} ${esc(t('createInvite'))}</button>`}
+      </section>` : ''}
       <section class="card pad-m"><h2 class="h3">${icon('pin', 20)} ${esc(t('location'))}</h2>
         <label class="label" for="p-country">${esc(t('country'))}</label>
         <select id="p-country" class="input" autocomplete="country">${countryOptions(S.me.country)}</select>
@@ -651,13 +714,16 @@
         <a class="btn ghost" href="#/terms">${icon('doc', 20)} ${esc(t('viewTerms'))}</a>
         ${S.agreed ? `<p class="muted tiny center">${esc(t('acceptedOn', { date: fmtDate(new Date(S.agreed.at)) }))}</p>` : ''}
         <button class="btn ghost" data-action="exportData">${icon('download', 20)} ${esc(t('exportData'))}</button>
-        <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(t('deleteAccount'))}</button></section>
+        ${LIVE ? `<p class="muted small">${esc(t('signedInAs', { email: live.email }))}</p><button class="btn ghost" data-action="signOut">${esc(t('signOut'))}</button>` : ''}
+        <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(LIVE ? t('leaveGroup') : t('deleteAccount'))}</button></section>
     </main>`;
   }
 
   // ---------- render ----------
   function route() {
-    const parts = (location.hash || '#/').slice(2).split('/');
+    const h = location.hash || '#/';
+    if (h.indexOf('#/') !== 0) return { name: '', id: null }; // e.g. sign-in tokens in the URL
+    const parts = h.slice(2).split('/');
     return { name: parts[0] || '', id: parts[1] ? decodeURIComponent(parts[1]) : null };
   }
   let lastRoute = null;
@@ -672,7 +738,10 @@
     const focusId = active && active.id;
     const sel = focusId && active.setSelectionRange ? [active.selectionStart, active.selectionEnd] : null;
     let body;
-    if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : viewOnboarding();
+    if (r.name === 'join' && r.id) { live.invite = r.id.toUpperCase().slice(0, 12); ui.onbMode = 'join'; }
+    if (LIVE && !live.ready) body = viewLoading();
+    else if (LIVE && !live.uid) body = r.name === 'terms' ? viewTerms() : viewSignIn();
+    else if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : viewOnboarding();
     else {
       const v = { '': viewBrowse, book: () => viewBook(r.id), requests: viewRequests, messages: viewMessages,
         chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms }[r.name] || viewBrowse;
@@ -718,6 +787,7 @@
   function setStatus(ids, status) { ids.forEach((id) => { const b = book(id); if (b) b.status = status; }); }
 
   function sendRequest(owner) {
+    if (LIVE) return liveSendRequest(owner);
     const ids = S.cart.filter((id) => { const b = book(id); return b && b.owner === owner; });
     if (!ids.length) return;
     const meta = S.cartMeta[owner] || { offered: [], msg: t('defaultMsg') };
@@ -1081,6 +1151,7 @@
       if (!postal) return fail(t('postalRequired'), 'onb-postal');
       if (!validPostal(country, postal)) return fail(t('postalInvalid', { country: countryName(country) }), 'onb-postal');
       if (!document.getElementById('onb-agree').checked) return fail(t('termsRequired'), 'onb-agree');
+      if (LIVE) return liveJoin(name, country, postal);
       S.me = { name: name, country: country, postal: postal };
       S.agreed = { version: TERMS.version, at: Date.now() };
       ui.onbError = ''; save(); go('#/');
@@ -1192,6 +1263,244 @@
     deleteAll: () => { if (window.confirm(t('confirmDelete'))) { localStorage.removeItem(KEY); S = fresh(); ui.draft = null; initCountry(); go('#/'); } }
   };
 
+  // ===================== live mode (Supabase) =====================
+  const live = { ready: !LIVE, uid: null, email: '', group: null, authStep: 'email', authEmail: '', busy: false, invite: '', newInvite: '' };
+
+  function friendlyError(e) {
+    const m = String((e && e.message) || e || '');
+    if (/invalid or expired invite/i.test(m)) return t('errInvite');
+    if (/not available|not yours/i.test(m)) return t('errNotAvailable');
+    if (/sharing copies|row-level security.*messages/i.test(m)) return t('copyBlocked');
+    if (/rate limit|only request this/i.test(m)) return t('errRateLimit');
+    if (/token.*(expired|invalid)|otp/i.test(m)) return t('codeInvalid');
+    if (/not authorized|not allowed for this/i.test(m)) return t('errEmailNotAllowed');
+    if (/failed to fetch|network/i.test(m)) return t('errOffline');
+    if (m === 'groupNameRequired' || m === 'inviteRequired') return t(m);
+    return t('errGeneric') + ' (' + m.slice(0, 120) + ')';
+  }
+
+  function mapBook(r, urls) {
+    const paths = r.photo_paths || [];
+    const photos = paths.map((p) => urls[p]).filter(Boolean);
+    return { id: r.id, isbn: r.isbn || '', title: r.title, author: r.author || '—', description: r.description || '', notes: r.notes || '',
+      lang: r.lang, topics: r.topics || [], age: r.age || '3–6', cond: r.condition, offer: r.offer, price: (r.price_cents || 0) / 100,
+      owner: r.owner_id === live.uid ? MINE : r.owner_id, added: Date.parse(r.created_at), status: r.status,
+      photoPaths: paths, photos: photos, photo: photos[0] || '' };
+  }
+  function mapThread(r) {
+    const me = live.uid; const role = r.owner_id === me ? 'owner' : 'requester';
+    const req = r.items.filter((i) => i.side === 'requested'); const off = r.items.filter((i) => i.side === 'offered');
+    const readAt = Date.parse(role === 'owner' ? r.owner_read_at : r.requester_read_at);
+    const fix = (v) => { const o = Object.assign({}, v || {}); if (o.name === me) o.name = MINE; return o; };
+    const msgs = r.messages.map((m) => (m.kind === 'system'
+      ? { from: 'system', key: m.sys_key, vars: fix(m.sys_vars), text: '', at: Date.parse(m.created_at) }
+      : { from: m.sender_id === me ? MINE : m.sender_id, text: m.body, at: Date.parse(m.created_at) }));
+    const lastOther = msgs.filter((m) => m.from !== MINE).pop();
+    return { id: r.id, with: role === 'owner' ? r.requester_id : r.owner_id, role: role,
+      books: req.map((i) => i.book_id), offered: off.map((i) => i.book_id), accepted: req.filter((i) => i.accepted).map((i) => i.book_id),
+      status: r.status, handover: r.handover_on ? { when: r.handover_on + 'T10:00:00', where: r.handover_place || '' } : null,
+      messages: msgs.length ? msgs : [{ from: 'system', key: 'sendRequest', vars: {}, text: '', at: Date.parse(r.created_at) }],
+      unread: !!(lastOther && lastOther.at > readAt) };
+  }
+  function computeReceived() {
+    const out = [];
+    S.threads.filter((th) => th.status === 'done').forEach((th) => {
+      (th.role === 'owner' ? th.offered : th.accepted).forEach((id) => {
+        const b = book(id); if (b) out.push({ title: b.title, lang: b.lang, topics: b.topics, offer: b.offer, price: b.price });
+      });
+    });
+    return out;
+  }
+
+  async function loadMembership() {
+    const m = await Backend.myMembership(live.uid);
+    if (m) {
+      live.group = { id: m.group_id, name: m.groups ? m.groups.name : '', role: m.role };
+      S.me = { name: m.display_name, country: m.country, postal: m.postal_code };
+      if (m.interested_langs && m.interested_langs.length) S.interested = m.interested_langs;
+      S.agreed = { version: m.terms_version, at: Date.now() };
+      ui.onbCountry = m.country;
+    } else { live.group = null; S.me = null; S.agreed = null; }
+  }
+  let refreshing = null;
+  function refreshAll() {
+    if (!LIVE || !live.group) return Promise.resolve();
+    if (refreshing) return refreshing;
+    refreshing = Promise.all([Backend.loadGroup(live.group.id), Backend.loadThreads()]).then((res) => {
+      const g = res[0];
+      Object.keys(MEMBERS).forEach((k) => delete MEMBERS[k]);
+      g.members.forEach((m) => { if (m.user_id !== live.uid) MEMBERS[m.user_id] = { name: m.display_name, country: m.country, postal: m.postal_code, role: m.role }; });
+      S.books = g.books.map((r) => mapBook(r, g.urls));
+      S.wishes = g.wishes.map((w) => ({ id: w.id, owner: w.owner_id === live.uid ? MINE : w.owner_id, title: w.title, author: w.author, lang: w.lang, isbn: w.isbn || '' }));
+      S.threads = res[1].map(mapThread);
+      S.received = computeReceived();
+      S.cart = S.cart.filter((id) => { const b = book(id); return b && b.status === 'available' && b.owner !== MINE; });
+    }).finally(() => { refreshing = null; });
+    return refreshing;
+  }
+  // Run a server action, then reload data and redraw; errors become a friendly message.
+  async function liveAct(fn, okMsg) {
+    live.busy = true;
+    try {
+      const r = await fn();
+      await refreshAll();
+      if (okMsg) toast(okMsg); else render();
+      return r === undefined ? true : r;
+    } catch (e) { toast(friendlyError(e)); return false; }
+    finally { live.busy = false; }
+  }
+
+  async function boot() {
+    try {
+      const s = await Backend.session();
+      live.uid = s ? s.user.id : null; live.email = s ? s.user.email : '';
+      if (live.uid) { await loadMembership(); await refreshAll(); }
+    } catch (e) { ui.toast = friendlyError(e); }
+    live.ready = true;
+    if (location.hash && location.hash.indexOf('#/') !== 0) history.replaceState(null, '', location.pathname + location.search + '#/');
+    render();
+    Backend.subscribe(() => { clearTimeout(boot.t); boot.t = setTimeout(() => refreshAll().then(render).catch(() => {}), 400); });
+    Backend.onAuthChange(async (sess) => {
+      const uid = sess ? sess.user.id : null;
+      if (uid === live.uid) return;
+      live.uid = uid; live.email = sess ? sess.user.email : '';
+      if (uid) { await loadMembership(); await refreshAll(); } else { live.group = null; S.me = null; S.agreed = null; }
+      render();
+    });
+    // keep the shelves fresh when coming back to the app
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && live.group) refreshAll().then(render).catch(() => {}); });
+  }
+
+  async function liveSendCode(email) {
+    email = String(email || '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { ui.onbError = t('emailInvalid'); render(); return; }
+    live.busy = true; ui.onbError = ''; live.authEmail = email; render();
+    try { await Backend.sendCode(email); live.authStep = 'code'; }
+    catch (e) { ui.onbError = friendlyError(e); }
+    finally { live.busy = false; render(); }
+  }
+  async function liveVerify(code) {
+    code = String(code || '').replace(/\D/g, '');
+    if (code.length < 6) { ui.onbError = t('codeInvalid'); render(); return; }
+    live.busy = true; ui.onbError = ''; render();
+    try { await Backend.verifyCode(live.authEmail, code); /* onAuthChange takes it from here */ }
+    catch (e) { ui.onbError = friendlyError(e); }
+    finally { live.busy = false; render(); }
+  }
+  async function liveJoin(name, country, postal) {
+    live.busy = true; ui.onbError = ''; render();
+    try {
+      const p = { name: name, country: country, postal: postal, langs: S.interested, terms: TERMS.version };
+      if (live.group) {
+        await Backend.updateProfile(live.group.id, live.uid, { display_name: name, country: country, postal_code: postal, interested_langs: S.interested });
+        await Backend.acceptTerms(live.group.id, TERMS.version);
+      } else if (ui.onbMode === 'start') {
+        p.groupName = String(ui.onbGroup || '').trim();
+        if (p.groupName.length < 2) throw new Error('groupNameRequired');
+        const r = await Backend.createGroup(p);
+        live.newInvite = r && r.invite_code;
+      } else {
+        p.code = String(live.invite || '').trim();
+        if (!p.code) throw new Error('inviteRequired');
+        await Backend.joinGroup(p);
+      }
+      await loadMembership(); await refreshAll();
+      location.hash = live.newInvite ? '#/profile' : '#/';
+    } catch (e) { ui.onbError = friendlyError(e); }
+    finally { live.busy = false; render(); }
+  }
+  async function liveSendRequest(owner) {
+    const ids = S.cart.filter((id) => { const b = book(id); return b && b.owner === owner; });
+    if (!ids.length) return;
+    const meta = S.cartMeta[owner] || { offered: [], msg: t('defaultMsg') };
+    const offered = meta.offered.filter((id) => { const b = book(id); return b && b.owner === MINE && b.status === 'available'; });
+    const id = await liveAct(() => Backend.createRequest(owner, ids, offered, meta.msg));
+    if (id && id !== true) {
+      S.cart = S.cart.filter((x) => ids.indexOf(x) < 0); delete S.cartMeta[owner]; save();
+      toast(t('sent')); go('#/chat/' + id);
+    }
+  }
+
+  if (LIVE) {
+    const thread = (el) => S.threads.find((x) => x.id === el.dataset.v || x.id === el.dataset.thread);
+    Object.assign(A, {
+      acceptThread: (el) => {
+        const th = thread(el);
+        const ticked = (ui.ticks[th.id] || th.books).filter((id) => th.books.indexOf(id) >= 0);
+        liveAct(() => Backend.respond(th.id, ticked));
+      },
+      declineThread: (el) => liveAct(() => Backend.decline(thread(el).id)),
+      confirmHandover: (el) => {
+        const when = document.getElementById('hdate').value || nextSaturdayISO();
+        const where = (document.getElementById('hwhere').value || t('handoverPh')).trim().slice(0, 60);
+        liveAct(() => Backend.schedule(thread(el).id, when, where));
+      },
+      markDone: (el) => liveAct(() => Backend.complete(thread(el).id)),
+      quick: (el) => liveAct(() => Backend.sendMessage(thread(el).id, live.uid, t(el.dataset.v))),
+      report: () => { const id = route().id; liveAct(() => Backend.report(live.group.id, live.uid, 'request', id, ''), t('reported')); },
+      saveDraft: async () => {
+        const d = ui.draft;
+        if (!d.title.trim()) { ui.addMsg = t('required'); ui.addMsgKind = 'warn'; render(); return; }
+        if (!d.photos.length) { ui.addMsg = t('photoRequired'); ui.addMsgKind = 'warn'; render(); window.scrollTo(0, 0); return; }
+        const row = { isbn: /^\d{13}$/.test(d.isbn || '') ? d.isbn : null, title: d.title.trim().slice(0, 150), author: (d.author || '').trim().slice(0, 120),
+          description: (d.description || '').trim().slice(0, 3000), notes: (d.notes || '').trim().slice(0, 300), lang: d.lang,
+          topics: d.topics.length ? d.topics.slice(0, 9) : ['learning'], age: d.age, condition: d.cond, offer: d.offer,
+          price_cents: d.offer === 'sell' ? Math.round((Number(String(d.price).replace(',', '.')) || 0) * 100) : 0 };
+        ui.busy = true; render();
+        const id = await liveAct(() => Backend.addBook(live.group.id, live.uid, row, d.photos.slice(0, MAX_PHOTOS)));
+        ui.busy = false;
+        if (id && id !== true) { ui.lastSaved = id; ui.lastWish = null; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; }
+        render();
+      },
+      saveWish: async () => {
+        const d = ui.draft;
+        if (!d.title.trim()) { ui.addMsg = t('required'); ui.addMsgKind = 'warn'; render(); return; }
+        const id = await liveAct(() => Backend.addWish(live.group.id, live.uid, { title: d.title.trim().slice(0, 150), author: (d.author || '').trim().slice(0, 120), lang: d.lang, isbn: /^\d{13}$/.test(d.isbn || '') ? d.isbn : null }));
+        if (id && id !== true) { ui.lastWish = id; ui.lastSaved = null; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; }
+        render();
+      },
+      removeWish: (el) => liveAct(() => Backend.removeWish(el.dataset.v)),
+      removeBook: (el) => {
+        const b = book(el.dataset.v);
+        if (!b || !window.confirm(t('confirmRemove'))) return;
+        liveAct(() => Backend.deleteBook(b.id, b.photoPaths)).then((ok) => { if (ok) go('#/profile'); });
+      },
+      savePostal: () => {
+        const cc = document.getElementById('p-country').value;
+        const v = cleanPostal(cc, document.getElementById('p-postal').value);
+        if (!v || !validPostal(cc, v)) { toast(t('postalInvalid', { country: countryName(cc) })); return; }
+        liveAct(() => Backend.updateProfile(live.group.id, live.uid, { country: cc, postal_code: v }).then(() => { S.me.country = cc; S.me.postal = v; }), t('saved'));
+      },
+      deleteAll: async () => {
+        if (!window.confirm(t('confirmLeave'))) return;
+        const ok = await liveAct(() => Backend.leaveGroup(live.group.id, live.uid));
+        if (ok) { await Backend.signOut(); live.group = null; S = fresh(); location.hash = '#/'; render(); }
+      },
+      createInvite: async () => {
+        const code = await liveAct(() => Backend.createInvite(live.group.id));
+        if (code && code !== true) { live.newInvite = code; render(); }
+      },
+      copyInvite: () => {
+        const link = location.origin + location.pathname + '#/join/' + live.newInvite;
+        const text = t('inviteMessage', { group: groupLabel(), code: live.newInvite, link: link });
+        if (navigator.share) navigator.share({ text: text }).catch(() => {});
+        else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast(t('copied')));
+      }
+    });
+  }
+  Object.assign(A, {
+    onbMode: (el) => { ui.onbMode = el.dataset.v; ui.onbError = ''; render(); },
+    otherEmail: () => { live.authStep = 'email'; ui.onbError = ''; render(); },
+    resendCode: () => liveSendCode(live.authEmail),
+    signOut: async () => { await Backend.signOut(); live.uid = null; live.group = null; S.me = null; S.agreed = null; live.authStep = 'email'; render(); }
+  });
+  if (!A.removeBook) {
+    A.removeBook = (el) => {
+      if (!window.confirm(t('confirmRemove'))) return;
+      S.books = S.books.filter((b) => b.id !== el.dataset.v); save(); go('#/profile');
+    };
+  }
+
   $app.addEventListener('click', (e) => {
     const el = e.target.closest('[data-action]');
     if (!el || !$app.contains(el)) return;
@@ -1209,14 +1518,19 @@
       if (!text) return;
       if (looksLikeCopySharing(text)) { toast(t('copyBlocked')); return; }
       const th = S.threads.find((x) => x.id === f.dataset.v);
+      if (LIVE) { box.value = ''; liveAct(() => Backend.sendMessage(th.id, live.uid, text)); return; }
       th.messages.push({ from: MINE, text: text, at: Date.now() }); box.value = ''; save(); render();
-    } else if (kind === 'lookupTyped') lookupIsbn(document.getElementById('isbn').value);
+    } else if (kind === 'sendCode') liveSendCode(document.getElementById('si-email').value);
+    else if (kind === 'verifyCode') liveVerify(document.getElementById('si-code').value);
+    else if (kind === 'lookupTyped') lookupIsbn(document.getElementById('isbn').value);
     else if (kind === 'titleSearch') titleSearch(document.getElementById('tsearch').value);
   });
   let qTimer;
   $app.addEventListener('input', (e) => {
     const el = e.target; const kind = el.dataset && el.dataset.input; if (!kind) return;
     if (kind === 'onbName') ui.onbName = el.value;
+    else if (kind === 'onbCode') live.invite = el.value;
+    else if (kind === 'onbGroup') ui.onbGroup = el.value;
     else if (kind === 'onbPostal') ui.onbPostal = el.value;
     else if (kind === 'q') { ui.q = el.value; clearTimeout(qTimer); qTimer = setTimeout(render, 250); }
     else if (kind === 'draft') { ui.draft[el.dataset.field] = el.value; }
@@ -1231,4 +1545,5 @@
 
   initCountry();
   render();
+  if (LIVE) boot();
 })();

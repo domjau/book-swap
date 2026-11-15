@@ -36,6 +36,13 @@ The prototype is therefore not a place to put real personal data. Anyone with ac
 - CSP is set with a `<meta>` tag, because GitHub Pages cannot set HTTP headers. Some directives (e.g. `frame-ancestors`) only work as real headers.
 - Google Fonts is loaded from Google's servers, which shows visitors' IP addresses to Google. Hosting the font locally would avoid this.
 
+## Live version (Supabase)
+
+- `config.js` contains only the **publishable** key, which is designed to be public. All access control is in the database (see `supabase/migrations/001_init.sql`): RLS on every table, column-level grants, and status changes only through checked functions. The `service_role` / secret key is never used by the app.
+- `supabase/tests/rls_test.sh` runs 44 cross-user and cross-group checks, and all pass.
+- Photos are in a private bucket and displayed via signed URLs that expire after 1 hour.
+- Sign-in is passwordless (email OTP). The sign-in tokens are removed from the address bar right after login.
+
 ## Security plan for the production version
 
 The production version adds a backend (planned: Supabase with Postgres, auth, storage and realtime). Before real families use it, all of these must be in place:

@@ -6,6 +6,7 @@
 2. Open **SQL Editor → New query**, paste the whole of [`migrations/001_init.sql`](migrations/001_init.sql) and click **Run**. It should finish with "Success. No rows returned".
 3. **Authentication → URL Configuration**: set **Site URL** to the app's address, e.g. `https://domjau.github.io/book-swap/`, and add the same under **Redirect URLs**.
 4. **Authentication → Emails → SMTP Settings**: connect an email provider (e.g. Brevo, Resend or your domain's mailbox). Until then, sign-in emails only reach members of your Supabase team.
+   Then, under **Authentication → Emails → Templates**, add the code to the **Magic Link** and **Confirm signup** templates, for example `<p>Your code: <strong>{{ .Token }}</strong></p>`. On phones, typing the code is more reliable than the link, because email apps often open links in a different browser.
 5. Put the **Project URL** and the **publishable key** in `config.js`. **Never** put the secret / service_role key in the app.
 
 ## What the schema does

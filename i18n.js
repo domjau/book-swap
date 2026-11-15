@@ -365,3 +365,68 @@ Object.assign(window.STRINGS.en, {
   copyNotes: 'About this copy', copyNotesPh: 'e.g. torn corner on the cover, a few pencil marks',
   descPh: 'What is the book about? (filled in automatically when we find one)', noDescFound: "We didn't find a description – you can write a short one."
 });
+
+/* Accounts (live mode) */
+Object.assign(window.STRINGS.lt, {
+  emailLabel: 'El. paštas', emailPh: 'jusu@pastas.lt', sendCode: 'Gauti prisijungimo kodą', emailInvalid: 'Patikrinkite el. pašto adresą.',
+  noPassword: 'Slaptažodžio nereikia – atsiųsime nuorodą ir 6 skaitmenų kodą.',
+  checkEmail: 'Išsiuntėme laišką adresu {email}. Atidarykite nuorodą arba įveskite kodą žemiau.',
+  codeLabel: 'Kodas iš laiško', verify: 'Prisijungti', otherEmail: 'Kitas el. paštas', resend: 'Siųsti dar kartą',
+  codeInvalid: 'Kodas neteisingas arba nebegalioja. Paprašykite naujo.',
+  joinWithCode: 'Turiu pakvietimo kodą', startGroup: 'Sukurti naują grupę', inviteCode: 'Pakvietimo kodas', inviteCodePh: 'Pvz. K7QM2WXA',
+  groupNameLabel: 'Grupės pavadinimas', groupNamePh: 'Pvz. Kopenhagos lituanistinė mokyklėlė',
+  groupNameRequired: 'Įveskite grupės pavadinimą.', inviteRequired: 'Įveskite pakvietimo kodą.',
+  inviteTitle: 'Pakviesti šeimas', inviteHint: 'Sukurkite kodą ir pasidalinkite juo tėvų grupėje.', createInvite: 'Sukurti pakvietimo kodą',
+  inviteShare: 'Kodas galioja 30 dienų. Pasidalinkite juo arba nuoroda.', copyLink: 'Dalintis pakvietimu', copied: 'Nukopijuota!',
+  inviteMessage: 'Prisijunk prie „{group}“ knygų keityklos! Kodas: {code}\n{link}',
+  signedInAs: 'Prisijungta kaip {email}', signOut: 'Atsijungti', leaveGroup: 'Palikti grupę ir ištrinti mano duomenis',
+  confirmLeave: 'Tikrai palikti grupę? Jūsų knygos, norai ir nuotraukos bus ištrinti.',
+  loading: 'Kraunama…', errGeneric: 'Kažkas nepavyko.', errInvite: 'Pakvietimo kodas neteisingas arba nebegalioja.',
+  errNotAvailable: 'Kai kurios knygos jau nebegalimos. Atnaujinkite ir bandykite dar kartą.',
+  errRateLimit: 'Per daug bandymų. Palaukite minutę ir bandykite dar kartą.',
+  errEmailNotAllowed: 'Laiško šiuo adresu išsiųsti dar negalime – programėlės el. pašto paslauga dar nenustatyta.',
+  errOffline: 'Nėra ryšio. Patikrinkite internetą.',
+  removeListing: 'Pašalinti skelbimą', confirmRemove: 'Pašalinti šią knygą iš lentynos?'
+});
+Object.assign(window.STRINGS.es, {
+  emailLabel: 'Correo electrónico', emailPh: 'tu@correo.es', sendCode: 'Recibir código de acceso', emailInvalid: 'Revisa el correo electrónico.',
+  noPassword: 'Sin contraseña: te enviamos un enlace y un código de 6 dígitos.',
+  checkEmail: 'Hemos enviado un correo a {email}. Abre el enlace o escribe el código abajo.',
+  codeLabel: 'Código del correo', verify: 'Entrar', otherEmail: 'Usar otro correo', resend: 'Reenviar',
+  codeInvalid: 'El código no es correcto o ha caducado. Pide uno nuevo.',
+  joinWithCode: 'Tengo un código de invitación', startGroup: 'Crear un grupo nuevo', inviteCode: 'Código de invitación', inviteCodePh: 'Ej. K7QM2WXA',
+  groupNameLabel: 'Nombre del grupo', groupNamePh: 'Ej. Escuela lituana de Copenhague',
+  groupNameRequired: 'Escribe el nombre del grupo.', inviteRequired: 'Escribe el código de invitación.',
+  inviteTitle: 'Invitar a familias', inviteHint: 'Crea un código y compártelo en el grupo de padres.', createInvite: 'Crear código de invitación',
+  inviteShare: 'El código vale 30 días. Compártelo o comparte el enlace.', copyLink: 'Compartir invitación', copied: '¡Copiado!',
+  inviteMessage: '¡Únete al intercambio de libros de «{group}»! Código: {code}\n{link}',
+  signedInAs: 'Conectado como {email}', signOut: 'Cerrar sesión', leaveGroup: 'Salir del grupo y borrar mis datos',
+  confirmLeave: '¿Seguro que quieres salir del grupo? Se borrarán tus libros, deseos y fotos.',
+  loading: 'Cargando…', errGeneric: 'Algo ha fallado.', errInvite: 'El código de invitación no es válido o ha caducado.',
+  errNotAvailable: 'Algunos libros ya no están disponibles. Actualiza e inténtalo de nuevo.',
+  errRateLimit: 'Demasiados intentos. Espera un minuto e inténtalo de nuevo.',
+  errEmailNotAllowed: 'Aún no podemos enviar correos a esta dirección: falta configurar el servicio de correo de la app.',
+  errOffline: 'Sin conexión. Revisa internet.',
+  removeListing: 'Retirar anuncio', confirmRemove: '¿Retirar este libro de tu estantería?'
+});
+Object.assign(window.STRINGS.en, {
+  emailLabel: 'Email', emailPh: 'you@example.com', sendCode: 'Send me a sign-in code', emailInvalid: 'Please check the email address.',
+  noPassword: "No password needed – we'll email you a link and a 6-digit code.",
+  checkEmail: 'We sent an email to {email}. Open the link, or type the code below.',
+  codeLabel: 'Code from the email', verify: 'Sign in', otherEmail: 'Use another email', resend: 'Send again',
+  codeInvalid: 'That code is wrong or has expired. Ask for a new one.',
+  joinWithCode: 'I have an invite code', startGroup: 'Start a new group', inviteCode: 'Invite code', inviteCodePh: 'e.g. K7QM2WXA',
+  groupNameLabel: 'Group name', groupNamePh: 'e.g. Lithuanian Saturday School, Copenhagen',
+  groupNameRequired: 'Please enter a group name.', inviteRequired: 'Please enter the invite code.',
+  inviteTitle: 'Invite families', inviteHint: 'Create a code and share it in your parents’ group chat.', createInvite: 'Create invite code',
+  inviteShare: 'The code is valid for 30 days. Share it or the link.', copyLink: 'Share invite', copied: 'Copied!',
+  inviteMessage: 'Join the "{group}" book swap! Code: {code}\n{link}',
+  signedInAs: 'Signed in as {email}', signOut: 'Sign out', leaveGroup: 'Leave group and delete my data',
+  confirmLeave: 'Really leave the group? Your books, wishes and photos will be deleted.',
+  loading: 'Loading…', errGeneric: 'Something went wrong.', errInvite: 'That invite code is wrong or has expired.',
+  errNotAvailable: 'Some books are no longer available. Refresh and try again.',
+  errRateLimit: 'Too many attempts. Wait a minute and try again.',
+  errEmailNotAllowed: "We can't send email to this address yet – the app's email service isn't set up.",
+  errOffline: 'No connection. Check your internet.',
+  removeListing: 'Remove listing', confirmRemove: 'Remove this book from your shelf?'
+});

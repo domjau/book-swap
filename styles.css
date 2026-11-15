@@ -240,3 +240,6 @@ select.input { appearance: auto; }
 .ph-hint { display: flex; gap: 6px; align-items: flex-start; }
 .gallery { display: flex; gap: 8px; overflow-x: auto; margin: 12px 0; }
 .gallery img { height: 140px; border-radius: 10px; flex: 0 0 auto; }
+.code-input { letter-spacing: .2em; font-weight: 900; text-transform: uppercase; }
+.invite-code { font-size: 30px; font-weight: 900; letter-spacing: .15em; text-align: center; padding: 12px; background: #FFF3E8; border-radius: 14px; margin: 6px 0; }
+.invite-card .btn { width: 100%; }

@@ -59,7 +59,11 @@ Topics are suggested by matching catalogue categories, subjects and description 
 
 **Coverage limits.** Free catalogues miss many European and small-language editions. For production, a server-side lookup (Edge Function with caching) can add national library catalogues such as the BnF (France), DNB (Germany) and LIBIS (Lithuania), or a paid service like ISBNdb. The shared catalogue means every book only has to be typed in once.
 
-## 2. Production target
+## 2. Live version (Supabase) – implemented
+
+`backend.js` wraps all Supabase calls: OTP sign-in, membership, group data, threads, RPCs, photo upload with signed URLs, and realtime. `app.js` keeps the same in-memory state shape in both modes. In live mode it fills that state from the server (`refreshAll()`) and sends every change through `Backend`, after which it reloads. Only device preferences (language, cart) are stored locally.
+
+## 2b. Production target (original plan)
 
 ```
 PWA (same UI, installable)  ──HTTPS──▶  Supabase
