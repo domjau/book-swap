@@ -1,4 +1,4 @@
--- Book Swap – one open network, moderated by platform admins (no communities, organisers or invite codes).
+-- seku seku – one open network, moderated by platform admins (no communities, organisers or invite codes).
 -- Run after 003_notifications_admin.sql.
 --
 -- How it works: the whole service is a single "network" group that everyone joins automatically at
@@ -9,9 +9,9 @@ begin;
 
 -- ---------------------------------------------------------------- the network
 create or replace function public.network_id()
-returns uuid language sql immutable as $$ select '00000000-0000-0000-0000-000000000001'::uuid $$;
+returns uuid language sql immutable set search_path = public as $$ select '00000000-0000-0000-0000-000000000001'::uuid $$;
 
-insert into public.groups (id, name) values (public.network_id(), 'Book Swap') on conflict (id) do nothing;
+insert into public.groups (id, name) values (public.network_id(), 'seku seku') on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------- move existing data (no-op on a fresh database)
 insert into public.members (group_id, user_id, role, display_name, country, postal_code, interested_langs, terms_version, terms_accepted_at, joined_at)
@@ -121,5 +121,15 @@ revoke all on function public.network_id(), public.join_network(text, text, text
   public.admin_add(text), public.admin_remove(uuid) from public, anon, authenticated;
 grant execute on function public.network_id(), public.join_network(text, text, text, text[], text), public.admin_list(),
   public.admin_add(text), public.admin_remove(uuid) to authenticated;
+
+-- ---------------------------------------------------------------- Supabase security advisor fixes
+alter function public._hash_code(text) set search_path = public, extensions;
+alter function public.looks_like_copy_sharing(text) set search_path = public;
+-- Supabase's own "automatic RLS" helper (exists only on projects created with that option).
+do $$ begin
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+  end if;
+end $$;
 
 commit;
