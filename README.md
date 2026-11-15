@@ -6,7 +6,9 @@ This is a **clickable prototype**. It runs entirely in the browser and keeps its
 
 ## Try it
 
-Open the GitHub Pages link on your phone and choose **Add to Home Screen** to use it like an app.
+**Live demo:** https://domjau.github.io/book-swap/
+
+Open it on your phone and choose **Add to Home Screen** to use it like an app. Try scanning the barcode of a children's book you own.
 
 To run it locally:
 
@@ -48,6 +50,18 @@ The camera only works over HTTPS or on `localhost`.
 | `styles.css` | Styles |
 | `vendor/html5-qrcode.min.js` | Barcode scanner library (Apache-2.0), hosted locally instead of from a CDN |
 
+## Documentation
+
+| Doc | What's in it |
+|---|---|
+| [docs/USER_JOURNEYS.md](docs/USER_JOURNEYS.md) | How organisers and members use the app, step by step |
+| [docs/FEATURES.md](docs/FEATURES.md) | What's built, what's next (MVP) and later ideas |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Prototype structure, book lookup pipeline, production design, data model, row-level security |
+| [SECURITY.md](SECURITY.md) | How to report vulnerabilities, current protections, production security checklist |
+| [docs/PRIVACY.md](docs/PRIVACY.md) | What data is stored and why, photo metadata, retention, GDPR checklist |
+| [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) | Adding app languages and book languages |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Running locally and coding rules |
+
 ## Security notes (prototype)
 
 - All user text is HTML-escaped before display. Chat messages are rendered as plain text only.
@@ -56,6 +70,8 @@ The camera only works over HTTPS or on `localhost`.
 - Location data is removed from photos.
 
 ## Towards a real version
+
+The full plan is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [SECURITY.md](SECURITY.md). In short:
 
 1. A backend (e.g. Supabase): email magic-link sign-in, Postgres with **row-level security** so members only see their own group, storage for photos, and realtime for chat.
 2. Invite-only groups with an expiring invite link per school or community, plus organiser/admin tools.
