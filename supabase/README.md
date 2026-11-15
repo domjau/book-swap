@@ -3,7 +3,7 @@
 ## Set up a new project
 
 1. Create a Supabase project (EU region), with **automatic RLS on** and **"expose new tables" off**.
-2. Open **SQL Editor → New query**, paste the whole of [`migrations/001_init.sql`](migrations/001_init.sql) and click **Run**. It should finish with "Success. No rows returned".
+2. Open **SQL Editor → New query**, paste the whole of [`migrations/001_init.sql`](migrations/001_init.sql) and click **Run**. It should finish with "Success. No rows returned". Then do the same with [`migrations/002_reviews_avatars.sql`](migrations/002_reviews_avatars.sql) (reviews and profile pictures). Always run the migrations in number order, each one once.
 3. **Authentication → URL Configuration**: set **Site URL** to the app's address, e.g. `https://domjau.github.io/book-swap/`, and add the same under **Redirect URLs**.
 4. **Authentication → Emails → SMTP Settings**: connect an email provider (e.g. Brevo, Resend or your domain's mailbox). Until then, sign-in emails only reach members of your Supabase team.
    Then, under **Authentication → Emails → Templates**, add the code to the **Magic Link** and **Confirm signup** templates, for example `<p>Your code: <strong>{{ .Token }}</strong></p>`. On phones, typing the code is more reliable than the link, because email apps often open links in a different browser.
@@ -19,10 +19,11 @@
 
 ## Security tests
 
-`tests/rls_test.sh` runs 44 checks against a local PostgreSQL with a small Supabase imitation (`tests/local_supabase_stub.sql`). It covers three users in two groups: reading, writing and status changes across groups, posting as someone else, and photo upload and read rules.
+`tests/rls_test.sh` runs 58 checks against a local PostgreSQL with a small Supabase imitation (`tests/local_supabase_stub.sql`). It covers three users in two groups: reading, writing and status changes across groups, posting as someone else, and photo upload and read rules.
 
 ```bash
 sudo -u postgres psql -f supabase/tests/local_supabase_stub.sql
 sudo -u postgres psql -d bs -f supabase/migrations/001_init.sql
-bash supabase/tests/rls_test.sh      # expects: 44 passed, 0 failed
+sudo -u postgres psql -d bs -f supabase/migrations/002_reviews_avatars.sql
+bash supabase/tests/rls_test.sh      # expects: 58 passed, 0 failed
 ```

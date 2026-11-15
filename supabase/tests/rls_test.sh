@@ -67,4 +67,22 @@ check "Ana can see group-1 photo" "1" "$(q $A "select count(*) from storage.obje
 check "Cleo cannot see group-1 photo" "0" "$(q $C "select count(*) from storage.objects where name='$G1/$B/2.jpg'")"
 check "Ana cannot delete Ben's photo" "DELETE 0" "$(q $A "delete from storage.objects where name='$G1/$B/2.jpg'")"
 
+echo "== reviews and avatars"
+R2=$(q $A "select r.id from requests r limit 1" | tr -d ' ')
+check "Cleo cannot review" "not allowed" "$(q $C "select submit_review('$R','5','great')")"
+check "Ben reviews Ana (5 books)" "" "$(q $B "select submit_review('$R',5,'Lovely swap!')")"
+check "Ben edits his review (one per exchange)" "1" "$(q $B "select submit_review('$R',4,'Very nice'); select count(*) from reviews where reviewer_id='$B'" | awk '{print $NF}')"
+check "rating out of range rejected" "1–5" "$(q $A "select submit_review('$R',9,'x')")"
+check "Ana reviews Ben" "" "$(q $A "select submit_review('$R',5,'')")"
+check "reviews readable in group" "2" "$(q $B "select count(*) from reviews")"
+check "Cleo cannot read group-1 reviews" "0" "$(q $C "select count(*) from reviews")"
+check "nobody can insert reviews directly" "permission denied" "$(q $B "insert into reviews (request_id, group_id, reviewer_id, reviewee_id, rating) values ('$R','$G1','$B','$A',1)")"
+check "Ben cannot fake-edit Ana's review" "permission denied" "$(q $B "update reviews set rating=1")"
+check "review comment blocks PDF links" "not allowed" "$(q $B "select submit_review('$R',3,'get it at libgen')")"
+R3=$(q $B "select create_request('$A','{$(q $A "insert into books (group_id, owner_id, title, offer, photo_paths) values ('$G1','$A','Gruffalo','swap','{x}') returning id" | awk '{print $1}')}','{}','hi')" | tr -d ' ')
+check "no review before handover" "after the handover" "$(q $B "select submit_review('$R3',5,'')")"
+check "Ben sets avatar in own folder" "UPDATE 1" "$(q $B "update members set avatar_path='$G1/$B/avatar.jpg' where user_id='$B'")"
+check "Ben cannot point avatar at Ana's file" "violates check constraint" "$(q $B "update members set avatar_path='$G1/$A/x.jpg' where user_id='$B'")"
+check "Ben cannot set Ana's avatar" "UPDATE 0" "$(q $B "update members set avatar_path='$G1/$A/a.jpg' where user_id='$A'")"
+
 echo; echo "RESULT: $pass passed, $fail failed"

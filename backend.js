@@ -88,15 +88,17 @@
 
     // ---------- data ----------
     async loadGroup(groupId) {
-      const [members, books, wishes] = await Promise.all([
-        sb.from('members').select('user_id, display_name, country, postal_code, role').eq('group_id', groupId),
+      const [members, books, wishes, reviews] = await Promise.all([
+        sb.from('members').select('user_id, display_name, country, postal_code, role, avatar_path').eq('group_id', groupId),
         sb.from('books').select('*').eq('group_id', groupId).order('created_at', { ascending: false }).limit(2000),
-        sb.from('wishes').select('*').eq('group_id', groupId).limit(5000)
+        sb.from('wishes').select('*').eq('group_id', groupId).limit(5000),
+        sb.from('reviews').select('*').eq('group_id', groupId).order('created_at', { ascending: false }).limit(5000)
       ]).then((rs) => rs.map(check));
       const paths = [];
       books.forEach((b) => (b.photo_paths || []).forEach((p) => paths.push(p)));
+      members.forEach((m) => { if (m.avatar_path) paths.push(m.avatar_path); });
       const urls = paths.length ? await signedUrls(paths) : {};
-      return { members: members, books: books, wishes: wishes, urls: urls };
+      return { members: members, books: books, wishes: wishes, reviews: reviews, urls: urls };
     },
     async loadThreads() {
       const reqs = check(await sb.from('requests').select('*').order('updated_at', { ascending: false }).limit(500));
@@ -146,6 +148,16 @@
     async markRead(requestId) { await sb.rpc('mark_read', { p_request: requestId }); },
     async sendMessage(requestId, uid, text) {
       check(await sb.from('messages').insert({ request_id: requestId, sender_id: uid, kind: 'user', body: text }));
+    },
+    async submitReview(requestId, rating, comment) {
+      check(await sb.rpc('submit_review', { p_request: requestId, p_rating: rating, p_comment: comment || '' }));
+    },
+    // Profile picture: upload a new file, point the profile at it, then remove the old one.
+    async setAvatar(groupId, uid, dataUrl, oldPath) {
+      const path = groupId + '/' + uid + '/avatar-' + rid() + '.jpg';
+      check(await sb.storage.from(BUCKET).upload(path, dataUrlToBlob(dataUrl), { contentType: 'image/jpeg', upsert: false }));
+      check(await sb.from('members').update({ avatar_path: path }).eq('group_id', groupId).eq('user_id', uid));
+      if (oldPath) await sb.storage.from(BUCKET).remove([oldPath]);
     },
     async report(groupId, uid, type, id, reason) {
       check(await sb.from('reports').insert({ group_id: groupId, reporter_id: uid, target_type: type, target_id: String(id), reason: reason || '' }));

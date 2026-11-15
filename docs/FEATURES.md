@@ -22,6 +22,9 @@
 | Handover card (date + place), mark handed over | ✅ |
 | Reserved / gone status | ✅ |
 | Profile stats + badges | ✅ |
+| Member reviews: 1–5 little books + comment after a finished exchange (one per person per exchange, editable) | ✅ |
+| Profile picture (square, 256 px, metadata removed) | ✅ |
+| Sold / donated / exchanged counts on profiles and member pages | ✅ |
 | Export / delete my data | ✅ (device only) |
 | Terms of use (LT/ES/EN), required at sign-up, re-accept on new version | ✅ |
 | Country + postal code at sign-up (format check for common countries), shown on books & members, "Near me" filter, sorted by distance | ✅ |

@@ -43,6 +43,8 @@ The camera only works over HTTPS or on `localhost`.
 - **Wish lists and tailored exchanges:** add books you're looking for (scan, search or type). See "From your wish list" and "They want your books" on the home screen. A member's page pre-ticks a fair swap: their books you want, and your books they want.
 - **Neighbours first:** members give their country and postal code, never an address. The country list is shown in the app language, and postal codes are checked for common countries (DK, LT, ES, DE, UK, NL…). Books show the owner's area, a *Near me* filter is available, and lists are sorted nearest first to avoid shipping.
 - **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that Book Swap is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
+- **Reviews with little books:** after a handover, each side rates the other 1–5 little books, with an optional comment. Ratings appear on profiles, member pages and book pages.
+- **Profile pictures** and **sold / donated / exchanged** counts for every member.
 - **Profile stats:** books listed, given away and received, money saved, a book-language mix, favourite topics and badges.
 - **Settings:** export my data (JSON) and delete everything.
 

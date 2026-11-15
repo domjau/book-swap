@@ -17,6 +17,8 @@
 | Email | Sign-in links, notifications | Nobody else | Not collected | Server, never shown |
 | Country + postal code | Show who is nearby, avoid shipping | Group members | Device only | Server |
 | Interested book languages | Better browsing | Only you | Device only | Server |
+| Profile picture (optional) | Recognise each other at handovers | Group members | Device only | Server (private bucket) |
+| Reviews you give and receive (1–5 + short comment) | Trust between members | Group members | Device only | Server |
 | Wish list (titles you're looking for) | Matching with other people's shelves | Group members | Device only | Server |
 | Terms acceptance (version + time) | Proof that the user accepted the terms | Only you / admins | Device only | Server |
 | Books (title, details, photo) | The listing itself | Group members | Device only | Server |

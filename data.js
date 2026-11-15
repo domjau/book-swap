@@ -86,6 +86,9 @@ window.SAMPLE_BOOKS = [
     description: 'Zog is a keen young dragon who tries his best at dragon school, with a little help from a princess.' },
   { id: 'b12', title: 'El pollo Pepe', author: 'Nick Denchfield', lang: 'es', topics: ['animals', 'funny'], age: '0–3', offer: 'give', price: 0, owner: 'me', cond: 'good', added: D(30),
     description: 'Un libro pop-up sobre un pollito que come muchísimo.' },
+  { id: 'b14', title: 'The Snail and the Whale', author: 'Julia Donaldson', lang: 'en', topics: ['animals'], age: '3–6', offer: 'sell', price: 3, owner: 'mette', cond: 'good', added: D(40), status: 'gone', description: '' },
+  { id: 'b15', title: 'Labanakt, pelyte', author: '—', lang: 'lt', topics: ['bedtime'], age: '0–3', offer: 'give', price: 0, owner: 'ana', cond: 'good', added: D(50), status: 'gone', description: '' },
+  { id: 'b16', title: 'Elmer', author: 'David McKee', lang: 'es', topics: ['animals', 'feelings'], age: '3–6', offer: 'swap', price: 0, owner: 'mette', cond: 'good', added: D(35), status: 'gone', description: '' },
   { id: 'b13', title: 'Bamse og venner', author: '—', lang: 'da', topics: ['animals'], age: '0–3', offer: 'give', price: 0, owner: 'mette', cond: 'worn', added: D(6),
     description: '' }
 ];
@@ -107,4 +110,12 @@ window.SAMPLE_WISHES = [
   { id: 'w6', owner: 'ruta', title: 'El pollo Pepe', author: 'Nick Denchfield', lang: 'es', isbn: '' },
   { id: 'w7', owner: 'me', title: 'Room on the Broom', author: 'Julia Donaldson', lang: 'en', isbn: '' },
   { id: 'w8', owner: 'me', title: 'Didžioji dinozaurų knyga', author: '', lang: 'lt', isbn: '' }
+];
+
+/* Reviews: 1–5 "little books" after a finished exchange. */
+window.SAMPLE_REVIEWS = [
+  { id: 'r1', request: 'x1', from: 'ana', to: 'mette', rating: 5, comment: 'Super friendly, book like new!', at: D(30) },
+  { id: 'r2', request: 'x2', from: 'jonas', to: 'mette', rating: 4, comment: 'Smooth swap at school.', at: D(20) },
+  { id: 'r3', request: 'x3', from: 'mette', to: 'ana', rating: 5, comment: '', at: D(45) },
+  { id: 'r4', request: 'x4', from: 'sofia', to: 'jonas', rating: 3, comment: 'Came a week late, but all good.', at: D(12) }
 ];

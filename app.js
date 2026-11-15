@@ -54,19 +54,20 @@
   function fresh() {
     if (LIVE) {
       return { v: 2, lang: detectLang(), me: null, interested: ['lt', 'es', 'en'], books: [], cart: [], cartMeta: {},
-        threads: [], received: [], wishes: [], agreed: null };
+        threads: [], received: [], wishes: [], agreed: null, reviews: [] };
     }
     return {
       v: 1, lang: detectLang(), me: null, interested: ['lt', 'es', 'en'],
       books: clone(SAMPLE_BOOKS).map((b) => Object.assign({ status: 'available', isbn: '' }, b)),
       cart: [], cartMeta: {}, threads: clone(SAMPLE_THREADS).map((t) => Object.assign({ unread: true }, t)),
-      received: [], wishes: clone(SAMPLE_WISHES), agreed: null
+      received: [], wishes: clone(SAMPLE_WISHES), agreed: null, reviews: clone(SAMPLE_REVIEWS)
     };
   }
   function migrate(s) {
     if (!s) return null;
     if (!s.wishes) s.wishes = clone(SAMPLE_WISHES);
     if (s.agreed === undefined) s.agreed = null;
+    if (!s.reviews) s.reviews = clone(SAMPLE_REVIEWS);
     s.v = 2;
     return s;
   }
@@ -89,7 +90,7 @@
   const ui = {
     q: '', fLang: 'all', fTopic: null, fAge: null,
     draft: null, addStep: 'scan', addMsg: '', addMsgKind: '', searchResults: [], busy: false, lastSaved: null,
-    ticks: {}, showOffer: {}, toast: '', onbName: '', onbPostal: '', onbCountry: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, chatTab: 'active'
+    ticks: {}, showOffer: {}, rating: {}, editReview: {}, toast: '', onbName: '', onbPostal: '', onbCountry: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, chatTab: 'active'
   };
 
   // ---------- i18n ----------
@@ -181,6 +182,44 @@
     return d <= 1 ? { rank: 1 + d / 10, label: label + ' · ' + t('nearby') } : { rank: 2 + Math.min(d, 1e6) / 1e7, label: label };
   }
   const byNear = (a, b) => near(a.owner).rank - near(b.owner).rank || b.added - a.added;
+  // Profile picture or initial
+  function avatarHtml(id, size) {
+    const m = id === MINE ? S.me : MEMBERS[id];
+    const url = m && m.avatar;
+    const cls = 'avatar' + (size === 'sm' ? ' sm' : size === 'xs' ? ' xs' : '');
+    return url ? `<span class="${cls}"><img src="${esc(url)}" alt=""></span>` : `<span class="${cls}">${esc((memberName(id) || '?').slice(0, 1).toUpperCase())}</span>`;
+  }
+  // Ratings: 1–5 "little books"
+  function ratingOf(id) {
+    const rs = (S.reviews || []).filter((r) => r.to === id);
+    return { n: rs.length, avg: rs.length ? rs.reduce((a, r) => a + r.rating, 0) / rs.length : 0, list: rs };
+  }
+  function booksRow(value, size) {
+    const full = Math.round(value);
+    let out = '';
+    for (let i = 1; i <= 5; i++) out += `<span class="rb ${i <= full ? 'on' : ''}">${icon('logo', size || 16)}</span>`;
+    return out;
+  }
+  function ratingHtml(id, size) {
+    const r = ratingOf(id);
+    if (!r.n) return `<span class="rating muted small">${esc(t('noRatings'))}</span>`;
+    return `<span class="rating" role="img" aria-label="${esc(t('booksOutOf', { n: r.avg.toFixed(1) }))}">${booksRow(r.avg, size)}<span class="small bold">${r.avg.toFixed(1)}</span><span class="muted small">(${r.n})</span></span>`;
+  }
+  // Books that left a member's shelf, by kind of deal
+  function dealCounts(id) {
+    const gone = S.books.filter((b) => b.owner === id && b.status === 'gone');
+    return { sold: gone.filter((b) => b.offer === 'sell').length, donated: gone.filter((b) => b.offer === 'give').length, swapped: gone.filter((b) => b.offer === 'swap').length };
+  }
+  function reviewsList(id) {
+    const rs = ratingOf(id).list.slice().sort((a, b) => b.at - a.at).slice(0, 5);
+    if (!rs.length) return `<p class="muted">${esc(t('noRatings'))}</p>`;
+    return `<ul class="reviews">${rs.map((r) => `<li><div class="row-between"><span class="row-gap tight">${avatarHtml(r.from, 'xs')}<span class="bold small">${esc(firstName(r.from))}</span></span><span class="rating">${booksRow(r.rating, 14)}</span></div>
+      ${r.comment ? `<p class="small">${esc(r.comment)}</p>` : ''}<div class="muted tiny">${esc(fmtDate(new Date(r.at)))}</div></li>`).join('')}</ul>`;
+  }
+  const countsHtml = (id) => {
+    const c = dealCounts(id);
+    return `<div class="deal-counts"><span><b>${c.sold}</b> ${esc(t('statSold'))}</span><span><b>${c.donated}</b> ${esc(t('statDonated'))}</span><span><b>${c.swapped}</b> ${esc(t('statSwapped'))}</span></div>`;
+  };
   const memberLink = (id) => `<a class="ulink" href="#/member/${esc(id)}">${esc(memberName(id))}</a>`;
   function offerBadge(b) {
     if (b.status === 'reserved') return `<span class="badge b-res">${esc(t('reserved'))}</span>`;
@@ -335,7 +374,7 @@
       const wanters = membersWantingMine();
       body = (wishHits.length ? `<h2 class="h2 pad">${icon('heart', 20)} ${esc(t('fromWishlist'))}</h2><div class="hscroll">${wishHits.map((b) => bookCard(b, 'row')).join('')}</div>` : '') +
         (wanters.length ? `<h2 class="h2 pad">${icon('swapArrows', 20)} ${esc(t('wantYourBooks'))}</h2><div class="hscroll">${wanters.map((w) => `<a class="member-chip" href="#/member/${esc(w.id)}">
-          <span class="avatar sm">${esc(memberName(w.id).slice(0, 1))}</span><span class="grow"><span class="bold block">${esc(firstName(w.id))}</span>
+          ${avatarHtml(w.id, 'sm')}<span class="grow"><span class="bold block">${esc(firstName(w.id))}</span>
           <span class="small block">${esc(t('wantsCount', { n: w.n }))}</span><span class="tiny muted block">${icon('pin', 11)} ${esc(near(w.id).label)}</span></span></a>`).join('')}</div>` : '') +
         (recent.length ? `<h2 class="h2 pad">${esc(t('rowNew'))}</h2><div class="hscroll">${recent.map((b) => bookCard(b, 'row')).join('')}</div>` : '') +
         `<h2 class="h2 pad">${esc(t('rowAll'))}</h2><div class="grid pad">${others.slice().sort(byNear).map((b) => bookCard(b, 'grid')).join('')}</div>`;
@@ -379,7 +418,7 @@
       ${b.notes ? `<section class="card pad-m"><h2 class="h3">${esc(t('copyNotes'))}</h2><p class="desc">${esc(b.notes)}</p></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('description'))}</h2><p class="desc">${esc(b.description || t('noDescription'))}</p></section>
       <dl class="details card pad-m">
-        <dt>${esc(t('owner'))}</dt><dd>${b.owner === MINE ? esc(memberName(b.owner)) : memberLink(b.owner)}</dd>
+        <dt>${esc(t('owner'))}</dt><dd>${b.owner === MINE ? esc(memberName(b.owner)) : memberLink(b.owner) + '<br>' + ratingHtml(b.owner, 14)}</dd>
         ${b.owner !== MINE ? `<dt>${esc(t('location'))}</dt><dd>${icon('pin', 14)} ${esc(near(b.owner).label)}</dd>` : ''}
         <dt>${esc(t('language'))}</dt><dd>${esc(langName(b.lang))}</dd>
         <dt>${esc(t('age'))}</dt><dd>${esc(t('years', { a: b.age }))}</dd>
@@ -406,8 +445,9 @@
     const theirWishes = S.wishes.filter((w) => w.owner === id);
     return `<main class="pad">
       <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
-      <div class="row-gap"><div class="avatar">${esc(memberName(id).slice(0, 1))}</div>
-        <div><h1 class="h1 tight">${esc(memberName(id))}</h1><div class="muted bold">${icon('pin', 14)} ${esc(near(id).label)}</div></div></div>
+      <div class="row-gap">${avatarHtml(id)}
+        <div><h1 class="h1 tight">${esc(memberName(id))}</h1><div class="muted bold">${icon('pin', 14)} ${esc(near(id).label)}</div>${ratingHtml(id)}</div></div>
+      ${countsHtml(id)}
       <section class="card bundle">
         <div class="h3">${icon('swapArrows', 20)} ${esc(t('tailored'))}</div>
         <div class="muted small">${esc(t('tailoredHint'))}</div>
@@ -423,6 +463,7 @@
           return `<li><span class="grow"><span class="bold">${esc(w.title)}</span> <span class="muted small">${esc(w.author || '')}</span></span>${have ? `<span class="badge b-give">${icon('check', 12)} ${esc(t('yourBook'))}</span>` : ''}</li>`;
         }).join('')}</ul>` : `<div class="muted">${esc(t('nothingHere'))}</div>`}
       </section>
+      <section class="card pad-m"><h2 class="h3">${esc(t('reviewsTitle'))}</h2>${reviewsList(id)}</section>
       <h2 class="h2">${esc(t('theirShelf'))}</h2>
       ${theirs.length ? `<div class="grid">${theirs.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('nothingHere'))}</div>`}
     </main>`;
@@ -478,6 +519,25 @@
   }
   const last = (th) => th.messages[th.messages.length - 1] || { at: 0, text: '' };
 
+  function reviewBox(th) {
+    const mine = (S.reviews || []).find((r) => r.request === th.id && r.from === MINE);
+    const other = firstName(th.with);
+    if (mine && !ui.editReview[th.id]) {
+      return `<div class="review-box"><div class="small bold">${esc(t('youRated', { name: other }))}</div>
+        <div class="row-between"><span class="rating">${booksRow(mine.rating, 20)}</span><button class="link small" data-action="editReview" data-v="${esc(th.id)}">${esc(t('editReview'))}</button></div>
+        ${mine.comment ? `<p class="small">${esc(mine.comment)}</p>` : ''}</div>`;
+    }
+    const sel = ui.rating[th.id] || (mine ? mine.rating : 0);
+    let picks = '';
+    for (let i = 1; i <= 5; i++) picks += `<button class="rb-pick ${i <= sel ? 'on' : ''}" data-action="rateBooks" data-thread="${esc(th.id)}" data-v="${i}" aria-label="${esc(t('booksOutOf', { n: i }))}" aria-pressed="${i === sel}">${icon('logo', 30)}</button>`;
+    return `<div class="review-box"><div class="h3">${esc(t('rateTitle', { name: other }))}</div>
+      <div class="muted small">${esc(t('rateHint'))}</div>
+      <div class="rb-picks" role="group">${picks}</div>
+      <label class="sr" for="rv-${esc(th.id)}">${esc(t('reviewPh'))}</label>
+      <textarea id="rv-${esc(th.id)}" class="input" rows="2" maxlength="300" placeholder="${esc(t('reviewPh'))}">${esc(mine ? mine.comment : '')}</textarea>
+      <button class="btn primary" data-action="submitReview" data-v="${esc(th.id)}">${esc(t('submitReview'))}</button></div>`;
+  }
+
   function viewChat(id) {
     const th = S.threads.find((x) => x.id === id);
     if (!th) return `<main class="pad">${esc(t('messagesEmpty'))}</main>`;
@@ -511,7 +571,7 @@
       control = `<div class="handover"><div class="h3">${icon('calendar', 20)} ${esc(t('handoverSet', { when: fmtDate(new Date(th.handover.when)), where: th.handover.where }))}</div>
         <button class="btn primary" data-action="markDone" data-v="${esc(th.id)}">${icon('check')} ${esc(t('markDone'))}</button></div>`;
     } else if (th.status === 'done') {
-      control = `<div class="notice ok">${icon('check')} ${esc(t('doneMsg'))}</div>`;
+      control = `<div class="notice ok">${icon('check')} ${esc(t('doneMsg'))}</div>` + reviewBox(th);
     } else {
       control = `<div class="notice">${esc(t('stDeclined'))}</div>`;
     }
@@ -679,10 +739,14 @@
     const myWishes = S.wishes.filter((w) => w.owner === MINE);
     const stat = (n, k) => `<div class="stat"><div class="stat-n">${esc(n)}</div><div class="stat-l">${esc(t(k))}</div></div>`;
     return `<main class="pad">
-      <div class="row-gap"><div class="avatar">${esc((S.me.name || '?').slice(0, 1).toUpperCase())}</div>
+      <div class="row-gap"><label class="avatar-edit" title="${esc(t('changeAvatar'))}">${avatarHtml(MINE)}<span class="avatar-cam">${icon('camera', 14)}</span>
+          <input type="file" accept="image/*" class="sr" data-change="avatar" aria-label="${esc(t('changeAvatar'))}"></label>
         <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: groupLabel() }))}</div><div class="muted small">${icon('pin', 12)} ${esc((S.me.postal || '') + ', ' + countryName(S.me.country))}</div></div></div>
-      <div class="stats">${stat(mine.length, 'statListed')}${stat(given.length, 'statGiven')}${stat(S.received.length, 'statReceived')}${stat('€' + saved, 'statSaved')}</div>
+      ${!S.me.avatar ? `<p class="muted small">${icon('camera', 14)} ${esc(t('avatarHint'))}</p>` : ''}
+      <div class="my-rating">${ratingHtml(MINE, 18)}</div>
+      <div class="stats six">${stat(mine.length, 'statListed')}${stat(dealCounts(MINE).sold, 'statSold')}${stat(dealCounts(MINE).donated, 'statDonated')}${stat(dealCounts(MINE).swapped, 'statSwapped')}${stat(S.received.length, 'statReceived')}${stat('€' + saved, 'statSaved')}</div>
       <div class="muted tiny">${esc(t('statsPrivate'))}</div>
+      <section class="card pad-m"><h2 class="h3">${esc(t('reviewsTitle'))}</h2>${reviewsList(MINE)}</section>
       ${langBars ? `<section class="card pad-m"><h2 class="h3">${esc(t('langMix'))}</h2>${langBars}</section>` : ''}
       ${top ? `<section class="card pad-m"><h2 class="h3">${esc(t('topTopics'))}</h2><div class="row-wrap">${top}</div></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('badges'))}</h2><div class="badges">${badges}</div></section>
@@ -1136,6 +1200,21 @@
     img.src = url;
   }
 
+  function handleAvatar(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      const side = Math.min(img.width, img.height); const out = 256;
+      const c = document.createElement('canvas'); c.width = out; c.height = out;
+      c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, out, out);
+      URL.revokeObjectURL(url);
+      const data = c.toDataURL('image/jpeg', 0.8);
+      if (LIVE) liveAct(() => Backend.setAvatar(live.group.id, live.uid, data, S.me.avatarPath), t('saved'));
+      else { S.me.avatar = data; save(); toast(t('saved')); }
+    };
+    img.src = url;
+  }
+
   // ---------- actions ----------
   const A = {
     setLang: (el) => { S.lang = el.dataset.v; save(); render(); },
@@ -1217,6 +1296,19 @@
       th.messages.push({ from: MINE, text: t(el.dataset.v), at: Date.now() }); save(); render();
     },
     report: () => toast(t('reported')),
+    rateBooks: (el) => { ui.rating[el.dataset.thread] = Number(el.dataset.v); render(); },
+    editReview: (el) => { ui.editReview[el.dataset.v] = true; render(); },
+    submitReview: (el) => {
+      const th = S.threads.find((x) => x.id === el.dataset.v);
+      const prev = S.reviews.find((r) => r.request === th.id && r.from === MINE);
+      const rating = ui.rating[th.id] || (prev ? prev.rating : 0);
+      if (!rating) { toast(t('pickRating')); return; }
+      const comment = (document.getElementById('rv-' + th.id).value || '').trim().slice(0, 300);
+      if (looksLikeCopySharing(comment)) { toast(t('copyBlocked')); return; }
+      S.reviews = S.reviews.filter((r) => !(r.request === th.id && r.from === MINE));
+      S.reviews.push({ id: uid('r'), request: th.id, from: MINE, to: th.with, rating: rating, comment: comment, at: Date.now() });
+      delete ui.editReview[th.id]; delete ui.rating[th.id]; save(); toast(t('reviewThanks'));
+    },
     startCamera: () => { startCamera(); },
     stopCamera: () => { stopCamera(); render(); },
     manual: () => { startDraft({}); ui.addMsg = ''; render(); },
@@ -1329,7 +1421,13 @@
     refreshing = Promise.all([Backend.loadGroup(live.group.id), Backend.loadThreads()]).then((res) => {
       const g = res[0];
       Object.keys(MEMBERS).forEach((k) => delete MEMBERS[k]);
-      g.members.forEach((m) => { if (m.user_id !== live.uid) MEMBERS[m.user_id] = { name: m.display_name, country: m.country, postal: m.postal_code, role: m.role }; });
+      g.members.forEach((m) => {
+        const avatar = m.avatar_path ? g.urls[m.avatar_path] || '' : '';
+        if (m.user_id !== live.uid) MEMBERS[m.user_id] = { name: m.display_name, country: m.country, postal: m.postal_code, role: m.role, avatar: avatar };
+        else if (S.me) { S.me.avatar = avatar; S.me.avatarPath = m.avatar_path || ''; }
+      });
+      const who = (u) => (u === live.uid ? MINE : u);
+      S.reviews = (g.reviews || []).map((r) => ({ id: r.id, request: r.request_id, from: who(r.reviewer_id), to: who(r.reviewee_id), rating: r.rating, comment: r.comment, at: Date.parse(r.created_at) }));
       S.books = g.books.map((r) => mapBook(r, g.urls));
       S.wishes = g.wishes.map((w) => ({ id: w.id, owner: w.owner_id === live.uid ? MINE : w.owner_id, title: w.title, author: w.author, lang: w.lang, isbn: w.isbn || '' }));
       S.threads = res[1].map(mapThread);
@@ -1467,6 +1565,16 @@
         render();
       },
       removeWish: (el) => liveAct(() => Backend.removeWish(el.dataset.v)),
+      submitReview: async (el) => {
+        const id = el.dataset.v;
+        const prev = S.reviews.find((r) => r.request === id && r.from === MINE);
+        const rating = ui.rating[id] || (prev ? prev.rating : 0);
+        if (!rating) { toast(t('pickRating')); return; }
+        const comment = (document.getElementById('rv-' + id).value || '').trim().slice(0, 300);
+        if (looksLikeCopySharing(comment)) { toast(t('copyBlocked')); return; }
+        const ok = await liveAct(() => Backend.submitReview(id, rating, comment), t('reviewThanks'));
+        if (ok) { delete ui.editReview[id]; delete ui.rating[id]; render(); }
+      },
       removeBook: (el) => {
         const b = book(el.dataset.v);
         if (!b || !window.confirm(t('confirmRemove'))) return;
@@ -1547,6 +1655,7 @@
     const el = e.target; if (!el.dataset) return;
     if (el.dataset.change === 'photo' && el.files && el.files[0]) handlePhoto(el.files[0]);
     else if (el.dataset.change === 'onbCountry') ui.onbCountry = el.value;
+    else if (el.dataset.change === 'avatar' && el.files && el.files[0]) handleAvatar(el.files[0]);
     else if (el.dataset.change === 'barcodePhoto' && el.files && el.files[0]) scanPhoto(el.files[0]);
   });
 

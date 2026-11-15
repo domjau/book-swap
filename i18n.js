@@ -433,3 +433,26 @@ Object.assign(window.STRINGS.en, {
 Object.assign(window.STRINGS.lt, { linkExpired: 'Ši prisijungimo nuoroda nebegalioja arba jau buvo panaudota (kartais el. pašto programos ją atidaro automatiškai). Paprašykite naujos ir atidarykite ją iškart.', linkFailed: 'Prisijungti per nuorodą nepavyko.' });
 Object.assign(window.STRINGS.es, { linkExpired: 'Este enlace ha caducado o ya se usó (a veces la app de correo lo abre automáticamente). Pide uno nuevo y ábrelo enseguida.', linkFailed: 'No se pudo entrar con el enlace.' });
 Object.assign(window.STRINGS.en, { linkExpired: 'This sign-in link has expired or was already used (some email apps open links automatically). Ask for a new one and open it straight away.', linkFailed: "Signing in with the link didn't work." });
+
+/* Ratings, profile picture, deal counts */
+Object.assign(window.STRINGS.lt, {
+  rateTitle: 'Kaip sekėsi mainai su {name}?', rateHint: 'Įvertinkite nuo 1 iki 5 knygelių.', reviewPh: 'Keli žodžiai (nebūtina)',
+  submitReview: 'Siųsti įvertinimą', youRated: 'Jūsų įvertinimas – {name}:', editReview: 'Keisti', reviewThanks: 'Ačiū už įvertinimą!',
+  pickRating: 'Pasirinkite nuo 1 iki 5 knygelių.', noRatings: 'Dar neįvertinta', reviewsTitle: 'Atsiliepimai', booksOutOf: '{n} iš 5 knygelių',
+  statSold: 'Parduota', statDonated: 'Padovanota', statSwapped: 'Iškeista',
+  changeAvatar: 'Keisti nuotrauką', avatarHint: 'Bakstelėkite raidę ir pridėkite nuotrauką – savo ar mėgstamo dalyko. Prašome nekelti vaikų nuotraukų.'
+});
+Object.assign(window.STRINGS.es, {
+  rateTitle: '¿Qué tal el intercambio con {name}?', rateHint: 'Valora de 1 a 5 libritos.', reviewPh: 'Unas palabras (opcional)',
+  submitReview: 'Enviar valoración', youRated: 'Tu valoración de {name}:', editReview: 'Cambiar', reviewThanks: '¡Gracias por tu valoración!',
+  pickRating: 'Elige de 1 a 5 libritos.', noRatings: 'Aún sin valoraciones', reviewsTitle: 'Valoraciones', booksOutOf: '{n} de 5 libritos',
+  statSold: 'Vendidos', statDonated: 'Regalados', statSwapped: 'Intercambiados',
+  changeAvatar: 'Cambiar foto', avatarHint: 'Toca la letra para añadir una foto, tuya o de algo que te guste. Por favor, sin fotos de niños.'
+});
+Object.assign(window.STRINGS.en, {
+  rateTitle: 'How was the exchange with {name}?', rateHint: 'Give 1 to 5 little books.', reviewPh: 'A few words (optional)',
+  submitReview: 'Send review', youRated: 'Your review of {name}:', editReview: 'Edit', reviewThanks: 'Thanks for your review!',
+  pickRating: 'Choose 1 to 5 little books.', noRatings: 'No reviews yet', reviewsTitle: 'Reviews', booksOutOf: '{n} of 5 books',
+  statSold: 'Sold', statDonated: 'Donated', statSwapped: 'Exchanged',
+  changeAvatar: 'Change picture', avatarHint: 'Tap the letter to add a picture – of yourself or something you like. Please no photos of children.'
+});

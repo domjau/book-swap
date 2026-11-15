@@ -243,3 +243,28 @@ select.input { appearance: auto; }
 .code-input { letter-spacing: .2em; font-weight: 900; text-transform: uppercase; }
 .invite-code { font-size: 30px; font-weight: 900; letter-spacing: .15em; text-align: center; padding: 12px; background: #FFF3E8; border-radius: 14px; margin: 6px 0; }
 .invite-card .btn { width: 100%; }
+
+/* ratings + avatars */
+.avatar { overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar.xs { width: 26px; height: 26px; font-size: 13px; border-radius: 999px; background: var(--accent); color: var(--ink); font-weight: 900; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.avatar-edit { position: relative; cursor: pointer; flex: 0 0 auto; }
+.avatar-cam { position: absolute; right: -2px; bottom: -2px; width: 26px; height: 26px; border-radius: 999px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; border: 2px solid var(--ground); }
+.rating { display: inline-flex; align-items: center; gap: 2px; margin-top: 4px; }
+.rating .small { margin-left: 4px; }
+.rb { color: #D6CDBB; display: inline-flex; }
+.rb.on { color: var(--accent-dark); }
+.rb.on svg { fill: #FFD3B0; }
+.rb-picks { display: flex; gap: 6px; margin: 4px 0; }
+.rb-pick { width: 48px; height: 48px; border-radius: 12px; border: 1.5px solid var(--line2); background: #fff; color: #C9BFAC; display: flex; align-items: center; justify-content: center; }
+.rb-pick.on { color: var(--accent-dark); border-color: var(--accent); background: #FFF3E8; }
+.rb-pick.on svg { fill: #FFD3B0; }
+.review-box { background: #F7F2E8; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.reviews { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.reviews li { border-bottom: 1px solid #F1EBDF; padding-bottom: 8px; }
+.reviews p { margin: 4px 0 0; }
+.row-gap.tight { margin: 0; gap: 6px; }
+.deal-counts { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--muted); font-weight: 700; margin: 4px 0 8px; }
+.deal-counts b { color: var(--ink); font-size: 18px; }
+.stats.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.my-rating { margin: 6px 0 2px; }
