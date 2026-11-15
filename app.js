@@ -67,6 +67,7 @@
     try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
   let S = migrate(load()) || fresh();
+  const initCountry = () => { ui.onbCountry = (S.me && S.me.country) || guessCountry(); };
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Storage full – try removing a photo.'); }
   }
@@ -74,7 +75,7 @@
   const ui = {
     q: '', fLang: 'all', fTopic: null, fAge: null,
     draft: null, addStep: 'scan', addMsg: '', addMsgKind: '', searchResults: [], busy: false, lastSaved: null,
-    ticks: {}, showOffer: {}, toast: '', onbName: '', onbPostal: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, chatTab: 'active'
+    ticks: {}, showOffer: {}, toast: '', onbName: '', onbPostal: '', onbCountry: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, chatTab: 'active'
   };
 
   // ---------- i18n ----------
@@ -97,7 +98,38 @@
 
   // ---------- book helpers ----------
   const book = (id) => S.books.find((b) => b.id === id);
-  const needsOnboarding = () => !S.me || !S.me.postal || !S.agreed || S.agreed.version !== TERMS.version;
+  const needsOnboarding = () => !S.me || !S.me.postal || !S.me.country || !S.agreed || S.agreed.version !== TERMS.version;
+
+  // Countries: names come from the browser in the current app language.
+  const displayNames = {};
+  function countryName(cc) {
+    if (!cc) return '';
+    try { displayNames[S.lang] = displayNames[S.lang] || new Intl.DisplayNames([S.lang], { type: 'region' }); return displayNames[S.lang].of(cc) || cc; }
+    catch (e) { return cc; }
+  }
+  function countryOptions(sel) {
+    const coll = new Intl.Collator(S.lang);
+    return COUNTRIES.map((c) => [c, countryName(c)]).sort((x, y) => coll.compare(x[1], y[1]))
+      .map((x) => `<option value="${x[0]}"${x[0] === sel ? ' selected' : ''}>${esc(x[1])}</option>`).join('');
+  }
+  function guessCountry() {
+    const langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+    for (let i = 0; i < langs.length; i++) {
+      const m = /-([A-Za-z]{2})$/.exec(langs[i]);
+      if (m && COUNTRIES.indexOf(m[1].toUpperCase()) >= 0) return m[1].toUpperCase();
+    }
+    return '';
+  }
+  const compact = (p) => String(p || '').toUpperCase().replace(/[\s-]/g, '');
+  function cleanPostal(cc, raw) {
+    let v = String(raw || '').trim().toUpperCase().replace(/\s+/g, ' ');
+    if (cc) v = v.replace(new RegExp('^' + cc + '[\\s-]?'), '');
+    return v.slice(0, 10);
+  }
+  function validPostal(cc, v) {
+    const c = compact(v); const re = POSTAL_FORMATS[cc];
+    return re ? re.test(c) : /^[A-Z0-9]{2,10}$/.test(c);
+  }
 
   // Wish-list matching: same ISBN, or the same title ignoring case, accents and punctuation.
   const norm = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -115,16 +147,23 @@
       .filter((x) => x.n > 0).sort((a, b) => b.n - a.n || near(a.id).rank - near(b.id).rank);
   }
 
-  // Location: postal codes only. "Nearby" is a rough guess from numeric postal codes
-  // (works well in e.g. Denmark); the production version would use postcode centre points.
-  const postalOf = (id) => (id === MINE ? (S.me && S.me.postal) || '' : (MEMBERS[id] ? MEMBERS[id].postal || '' : ''));
+  // Location: country + postal code only. "Nearby" is a rough guess: same country, and postal
+  // codes that are numerically close (or share the same district part, e.g. UK "SW1A").
+  // The production version would use postcode centre points instead.
+  const placeOf = (id) => (id === MINE ? (S.me || {}) : (MEMBERS[id] || {}));
+  const postalOf = (id) => placeOf(id).postal || '';
   function near(id) {
-    const a = postalOf(MINE); const b = postalOf(id);
-    if (!a || !b) return { rank: 3, label: b };
-    if (a === b) return { rank: 0, label: b + ' · ' + t('sameArea') };
-    const na = parseInt(a, 10); const nb = parseInt(b, 10);
-    const d = (isNaN(na) || isNaN(nb) || /[^0-9]/.test(a + b)) ? 99999 : Math.abs(na - nb);
-    return d <= 50 ? { rank: 1 + d / 1000, label: b + ' · ' + t('nearby') } : { rank: 2 + d / 1e6, label: b };
+    const me = placeOf(MINE); const o = placeOf(id);
+    if (!o.postal) return { rank: 4, label: '' };
+    const foreign = !!(o.country && me.country && o.country !== me.country);
+    const label = o.postal + (foreign ? ', ' + countryName(o.country) : '');
+    if (!me.postal || foreign) return { rank: 3, label: label };
+    const a = compact(me.postal); const b = compact(o.postal);
+    if (a === b) return { rank: 0, label: label + ' · ' + t('sameArea') };
+    let d;
+    if (/^\d+$/.test(a + b) && a.length === b.length) d = Math.abs(Number(a) - Number(b)) / (a.length <= 4 ? 50 : a.length === 5 ? 200 : 2000);
+    else d = a.slice(0, Math.max(2, a.length - 3)) === b.slice(0, Math.max(2, b.length - 3)) ? 0.5 : 99;
+    return d <= 1 ? { rank: 1 + d / 10, label: label + ' · ' + t('nearby') } : { rank: 2 + Math.min(d, 1e6) / 1e7, label: label };
   }
   const byNear = (a, b) => near(a.owner).rank - near(b.owner).rank || b.added - a.added;
   const memberLink = (id) => `<a class="ulink" href="#/member/${esc(id)}">${esc(memberName(id))}</a>`;
@@ -163,13 +202,16 @@
     return `<main class="onboard">
       <div class="logo-big">${icon('logo', 44)}</div>
       <h1>${esc(t('welcomeTitle'))}</h1>
-      ${S.me ? `<div class="notice warn">${esc(t('termsUpdated'))}</div>` : ''}
+      ${S.me ? `<div class="notice warn">${esc(S.agreed && S.agreed.version === TERMS.version ? t('profileIncomplete') : t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
       <div class="card invite"><div class="muted small">${esc(t('invitedTo'))}</div><div class="h3">${esc(t('groupName'))}</div></div>
       <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
       <div class="field"><span class="label">${esc(t('interestedLangs'))}</span><div class="row-wrap">${interests}</div></div>
       <label class="field"><span class="label">${esc(t('yourName'))}</span>
         <input id="onb-name" class="input" maxlength="40" autocomplete="nickname" value="${esc(ui.onbName || (S.me ? S.me.name : ''))}" data-input="onbName" placeholder="${esc(t('yourNamePh'))}"></label>
+      <label class="field"><span class="label">${esc(t('country'))}</span>
+        <select id="onb-country" class="input" autocomplete="country" data-change="onbCountry">
+          <option value="">${esc(t('chooseCountry'))}</option>${countryOptions(ui.onbCountry)}</select></label>
       <label class="field"><span class="label">${esc(t('postal'))}</span>
         <input id="onb-postal" class="input" maxlength="10" autocomplete="postal-code" inputmode="text" value="${esc(ui.onbPostal || (S.me ? S.me.postal || '' : ''))}" data-input="onbPostal" placeholder="${esc(t('postalPh'))}"></label>
       <p class="muted small">${icon('pin', 14)} ${esc(t('postalHint'))}</p>
@@ -571,15 +613,17 @@
     const stat = (n, k) => `<div class="stat"><div class="stat-n">${esc(n)}</div><div class="stat-l">${esc(t(k))}</div></div>`;
     return `<main class="pad">
       <div class="row-gap"><div class="avatar">${esc((S.me.name || '?').slice(0, 1).toUpperCase())}</div>
-        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: t('groupName') }))}</div><div class="muted small">${icon('pin', 12)} ${esc(S.me.postal || '')}</div></div></div>
+        <div><h1 class="h1 tight">${esc(S.me.name)}</h1><div class="muted bold">${esc(t('memberOf', { group: t('groupName') }))}</div><div class="muted small">${icon('pin', 12)} ${esc((S.me.postal || '') + ', ' + countryName(S.me.country))}</div></div></div>
       <div class="stats">${stat(mine.length, 'statListed')}${stat(given.length, 'statGiven')}${stat(S.received.length, 'statReceived')}${stat('€' + saved, 'statSaved')}</div>
       <div class="muted tiny">${esc(t('statsPrivate'))}</div>
       ${langBars ? `<section class="card pad-m"><h2 class="h3">${esc(t('langMix'))}</h2>${langBars}</section>` : ''}
       ${top ? `<section class="card pad-m"><h2 class="h3">${esc(t('topTopics'))}</h2><div class="row-wrap">${top}</div></section>` : ''}
       <section class="card pad-m"><h2 class="h3">${esc(t('badges'))}</h2><div class="badges">${badges}</div></section>
       <section class="card pad-m"><h2 class="h3">${icon('pin', 20)} ${esc(t('location'))}</h2>
-        <div class="row-gap"><label class="sr" for="p-postal">${esc(t('postal'))}</label>
-          <input id="p-postal" class="input" maxlength="10" autocomplete="postal-code" value="${esc(S.me.postal || '')}">
+        <label class="label" for="p-country">${esc(t('country'))}</label>
+        <select id="p-country" class="input" autocomplete="country">${countryOptions(S.me.country)}</select>
+        <label class="label" for="p-postal">${esc(t('postal'))}</label>
+        <div class="row-gap tight-top"><input id="p-postal" class="input" maxlength="10" autocomplete="postal-code" value="${esc(S.me.postal || '')}">
           <button class="btn primary" data-action="savePostal">${esc(t('savePostal'))}</button></div>
         <div class="muted small">${esc(t('postalHint'))}</div></section>
       <section class="card pad-m"><h2 class="h3">${icon('heart', 20)} ${esc(t('myWishlist'))}</h2>
@@ -832,12 +876,15 @@
     toggleAgree: (el) => { ui.onbAgree = el.checked; },
     join: () => {
       const name = (document.getElementById('onb-name').value || '').trim().slice(0, 40);
-      const postal = (document.getElementById('onb-postal').value || '').trim().toUpperCase().slice(0, 10);
+      const country = document.getElementById('onb-country').value;
+      const postal = cleanPostal(country, document.getElementById('onb-postal').value);
       const fail = (msg, id) => { ui.onbError = msg; render(); const f = document.getElementById(id); if (f) f.focus(); };
       if (!name) return fail(t('nameRequired'), 'onb-name');
-      if (!/^[A-Z0-9][A-Z0-9 -]{1,9}$/.test(postal)) return fail(t('postalRequired'), 'onb-postal');
+      if (!country) return fail(t('countryRequired'), 'onb-country');
+      if (!postal) return fail(t('postalRequired'), 'onb-postal');
+      if (!validPostal(country, postal)) return fail(t('postalInvalid', { country: countryName(country) }), 'onb-postal');
       if (!document.getElementById('onb-agree').checked) return fail(t('termsRequired'), 'onb-agree');
-      S.me = { name: name, postal: postal };
+      S.me = { name: name, country: country, postal: postal };
       S.agreed = { version: TERMS.version, at: Date.now() };
       ui.onbError = ''; save(); go('#/');
     },
@@ -933,16 +980,17 @@
     addWish: () => { ui.addMode = 'wish'; ui.addStep = 'scan'; ui.draft = null; ui.addMsg = ''; ui.searchResults = []; go('#/add'); },
     removeWish: (el) => { S.wishes = S.wishes.filter((w) => w.id !== el.dataset.v); save(); render(); },
     savePostal: () => {
-      const v = (document.getElementById('p-postal').value || '').trim().toUpperCase().slice(0, 10);
-      if (!/^[A-Z0-9][A-Z0-9 -]{1,9}$/.test(v)) { toast(t('postalRequired')); return; }
-      S.me.postal = v; save(); toast(t('saved'));
+      const cc = document.getElementById('p-country').value;
+      const v = cleanPostal(cc, document.getElementById('p-postal').value);
+      if (!v || !validPostal(cc, v)) { toast(t('postalInvalid', { country: countryName(cc) })); return; }
+      S.me.country = cc; S.me.postal = v; save(); toast(t('saved'));
     },
     exportData: () => {
       const blob = new Blob([JSON.stringify({ me: S.me, books: S.books.filter((b) => b.owner === MINE), threads: S.threads, received: S.received }, null, 2)], { type: 'application/json' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'book-swap-my-data.json';
       document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
     },
-    deleteAll: () => { if (window.confirm(t('confirmDelete'))) { localStorage.removeItem(KEY); S = fresh(); ui.draft = null; go('#/'); } }
+    deleteAll: () => { if (window.confirm(t('confirmDelete'))) { localStorage.removeItem(KEY); S = fresh(); ui.draft = null; initCountry(); go('#/'); } }
   };
 
   $app.addEventListener('click', (e) => {
@@ -975,8 +1023,11 @@
     else if (kind === 'cartMsg') { const o = el.dataset.owner; (S.cartMeta[o] = S.cartMeta[o] || { offered: [], msg: '' }).msg = el.value; save(); }
   });
   $app.addEventListener('change', (e) => {
-    const el = e.target; if (el.dataset && el.dataset.change === 'photo' && el.files && el.files[0]) handlePhoto(el.files[0]);
+    const el = e.target; if (!el.dataset) return;
+    if (el.dataset.change === 'photo' && el.files && el.files[0]) handlePhoto(el.files[0]);
+    else if (el.dataset.change === 'onbCountry') ui.onbCountry = el.value;
   });
 
+  initCountry();
   render();
 })();

@@ -282,3 +282,23 @@ Object.assign(window.STRINGS.en, {
   wishSavedTitle: 'Added to your wish list!', wishSavedText: "We'll let you know when someone offers it.",
   alreadyAvailable: 'Already available from:', peopleWant: '{n} people are looking for this book!'
 });
+
+/* Country */
+Object.assign(window.STRINGS.lt, {
+  country: 'Šalis', chooseCountry: 'Pasirinkite šalį', countryRequired: 'Pasirinkite šalį.',
+  postalInvalid: 'Patikrinkite pašto kodą – jis neatitinka šalies formato ({country}).',
+  postalHint: 'Rodoma tik šalis ir pašto kodas – niekada adresas. Taip rasite kaimynus ir išvengsite siuntimo.',
+  profileIncomplete: 'Papildykite profilį: nurodykite šalį ir pašto kodą.'
+});
+Object.assign(window.STRINGS.es, {
+  country: 'País', chooseCountry: 'Elige un país', countryRequired: 'Elige un país.',
+  postalInvalid: 'Revisa el código postal: no coincide con el formato del país ({country}).',
+  postalHint: 'Solo se muestran el país y el código postal, nunca tu dirección. Así encontrarás vecinos y evitarás envíos.',
+  profileIncomplete: 'Completa tu perfil: indica tu país y código postal.'
+});
+Object.assign(window.STRINGS.en, {
+  country: 'Country', chooseCountry: 'Choose a country', countryRequired: 'Please choose a country.',
+  postalInvalid: "Please check the postal code – it doesn't match the format for {country}.",
+  postalHint: 'Only your country and postal code are shown – never your address. It helps you find neighbours and avoid shipping.',
+  profileIncomplete: 'Please complete your profile: add your country and postal code.'
+});

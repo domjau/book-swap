@@ -34,11 +34,29 @@ window.TOPICS = [
 
 /* Sample members. Only a postal code is stored – never an address. */
 window.MEMBERS = {
-  ana: { name: 'Ana (García)', postal: '2400' },
-  jonas: { name: 'Jonas (Petraičiai)', postal: '2700' },
-  mette: { name: 'Mette (Jensen)', postal: '2720' },
-  ruta: { name: 'Rūta (Kazlauskai)', postal: '2100' },
-  sofia: { name: 'Sofía (Rodríguez)', postal: '2650' }
+  ana: { name: 'Ana (García)', country: 'DK', postal: '2400' },
+  jonas: { name: 'Jonas (Petraičiai)', country: 'DK', postal: '2700' },
+  mette: { name: 'Mette (Jensen)', country: 'DK', postal: '2720' },
+  ruta: { name: 'Rūta (Kazlauskai)', country: 'DK', postal: '2100' },
+  sofia: { name: 'Sofía (Rodríguez)', country: 'DK', postal: '2650' }
+};
+
+/* ISO 3166-1 country codes. Names are shown in the app language via Intl.DisplayNames. */
+window.COUNTRIES = ('AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ ' +
+  'CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR ' +
+  'GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP ' +
+  'KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS ' +
+  'MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS ' +
+  'RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TG TH TJ TK TL TM TN TO TR TT TV TW TZ ' +
+  'UA UG US UY UZ VA VC VE VG VI VN VU WF WS XK YE YT ZA ZM ZW').split(' ');
+
+/* Postal-code formats for common countries (after removing spaces/prefixes like "LT-").
+   Countries not listed accept 2–10 letters/digits. */
+window.POSTAL_FORMATS = {
+  DK: /^\d{4}$/, NO: /^\d{4}$/, BE: /^\d{4}$/, AT: /^\d{4}$/, CH: /^\d{4}$/, LV: /^\d{4}$/, AU: /^\d{4}$/, HU: /^\d{4}$/,
+  LT: /^\d{5}$/, ES: /^\d{5}$/, DE: /^\d{5}$/, FR: /^\d{5}$/, IT: /^\d{5}$/, FI: /^\d{5}$/, EE: /^\d{5}$/, US: /^\d{5}$/,
+  SE: /^\d{5}$/, PL: /^\d{5}$/, PT: /^\d{7}$/, IS: /^\d{3}$/,
+  NL: /^\d{4}[A-Z]{2}$/, GB: /^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/, IE: /^[A-Z]\d[\dW][A-Z\d]{4}$/, CA: /^[A-Z]\d[A-Z]\d[A-Z]\d$/
 };
 
 const D = (daysAgo) => Date.now() - daysAgo * 86400000;

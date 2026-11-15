@@ -1,6 +1,6 @@
 # Terms of use
 
-*Version 2026-11-15. The same text is shown in the app in Lithuanian, Spanish and English (`terms.js`), and every user must accept it before using the app.*
+*Version 2026-11-15.2. The same text is shown in the app in Lithuanian, Spanish and English (`terms.js`), and every user must accept it before using the app.*
 
 Book Swap is a free, volunteer-run noticeboard that helps people find each other to swap, sell or give away books. By creating a profile you accept these terms.
 
@@ -23,7 +23,7 @@ You must resolve disputes directly with the other user. We may – but are not o
 Only list books that you own and are allowed to give away or sell. No illegal, offensive or adult content, no spam, no large-scale commercial reselling and no harassment. Do not post children's names or photos of people.
 
 ## 7. Your location
-You share a postal code – never your address – so that neighbours can find each other and avoid shipping. Your postal code is visible to members of your group.
+You share your country and postal code – never your address – so that neighbours can find each other and avoid shipping. Your country and postal code are visible to members of your group.
 
 ## 8. Privacy
 We only store what is needed for swapping. You can download or delete your data at any time from your profile. See [docs/PRIVACY.md](docs/PRIVACY.md).

@@ -22,7 +22,7 @@
 | Profile stats + badges | ✅ |
 | Export / delete my data | ✅ (device only) |
 | Terms of use (LT/ES/EN), required at sign-up, re-accept on new version | ✅ |
-| Postal code at sign-up, shown on books & members, "Near me" filter, sorted by distance | ✅ |
+| Country + postal code at sign-up (format check for common countries), shown on books & members, "Near me" filter, sorted by distance | ✅ |
 | Wish list (add by scan / search / manual), matched against shelves | ✅ |
 | "From your wish list" and "They want your books" rows | ✅ |
 | Member page with tailored offer: their books you want + your books they want, pre-ticked | ✅ |

@@ -66,7 +66,7 @@ Why Supabase: a free tier that fits a few hundred families, Postgres with row-le
 groups        (id uuid pk, name text, created_by uuid, handover_place text, created_at)
 group_invites (id uuid pk, group_id fk, code_hash text, expires_at, revoked bool)
 members       (group_id fk, user_id fk → auth.users, role text check (role in ('member','organiser')),
-               display_name text, postal_code text, interested_langs text[], joined_at, primary key (group_id, user_id))
+               display_name text, country char(2), postal_code text, interested_langs text[], joined_at, primary key (group_id, user_id))
 terms_acceptances (user_id fk, version text, accepted_at timestamptz, primary key (user_id, version))
 postcodes     (country text, postal_code text, lat numeric, lng numeric, primary key (country, postal_code))
                -- public reference data (area centre points) for "nearby"; never user positions

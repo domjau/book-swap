@@ -219,3 +219,5 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .agree input { margin-top: 2px; }
 .terms p { line-height: 1.55; font-weight: 600; }
 .terms .h3 { margin-top: 20px; }
+.tight-top { margin-top: 0; }
+select.input { appearance: auto; }

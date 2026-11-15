@@ -13,7 +13,7 @@ There is one kind of user: a **member** (in practice usually a parent). Any memb
 
 1. Opens the invite link and picks the app language.
 2. Signs in with an emailed link (no password).
-3. Enters a display name, e.g. "Ana (García family)", a **postal code** (never an address) and the book languages they're looking for.
+3. Enters a display name, e.g. "Ana (García family)", a **country and postal code** (never an address; the country is guessed from the phone and the postal code is checked against that country's format) and the book languages they're looking for.
 4. Reads and **accepts the terms of use**. Book Swap is a peer-to-peer noticeboard and is not responsible for the deals between members.
 5. Gets prompted to **add a few books and a wish list**, so the shelves and matches fill up.
 
