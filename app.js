@@ -1,4 +1,4 @@
-/* Book Swap prototype – plain JavaScript, no build step.
+/* Seku Seku prototype – plain JavaScript, no build step.
    All data lives in localStorage on this device. Every piece of user text is
    escaped before it is put on the page (see esc()). */
 (function () {
@@ -20,6 +20,7 @@
   const TOPIC = {}; TOPICS.forEach((t) => { TOPIC[t.id] = t; });
 
   const ICON = {
+    seku: 'M1.75 18.62 L6.75 18.62 L6.75 6.12 Q6.75 5.38 7.50 5.38 L10 5.38 Q10.75 5.38 10.75 6.12 L10.75 18.62 L12.50 18.62 L15 7.62 Q15.19 6.88 15.94 7.06 L18.25 7.62 Q19 7.81 18.81 8.56 L16.38 18.62 L22.25 18.62',
     logo: 'M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5V19c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5zM12 6v13.5',
     books: 'M4 4h5v16H4zM10 4h5v16h-5zM16 5l3.5-.8 2 15.5-3.5.8z',
     plus: 'M12 5v14M5 12h14',
@@ -255,7 +256,7 @@
     const interests = BOOK_LANGS.filter((c) => c !== 'other').map((c) => `<label class="check-pill ${S.interested.indexOf(c) >= 0 ? 'on' : ''}">
       <input type="checkbox" data-action="toggleInterest" data-v="${c}" ${S.interested.indexOf(c) >= 0 ? 'checked' : ''}> ${esc(langName(c))}</label>`).join('');
     return `<main class="onboard">
-      <div class="logo-big">${icon('logo', 44)}</div>
+      <div class="logo-big">${icon('seku', 48)}</div>
       <h1>${esc(t('welcomeTitle'))}</h1>
       ${S.me ? `<div class="notice warn">${esc(S.agreed && S.agreed.version === TERMS.version ? t('profileIncomplete') : t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
@@ -295,7 +296,7 @@
     const langs = UI_LANGS.map((c) => `<button class="pill ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}">${esc(STRINGS[c].langNames[c])}</button>`).join('');
     const step = live.authStep;
     return `<main class="onboard">
-      <div class="logo-big">${icon('logo', 44)}</div>
+      <div class="logo-big">${icon('seku', 48)}</div>
       <h1>${esc(t('welcomeTitle'))}</h1>
       <p class="lead">${esc(t('welcomeText'))}</p>
       <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
@@ -319,7 +320,7 @@
   }
 
   function viewLoading() {
-    return `<main class="onboard center-col"><div class="logo-big">${icon('logo', 44)}</div><p class="muted bold">${esc(t('loading'))}</p></main>`;
+    return `<main class="onboard center-col"><div class="logo-big">${icon('seku', 48)}</div><p class="muted bold">${esc(t('loading'))}</p></main>`;
   }
 
   function viewTerms() {
@@ -336,7 +337,7 @@
 
   function header() {
     const langs = UI_LANGS.map((c) => `<button class="lang-btn ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}" aria-label="${esc(STRINGS[c].langNames[c])}">${c.toUpperCase()}</button>`).join('');
-    return `<header class="top"><a class="brand" href="#/">${'<span class="logo">' + icon('logo', 20) + '</span>'}
+    return `<header class="top"><a class="brand" href="#/">${'<span class="logo">' + icon('seku', 24) + '</span>'}
       <span><span class="brand-name">${esc(t('appName'))}</span><span class="brand-group">${esc(groupLabel())}</span></span></a>
       <div class="langs">${bellHtml()}${langs}</div></header>`;
   }
