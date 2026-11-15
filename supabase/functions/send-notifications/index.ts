@@ -13,34 +13,34 @@ const DEFAULT_PREFS = { email_types: ['request_new', 'message', 'request_answere
 
 export const TEXT = {
   en: {
-    subjectOne: 'Seku Seku: {text}', subjectMany: 'Seku Seku: {n} new notifications', hello: 'Hi {name},', open: 'Open Seku Seku',
-    footer: 'You get these emails because of your notification settings. Change them in Seku Seku → Profile → Notifications.',
+    subjectOne: 'seku seku: {text}', subjectMany: 'seku seku: {n} new notifications', hello: 'Hi {name},', open: 'Open seku seku',
+    footer: 'You get these emails because of your notification settings. Change them in seku seku → Profile → Notifications.',
     request_new: '{name} asks for your book(s)', message: 'New message from {name}', message_many: '{n} new messages from {name}',
     request_accepted: '{name} accepted your request', request_declined: '{name} declined your request',
     handover_set: 'Handover with {name}: {when}, {where}', handover_reminder: 'Reminder: handover with {name} tomorrow – {where}',
     exchange_done: 'Exchange with {name} is done – leave a review', wish_match: '"{title}" from your wish list was listed by {name}',
-    wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From Seku Seku: {text}',
-    report_new: 'New report on Seku Seku', member_joined: '{name} joined the group'
+    wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From seku seku: {text}',
+    report_new: 'New report on seku seku', member_joined: '{name} joined the group'
   },
   lt: {
-    subjectOne: 'Seku Seku: {text}', subjectMany: 'Seku Seku: {n} nauji pranešimai', hello: 'Labas, {name},', open: 'Atidaryti Seku Seku',
-    footer: 'Šiuos laiškus gaunate pagal savo pranešimų nustatymus. Juos galite pakeisti: Seku Seku → Profilis → Pranešimai.',
+    subjectOne: 'seku seku: {text}', subjectMany: 'seku seku: {n} nauji pranešimai', hello: 'Labas, {name},', open: 'Atidaryti seku seku',
+    footer: 'Šiuos laiškus gaunate pagal savo pranešimų nustatymus. Juos galite pakeisti: seku seku → Profilis → Pranešimai.',
     request_new: '{name} prašo jūsų knygos(-ų)', message: 'Nauja žinutė nuo {name}', message_many: '{n} naujos žinutės nuo {name}',
     request_accepted: '{name} priėmė jūsų prašymą', request_declined: '{name} atmetė jūsų prašymą',
     handover_set: 'Perdavimas su {name}: {when}, {where}', handover_reminder: 'Priminimas: rytoj perdavimas su {name} – {where}',
     exchange_done: 'Mainai su {name} baigti – įvertinkite', wish_match: '„{title}“ iš jūsų norų sąrašo pasiūlė {name}',
-    wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'Seku Seku praneša: {text}',
-    report_new: 'Naujas pranešimas apie problemą Seku Seku platformoje', member_joined: '{name} prisijungė prie grupės'
+    wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'seku seku praneša: {text}',
+    report_new: 'Naujas pranešimas apie problemą seku seku platformoje', member_joined: '{name} prisijungė prie grupės'
   },
   es: {
-    subjectOne: 'Seku Seku: {text}', subjectMany: 'Seku Seku: {n} notificaciones nuevas', hello: 'Hola, {name}:', open: 'Abrir Seku Seku',
-    footer: 'Recibes estos correos por tus ajustes de notificaciones. Cámbialos en Seku Seku → Perfil → Notificaciones.',
+    subjectOne: 'seku seku: {text}', subjectMany: 'seku seku: {n} notificaciones nuevas', hello: 'Hola, {name}:', open: 'Abrir seku seku',
+    footer: 'Recibes estos correos por tus ajustes de notificaciones. Cámbialos en seku seku → Perfil → Notificaciones.',
     request_new: '{name} te pide libro(s)', message: 'Nuevo mensaje de {name}', message_many: '{n} mensajes nuevos de {name}',
     request_accepted: '{name} ha aceptado tu pedido', request_declined: '{name} ha rechazado tu pedido',
     handover_set: 'Entrega con {name}: {when}, {where}', handover_reminder: 'Recordatorio: mañana entrega con {name} – {where}',
     exchange_done: 'Intercambio con {name} completado: deja tu valoración', wish_match: '{name} ha anunciado «{title}», de tu lista de deseos',
-    wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'De Seku Seku: {text}',
-    report_new: 'Nueva denuncia en Seku Seku', member_joined: '{name} se ha unido al grupo'
+    wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'De seku seku: {text}',
+    report_new: 'Nueva denuncia en seku seku', member_joined: '{name} se ha unido al grupo'
   }
 };
 
