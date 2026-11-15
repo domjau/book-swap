@@ -27,7 +27,7 @@ Book lookups send **only the ISBN or the search text** to Google Books / Open Li
 
 ## Photos
 
-Phone photos often carry GPS coordinates in their EXIF metadata. The app redraws every photo on a canvas before saving, which removes all metadata. The production server will do the same again. Users are encouraged to photograph only the book.
+Phone photos often carry GPS coordinates in their EXIF metadata. The app redraws every photo on a canvas before saving, which removes all metadata. The production server will do the same again. Users are asked to photograph only the book: its cover and its condition. At least one photo is required and at most 4 are allowed, each resized to 720 px. Another family's photos are never copied when the same ISBN is added again.
 
 ## Country and postal codes
 

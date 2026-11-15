@@ -14,7 +14,9 @@
 | Scan ISBN → prefill from own catalogue, Google Books, Open Library | ✅ |
 | Search by title when adding | ✅ |
 | Manual entry fallback | ✅ |
-| Own photo, metadata stripped | ✅ |
+| 1–4 own photos required (cover and wear), 720 px, metadata stripped | ✅ |
+| ISBN shown while looking up and in the found / not found message | ✅ |
+| Anti-piracy: chat blocks e-book files and file-sharing links; terms §6a and §11 | ✅ |
 | Bundled requests per owner, offer own books in return | ✅ |
 | Chat per request, quick replies, accept some or all, decline | ✅ |
 | Handover card (date + place), mark handed over | ✅ |

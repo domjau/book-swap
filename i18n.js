@@ -316,3 +316,38 @@ Object.assign(window.STRINGS.en, {
   scanTips: 'Hold it 15–25 cm away, with the barcode horizontal and filling the frame. Good light helps.',
   photoOfBarcode: 'Take a photo of the barcode', photoScanFail: "We couldn't find a barcode in the photo. Take it closer and in focus, or type the ISBN."
 });
+
+/* ISBN feedback and photos */
+Object.assign(window.STRINGS.lt, {
+  searchingIsbn: 'Ieškoma ISBN {isbn}…',
+  foundIsbn: 'ISBN {isbn} rasta: {src}. Patikrinkite ir papildykite.',
+  notFoundIsbn: 'ISBN {isbn} nerasta – nieko tokio, įveskite kelias detales.',
+  foundLocalIsbn: 'ISBN {isbn}: šią knygą jau buvo pridėjusi kita šeima – informacija nukopijuota.',
+  photosLabel: 'Jūsų egzemplioriaus nuotraukos (1–{max})', photoN: 'Nuotrauka {n}', removePhoto: 'Pašalinti nuotrauką',
+  photosHint: 'Nufotografuokite viršelį ir nusidėvėjimą. Nefotografuokite vidinių puslapių – čia keičiamasi tik popierinėmis knygomis, ne kopijomis.',
+  photoRequired: 'Pridėkite bent vieną savo egzemplioriaus nuotrauką.', maxPhotos: 'Daugiausia {max} nuotraukos.'
+});
+Object.assign(window.STRINGS.es, {
+  searchingIsbn: 'Buscando ISBN {isbn}…',
+  foundIsbn: 'ISBN {isbn} encontrado en {src}. Revisa y completa los datos.',
+  notFoundIsbn: 'No se ha encontrado el ISBN {isbn}; no pasa nada, añade unos datos.',
+  foundLocalIsbn: 'ISBN {isbn}: otra familia ya añadió este libro; hemos copiado los datos.',
+  photosLabel: 'Fotos de tu ejemplar (1–{max})', photoN: 'Foto {n}', removePhoto: 'Quitar foto',
+  photosHint: 'Fotografía la portada y el desgaste. No fotografíes las páginas interiores: aquí se intercambian libros en papel, no copias.',
+  photoRequired: 'Añade al menos una foto de tu ejemplar.', maxPhotos: 'Máximo {max} fotos.'
+});
+Object.assign(window.STRINGS.en, {
+  searchingIsbn: 'Looking up ISBN {isbn}…',
+  foundIsbn: 'ISBN {isbn} found on {src}. Check and complete the details.',
+  notFoundIsbn: 'ISBN {isbn} could not be found – no problem, add a few details.',
+  foundLocalIsbn: 'ISBN {isbn}: another family already added this book – details copied.',
+  photosLabel: 'Photos of your copy (1–{max})', photoN: 'Photo {n}', removePhoto: 'Remove photo',
+  photosHint: 'Photograph the cover and any wear and tear. Do not photograph the inside pages – Book Swap is for physical books, not copies.',
+  photoRequired: 'Please add at least one photo of your own copy.', maxPhotos: 'Up to {max} photos.'
+});
+Object.assign(window.STRINGS.lt, { copyBlocked: 'Knygų kopijomis ir failais dalintis negalima – tik popierinėmis knygomis.' });
+Object.assign(window.STRINGS.es, { copyBlocked: 'No se pueden compartir copias ni archivos de libros, solo libros en papel.' });
+Object.assign(window.STRINGS.en, { copyBlocked: "Sharing copies or files of books isn't allowed – only physical books." });
+Object.assign(window.STRINGS.lt, { photoAdd: 'Pridėti nuotrauką' });
+Object.assign(window.STRINGS.es, { photoAdd: 'Añadir foto' });
+Object.assign(window.STRINGS.en, { photoAdd: 'Add photo' });

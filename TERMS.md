@@ -1,6 +1,6 @@
 # Terms of use
 
-*Version 2026-11-15.2. The same text is shown in the app in Lithuanian, Spanish and English (`terms.js`), and every user must accept it before using the app.*
+*Version 2026-11-15.3. The same text is shown in the app in Lithuanian, Spanish and English (`terms.js`), and every user must accept it before using the app.*
 
 Book Swap is a free, volunteer-run noticeboard that helps people find each other to swap, sell or give away books. By creating a profile you accept these terms.
 
@@ -20,7 +20,10 @@ To the maximum extent permitted by law, the people who run Book Swap are not lia
 You must resolve disputes directly with the other user. We may – but are not obliged to – look at reports, hide listings or remove users.
 
 ## 6. Acceptable use
-Only list books that you own and are allowed to give away or sell. No illegal, offensive or adult content, no spam, no large-scale commercial reselling and no harassment. Do not post children's names or photos of people.
+Only list physical books that you own and are allowed to give away or sell. Each listing needs at least one photo of your own copy; photos may show the cover and its condition only. No illegal, offensive or adult content, no spam, no large-scale commercial reselling and no harassment. Do not post children's names or photos of people.
+
+## 6a. Copyright – no copies
+Book Swap is for passing on physical books, never their content. Do not upload, send or link to scans, photos of inside pages, PDFs, e-books, audiobooks or any other copies – not in listings, photos or chat. Copying and sharing a book's content without permission infringes the author's and publisher's copyright. We remove such content and may remove users who post it.
 
 ## 7. Your location
 You share your country and postal code – never your address – so that neighbours can find each other and avoid shipping. Your country and postal code are visible to members of your group.
@@ -33,6 +36,9 @@ We may change these terms; you will then be asked to accept the new version. We 
 
 ## 10. Contact
 Questions and reports: https://github.com/domjau/book-swap/issues
+
+## 11. Copyright complaints
+If you believe something on Book Swap infringes your copyright, report it with the flag button or via the contact above, saying what it is and where. We will remove infringing content promptly.
 
 ---
 

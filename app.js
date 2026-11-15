@@ -7,6 +7,7 @@
   const KEY = 'bookswap-v1';
   const $app = document.getElementById('app');
   const MINE = 'me';
+  const MAX_PHOTOS = 4;
 
   // ---------- helpers ----------
   const esc = (v) => String(v == null ? '' : v)
@@ -313,6 +314,7 @@
       <h1 class="h1 center">${esc(b.title)}</h1>
       <div class="muted center bold">${esc(b.author)}</div>
       <div class="row-wrap center-row">${offerBadge(b)} ${topics}</div>
+      ${(b.photos || []).length > 1 ? `<div class="gallery">${b.photos.map((ph, i) => `<img src="${esc(ph)}" alt="${esc(t('photoN', { n: i + 1 }))}" loading="lazy">`).join('')}</div>` : ''}
       ${iWant(b) ? `<div class="notice wish">${icon('heart', 20)} ${esc(t('onYourWishlist'))}</div>` : ''}
       ${b.owner === MINE && wishersOf(b).length ? `<div class="notice wish">${icon('heart', 20)} <span>${esc(t('wantedBy'))} ${wishersOf(b).map(memberLink).join(', ')}</span></div>` : ''}
       <div class="actions">${actions}</div>
@@ -515,7 +517,7 @@
           <input type="file" accept="image/*" capture="environment" class="sr" data-change="barcodePhoto"></label>
       </section>
       ${msg}
-      ${ui.busy ? `<div class="notice">${esc(t('searching'))}</div>` : ''}
+      ${ui.busy ? `<div class="notice">${esc(ui.busyIsbn ? t('searchingIsbn', { isbn: ui.busyIsbn }) : t('searching'))}</div>` : ''}
       <form class="row-gap" data-action-submit="lookupTyped"><label class="sr" for="isbn">${esc(t('orTypeIsbn'))}</label>
         <input id="isbn" class="input grow" inputmode="numeric" maxlength="17" placeholder="${esc(t('orTypeIsbn'))}: ${esc(t('isbnPh'))}">
         <button class="btn primary" type="submit">${esc(t('lookUp'))}</button></form>
@@ -558,22 +560,25 @@
     const d = ui.draft;
     const chip = (on) => `pill ${on ? 'on' : ''}`;
     const msg = ui.addMsg ? `<div class="notice ${ui.addMsgKind}">${esc(ui.addMsg)}</div>` : '';
-    const img = d.photo || d.cover;
+    const photoTiles = d.photos.map((ph, i) => `<div class="ph-tile"><img src="${esc(ph)}" alt="${esc(t('photoN', { n: i + 1 }))}">
+        <button class="ph-x" data-action="removePhoto" data-v="${i}" aria-label="${esc(t('removePhoto'))}">${icon('x', 14)}</button></div>`).join('');
+    const addTile = d.photos.length < MAX_PHOTOS ? `<label class="ph-tile ph-add">${icon('camera', 26)}<span>${esc(t('photoAdd'))}</span>
+        <input type="file" accept="image/*" capture="environment" class="sr" data-change="photo"></label>` : '';
     return `<main class="pad">
       <button class="back" data-action="restartAdd">${icon('back', 20)} ${esc(t('back'))}</button>
       ${modeToggle()}${msg}
       <h1 class="h1">${esc(t('review'))}</h1>
       <div class="draft-top">
-        <label class="photo-box ${img ? 'has' : ''}">
-          ${img ? `<img src="${esc(img)}" alt="">` : icon('camera', 30)}
-          <span class="small bold">${esc(d.photo ? t('changePhoto') : (d.cover ? t('coverFromSource') : t('addPhoto')))}</span>
-          <input type="file" accept="image/*" capture="environment" class="sr" data-change="photo"></label>
+        ${d.cover ? `<div class="cat-cover"><img src="${esc(d.cover)}" alt=""><span class="tiny bold">${esc(t('coverFromSource'))}</span></div>` : ''}
         <div class="grow col">
           <label class="label" for="d-title">${esc(t('title'))}</label><input id="d-title" class="input" maxlength="150" value="${esc(d.title)}" data-input="draft" data-field="title">
           <label class="label" for="d-author">${esc(t('author'))}</label><input id="d-author" class="input" maxlength="120" value="${esc(d.author)}" data-input="draft" data-field="author">
         </div>
       </div>
-      ${d.photo ? `<div class="muted small">${icon('check', 14)} ${esc(t('photoClean'))}</div>` : (d.cover ? `<label class="link small">${esc(t('addPhoto'))}<input type="file" accept="image/*" capture="environment" class="sr" data-change="photo"></label>` : '')}
+      <span class="label">${esc(t('photosLabel', { max: MAX_PHOTOS }))} *</span>
+      <div class="ph-strip">${photoTiles}${addTile}</div>
+      <p class="muted small ph-hint">${icon('shield', 14)} ${esc(t('photosHint'))}</p>
+      ${d.photos.length ? `<div class="muted tiny">${icon('check', 12)} ${esc(t('photoClean'))}</div>` : ''}
       <label class="label" for="d-desc">${esc(t('description'))}</label>
       <textarea id="d-desc" class="input" rows="4" maxlength="2000" data-input="draft" data-field="description">${esc(d.description)}</textarea>
       ${d.isbn ? `<div class="muted small">ISBN ${esc(d.isbn)}</div>` : ''}
@@ -695,6 +700,10 @@
   const go = (hash) => { if (location.hash === hash) render(); else location.hash = hash; };
 
   // ---------- requests & chat logic ----------
+  // Block obvious attempts to share copies of books in chat (files and file-sharing links).
+  // A simple guard, not a guarantee – reports and moderation remain the main tool.
+  const COPY_PATTERNS = /\.(pdf|epub|mobi|azw3?|djvu|cbz|cbr|fb2)(\b|$)|drive\.google|docs\.google|dropbox|wetransfer|mega\.nz|mediafire|z-?lib|libgen|annas-archive|scribd|t\.me\//i;
+  const looksLikeCopySharing = (text) => COPY_PATTERNS.test(text);
   function sysMsg(th, key, vars) { th.messages.push({ from: 'system', key: key, vars: vars || {}, text: '', at: Date.now() }); }
   function msgText(m) {
     if (!m.key) return m.text || '';
@@ -843,21 +852,22 @@
     // 1. Our own catalogue – best for small-language books
     const local = S.books.find((b) => b.isbn && (b.isbn === isbn || b.isbn === isbn10));
     if (local) {
-      startDraft({ isbn: isbn, title: local.title, author: local.author, description: local.description, lang: local.lang, topics: local.topics.slice(), cover: local.cover || local.photo || '', age: local.age });
-      ui.addMsg = t('foundLocal'); ui.addMsgKind = 'ok'; render(); return;
+      // Copy the book details – never another family's own photos.
+      startDraft({ isbn: isbn, title: local.title, author: local.author, description: local.description, lang: local.lang, topics: local.topics.slice(), cover: local.cover || '', age: local.age });
+      ui.addMsg = t('foundLocalIsbn', { isbn: isbn }); ui.addMsgKind = 'ok'; render(); return;
     }
-    ui.busy = true; ui.addMsg = ''; render();
+    ui.busy = true; ui.busyIsbn = isbn; ui.addMsg = ''; render();
     // 2. Google Books and Open Library at the same time; combine what they know.
     const results = await Promise.all([googleByIsbn(isbn, isbn10).catch(() => null), openLibraryByIsbn(isbn, isbn10).catch(() => null)]);
     const found = mergeFound(results[0], results[1]);
-    ui.busy = false;
+    ui.busy = false; ui.busyIsbn = '';
     if (found && found.title) {
       found.isbn = isbn;
       startDraft(found);
-      ui.addMsg = t('foundIn', { src: found.source }); ui.addMsgKind = 'ok';
+      ui.addMsg = t('foundIsbn', { isbn: isbn, src: found.source }); ui.addMsgKind = 'ok';
     } else {
       startDraft({ isbn: isbn });
-      ui.addMsg = t('notFound'); ui.addMsgKind = 'warn';
+      ui.addMsg = t('notFoundIsbn', { isbn: isbn }); ui.addMsgKind = 'warn';
     }
     render();
   }
@@ -875,7 +885,8 @@
     ui.busy = false; render();
   }
   function startDraft(p) {
-    ui.draft = Object.assign({ isbn: '', title: '', author: '', description: '', lang: S.interested[0] || 'lt', topics: [], age: '3–6', cond: 'good', offer: 'swap', price: '3', cover: '', photo: '' }, p || {});
+    ui.draft = Object.assign({ isbn: '', title: '', author: '', description: '', lang: S.interested[0] || 'lt', topics: [], age: '3–6', cond: 'good', offer: 'swap', price: '3', cover: '', photos: [] }, p || {});
+    ui.draft.photos = [];
     if (ui.draft.lang === 'other' && !p.title) ui.draft.lang = S.interested[0] || 'lt';
     ui.addStep = 'form';
     stopCamera();
@@ -1007,15 +1018,19 @@
   }
 
   // ---------- photo (resized + metadata stripped by redrawing on a canvas) ----------
+  // Photos are for showing the copy and its condition – kept small on purpose (max 720 px),
+  // and limited to MAX_PHOTOS, so the app can't be used to share the pages of a book.
   function handlePhoto(file) {
-    if (!file || !/^image\//.test(file.type)) return;
+    if (!file || !/^image\//.test(file.type) || !ui.draft) return;
+    if (ui.draft.photos.length >= MAX_PHOTOS) { toast(t('maxPhotos', { max: MAX_PHOTOS })); return; }
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
-      const max = 800; const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const max = 720; const scale = Math.min(1, max / Math.max(img.width, img.height));
       const c = document.createElement('canvas'); c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      ui.draft.photo = c.toDataURL('image/jpeg', 0.75);
+      if (ui.draft && ui.draft.photos.length < MAX_PHOTOS) ui.draft.photos.push(c.toDataURL('image/jpeg', 0.72));
+      if (ui.addMsg === t('photoRequired')) ui.addMsg = '';
       URL.revokeObjectURL(url); render();
     };
     img.src = url;
@@ -1107,6 +1122,7 @@
     pickResult: (el) => { const r = ui.searchResults[Number(el.dataset.v)]; if (r) { startDraft(r); ui.addMsg = r.source === 'local' ? t('foundLocal') : t('foundIn', { src: r.source }); ui.addMsgKind = 'ok'; render(); } },
     restartAdd: () => { ui.addStep = 'scan'; ui.draft = null; ui.addMsg = ''; ui.searchResults = []; go('#/add'); },
     dLang: (el) => { ui.draft.lang = el.dataset.v; render(); },
+    removePhoto: (el) => { ui.draft.photos.splice(Number(el.dataset.v), 1); render(); },
     dTopic: (el) => { const a = ui.draft.topics; const i = a.indexOf(el.dataset.v); if (i >= 0) a.splice(i, 1); else a.push(el.dataset.v); render(); },
     dAge: (el) => { ui.draft.age = el.dataset.v; render(); },
     dCond: (el) => { ui.draft.cond = el.dataset.v; render(); },
@@ -1114,10 +1130,11 @@
     saveDraft: () => {
       const d = ui.draft;
       if (!d.title.trim()) { ui.addMsg = t('required'); ui.addMsgKind = 'warn'; render(); return; }
+      if (!d.photos.length) { ui.addMsg = t('photoRequired'); ui.addMsgKind = 'warn'; render(); window.scrollTo(0, 0); return; }
       const b = { id: uid('b'), isbn: d.isbn, title: d.title.trim(), author: d.author.trim() || '—', description: d.description.trim(),
         lang: d.lang, topics: d.topics.length ? d.topics.slice() : ['learning'], age: d.age, cond: d.cond, offer: d.offer,
         price: d.offer === 'sell' ? (Number(String(d.price).replace(',', '.')) || 0) : 0, owner: MINE, added: Date.now(),
-        status: 'available', cover: d.cover, photo: d.photo };
+        status: 'available', cover: d.cover, photos: d.photos.slice(0, MAX_PHOTOS), photo: d.photos[0] };
       S.books.push(b); save();
       ui.lastSaved = b.id; ui.lastWish = null; ui.addStep = 'done'; ui.draft = null; ui.addMsg = ''; render();
     },
@@ -1160,6 +1177,7 @@
     if (kind === 'sendMsg') {
       const box = document.getElementById('msgbox'); const text = (box.value || '').trim().slice(0, 1000);
       if (!text) return;
+      if (looksLikeCopySharing(text)) { toast(t('copyBlocked')); return; }
       const th = S.threads.find((x) => x.id === f.dataset.v);
       th.messages.push({ from: MINE, text: text, at: Date.now() }); box.value = ''; save(); render();
     } else if (kind === 'lookupTyped') lookupIsbn(document.getElementById('isbn').value);

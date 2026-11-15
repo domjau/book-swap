@@ -2,7 +2,7 @@
    change the version whenever the text changes so everyone is asked to accept again.
    Keep TERMS.md in the repository root in sync with the English text. */
 window.TERMS = {
-  version: '2026-11-15.2',
+  version: '2026-11-15.3',
   contact: 'https://github.com/domjau/book-swap/issues',
 
   en: {
@@ -14,11 +14,13 @@ window.TERMS = {
       ['3. Your responsibility', 'Any agreement is solely between the users involved. You decide whom to trust, you check the book before you pay, and you choose how to pay. Safety tips: meet in a public place, do not pay in advance to people you do not know, and never share bank log-ins or card details.'],
       ['4. Limitation of liability', 'To the maximum extent permitted by law, the people who run Book Swap are not liable for any loss or damage arising from the use of the platform or from dealings between users – including fraud, scams, books not handed over, lost money, damaged books or disputes. Nothing in these terms limits liability that cannot be limited by law.'],
       ['5. Disputes between users', 'You must resolve disputes directly with the other user. We may – but are not obliged to – look at reports, hide listings or remove users.'],
-      ['6. Acceptable use', 'Only list books that you own and are allowed to give away or sell. No illegal, offensive or adult content, no spam, no large-scale commercial reselling and no harassment. Do not post children\'s names or photos of people.'],
+      ['6. Acceptable use', 'Only list physical books that you own and are allowed to give away or sell. Each listing needs at least one photo of your own copy; photos may show the cover and its condition only. No illegal, offensive or adult content, no spam, no large-scale commercial reselling and no harassment. Do not post children\'s names or photos of people.'],
+      ['6a. Copyright – no copies', 'Book Swap is for passing on physical books, never their content. Do not upload, send or link to scans, photos of inside pages, PDFs, e-books, audiobooks or any other copies – not in listings, photos or chat. Copying and sharing a book\'s content without permission infringes the author\'s and publisher\'s copyright. We remove such content and may remove users who post it.'],
       ['7. Your location', 'You share your country and postal code – never your address – so that neighbours can find each other and avoid shipping. Your country and postal code are visible to members of your group.'],
       ['8. Privacy', 'We only store what is needed for swapping. You can download or delete your data at any time from your profile.'],
       ['9. Changes and ending', 'We may change these terms; you will then be asked to accept the new version. We may suspend or end the service or your profile at any time. You can stop using Book Swap and delete your profile at any time.'],
-      ['10. Contact', 'Questions and reports: {contact}']
+      ['10. Contact', 'Questions and reports: {contact}'],
+      ['11. Copyright complaints', 'If you believe something on Book Swap infringes your copyright, report it with the flag button or via {contact}, saying what it is and where. We will remove infringing content promptly.']
     ]
   },
 
@@ -31,11 +33,13 @@ window.TERMS = {
       ['3. Jūsų atsakomybė', 'Bet koks susitarimas sudaromas tik tarp jame dalyvaujančių vartotojų. Jūs patys sprendžiate, kuo pasitikėti, patikrinate knygą prieš mokėdami ir pasirenkate mokėjimo būdą. Saugumo patarimai: susitikite viešoje vietoje, nemokėkite iš anksto nepažįstamiems ir niekam neatskleiskite banko prisijungimo ar kortelės duomenų.'],
       ['4. Atsakomybės ribojimas', 'Kiek leidžia įstatymai, Knygų keityklą prižiūrintys žmonės neatsako už jokius nuostolius ar žalą, kilusius naudojantis platforma ar dėl vartotojų tarpusavio sandorių, įskaitant sukčiavimą, apgaulę, neperduotas knygas, prarastus pinigus, sugadintas knygas ar ginčus. Šios sąlygos neriboja atsakomybės, kurios pagal įstatymus apriboti negalima.'],
       ['5. Ginčai tarp vartotojų', 'Ginčus turite spręsti tiesiogiai su kitu vartotoju. Galime, bet neprivalome, peržiūrėti pranešimus, paslėpti skelbimus ar pašalinti vartotojus.'],
-      ['6. Leistinas naudojimas', 'Skelbkite tik savo knygas, kurias turite teisę atiduoti ar parduoti. Draudžiamas neteisėtas, įžeidžiantis ar suaugusiesiems skirtas turinys, šlamštas, masinis komercinis perpardavinėjimas ir priekabiavimas. Neskelbkite vaikų vardų ar žmonių nuotraukų.'],
+      ['6. Leistinas naudojimas', 'Skelbkite tik savo popierines knygas, kurias turite teisę atiduoti ar parduoti. Kiekvienam skelbimui reikia bent vienos jūsų egzemplioriaus nuotraukos; nuotraukose galima rodyti tik viršelį ir būklę. Draudžiamas neteisėtas, įžeidžiantis ar suaugusiesiems skirtas turinys, šlamštas, masinis komercinis perpardavinėjimas ir priekabiavimas. Neskelbkite vaikų vardų ar žmonių nuotraukų.'],
+      ['6a. Autorių teisės – jokių kopijų', 'Knygų keitykla skirta perduoti popierines knygas, o ne jų turinį. Nekelkite, nesiųskite ir nesidalinkite nuorodomis į skenuotas kopijas, vidinių puslapių nuotraukas, PDF, el. knygas, garsines knygas ar kitas kopijas – nei skelbimuose, nei nuotraukose, nei pokalbiuose. Knygos turinio kopijavimas ir platinimas be leidimo pažeidžia autoriaus ir leidėjo teises. Tokį turinį šaliname ir galime pašalinti jį skelbiančius vartotojus.'],
       ['7. Jūsų vieta', 'Nurodote šalį ir pašto kodą – niekada ne adresą, – kad kaimynai galėtų vieni kitus rasti ir nereikėtų siuntimo. Jūsų šalį ir pašto kodą mato jūsų grupės nariai.'],
       ['8. Privatumas', 'Saugome tik tai, ko reikia mainams. Savo duomenis galite bet kada atsisiųsti ar ištrinti profilyje.'],
       ['9. Pakeitimai ir nutraukimas', 'Sąlygas galime keisti – tada paprašysime sutikti su nauja versija. Galime bet kada sustabdyti ar nutraukti paslaugą ar jūsų profilį. Jūs galite bet kada nustoti naudotis Knygų keitykla ir ištrinti profilį.'],
-      ['10. Kontaktai', 'Klausimai ir pranešimai: {contact}']
+      ['10. Kontaktai', 'Klausimai ir pranešimai: {contact}'],
+      ['11. Pranešimai apie autorių teisių pažeidimus', 'Jei manote, kad Knygų keitykloje kas nors pažeidžia jūsų autorių teises, praneškite vėliavėlės mygtuku arba per {contact}, nurodydami, kas ir kur. Pažeidžiantį turinį nedelsdami pašalinsime.']
     ]
   },
 
@@ -48,11 +52,13 @@ window.TERMS = {
       ['3. Tu responsabilidad', 'Cualquier acuerdo es exclusivamente entre los usuarios implicados. Tú decides en quién confiar, revisas el libro antes de pagar y eliges cómo pagar. Consejos: queda en un lugar público, no pagues por adelantado a desconocidos y nunca compartas tus claves bancarias ni los datos de tu tarjeta.'],
       ['4. Limitación de responsabilidad', 'En la máxima medida permitida por la ley, las personas que gestionan Intercambio de libros no son responsables de ninguna pérdida o daño derivado del uso de la plataforma o de los tratos entre usuarios, incluidos fraudes, estafas, libros no entregados, dinero perdido, libros dañados o disputas. Nada en estas condiciones limita la responsabilidad que la ley no permite limitar.'],
       ['5. Disputas entre usuarios', 'Debes resolver las disputas directamente con el otro usuario. Podemos, sin estar obligados, revisar denuncias, ocultar anuncios o eliminar usuarios.'],
-      ['6. Uso aceptable', 'Anuncia solo libros tuyos que puedas regalar o vender. Prohibido el contenido ilegal, ofensivo o para adultos, el spam, la reventa comercial a gran escala y el acoso. No publiques nombres de niños ni fotos de personas.'],
+      ['6. Uso aceptable', 'Anuncia solo libros en papel que sean tuyos y que puedas regalar o vender. Cada anuncio necesita al menos una foto de tu ejemplar; las fotos solo pueden mostrar la portada y su estado. Prohibido el contenido ilegal, ofensivo o para adultos, el spam, la reventa comercial a gran escala y el acoso. No publiques nombres de niños ni fotos de personas.'],
+      ['6a. Derechos de autor: nada de copias', 'Intercambio de libros sirve para pasar libros en papel, nunca su contenido. No subas, envíes ni enlaces escaneos, fotos de páginas interiores, PDF, libros electrónicos, audiolibros ni ninguna otra copia, ni en anuncios, ni en fotos, ni en el chat. Copiar y compartir el contenido de un libro sin permiso infringe los derechos del autor y del editor. Eliminamos ese contenido y podemos eliminar a quien lo publique.'],
       ['7. Tu ubicación', 'Compartes tu país y código postal, nunca tu dirección, para que los vecinos puedan encontrarse y evitar envíos. Tu país y código postal los ven los miembros de tu grupo.'],
       ['8. Privacidad', 'Solo guardamos lo necesario para los intercambios. Puedes descargar o borrar tus datos en cualquier momento desde tu perfil.'],
       ['9. Cambios y baja', 'Podemos cambiar estas condiciones; entonces te pediremos que aceptes la nueva versión. Podemos suspender o terminar el servicio o tu perfil en cualquier momento. Puedes dejar de usar Intercambio de libros y borrar tu perfil cuando quieras.'],
-      ['10. Contacto', 'Preguntas y denuncias: {contact}']
+      ['10. Contacto', 'Preguntas y denuncias: {contact}'],
+      ['11. Reclamaciones de derechos de autor', 'Si crees que algo en Intercambio de libros infringe tus derechos de autor, denúncialo con el botón de la bandera o a través de {contact}, indicando qué es y dónde está. Retiraremos el contenido infractor sin demora.']
     ]
   }
 };

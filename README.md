@@ -35,7 +35,8 @@ The camera only works over HTTPS or on `localhost`.
   3. Open Library (fills in any gaps).
 
   Topics are suggested from the catalogue categories. If the book isn't found, it can be entered by hand.
-- **Photos:** resized on the phone and redrawn on a canvas, which removes EXIF and GPS data before saving.
+- **Photos:** 1–4 photos of your own copy are **required** for every listing (cover and wear only). They are resized to 720 px on the phone and redrawn on a canvas, which removes EXIF and GPS data.
+- **No piracy:** only physical books. The chat blocks e-book files and file-sharing links, and the terms forbid sharing copies. See [docs/COPYRIGHT.md](docs/COPYRIGHT.md).
 - **Wish lists and tailored exchanges:** add books you're looking for (scan, search or type). See "From your wish list" and "They want your books" on the home screen. A member's page pre-ticks a fair swap: their books you want, and your books they want.
 - **Neighbours first:** members give their country and postal code, never an address. The country list is shown in the app language, and postal codes are checked for common countries (DK, LT, ES, DE, UK, NL…). Books show the owner's area, a *Near me* filter is available, and lists are sorted nearest first to avoid shipping.
 - **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that Book Swap is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
@@ -62,6 +63,7 @@ The camera only works over HTTPS or on `localhost`.
 | [docs/FEATURES.md](docs/FEATURES.md) | What's built, what's next (MVP) and later ideas |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Prototype structure, book lookup pipeline, production design, data model, row-level security |
 | [TERMS.md](TERMS.md) | Terms of use (P2P disclaimer, limitation of liability) and notes for maintainers |
+| [docs/COPYRIGHT.md](docs/COPYRIGHT.md) | Why swapping physical books is fine, and how the app prevents sharing copies |
 | [SECURITY.md](SECURITY.md) | How to report vulnerabilities, current protections, production security checklist |
 | [docs/PRIVACY.md](docs/PRIVACY.md) | What data is stored and why, photo metadata, retention, GDPR checklist |
 | [docs/TRANSLATIONS.md](docs/TRANSLATIONS.md) | Adding app languages and book languages |
