@@ -1,0 +1,11 @@
+{
+  "name": "Book Swap",
+  "short_name": "Book Swap",
+  "description": "Swap, sell or give away children's books within your community.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFF8EE",
+  "theme_color": "#FFF8EE",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
