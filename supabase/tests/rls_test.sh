@@ -85,4 +85,72 @@ check "Ben sets avatar in own folder" "UPDATE 1" "$(q $B "update members set ava
 check "Ben cannot point avatar at Ana's file" "violates check constraint" "$(q $B "update members set avatar_path='$G1/$A/x.jpg' where user_id='$B'")"
 check "Ben cannot set Ana's avatar" "UPDATE 0" "$(q $B "update members set avatar_path='$G1/$A/a.jpg' where user_id='$A'")"
 
+echo "== notifications"
+check "Ana got 'request_new' for each of Ben's 2 requests" "2" "$(q $A "select count(*) from notifications where type='request_new'")"
+check "Ben got 'request_answered'" "1" "$(q $B "select count(*) from notifications where type='request_answered'")"
+check "Ben got 'review' from Ana" "1" "$(q $B "select count(*) from notifications where type='review'")"
+check "Cleo sees no one else's notifications" "0" "$(q $C "select count(*) from notifications where user_id<>'$C'")"
+check "Ben cannot mark Ana's notifications read" "UPDATE 0" "$(q $B "update notifications set read_at=now() where user_id='$A'")"
+check "Ben can mark his own read" "UPDATE" "$(q $B "update notifications set read_at=now() where user_id='$B'")"
+check "Ben cannot create notifications" "permission denied" "$(q $B "insert into notifications (user_id, type) values ('$A','announcement')")"
+check "_notify not callable" "permission denied" "$(q $B "select _notify('$A','$G1','announcement','{}')")"
+q $B "insert into messages (request_id, sender_id, body) values ('$R3','$B','one')" >/dev/null
+q $B "insert into messages (request_id, sender_id, body) values ('$R3','$B','two')" >/dev/null
+check "3 chat messages collapse into one unread notification" "1 3" "$(q $A "select count(*), max((data->>'count')::int) from notifications where type='message' and data->>'request_id'='$R3'" | tr '|' ' ')"
+check "Ben sets his notification prefs" "INSERT 0 1" "$(q $B "insert into notification_prefs (user_id, app_types, email_types, email_mode, lang) values ('$B','{request_new}','{}','off','lt')")"
+check "prefs reject unknown types" "violates check constraint" "$(q $B "update notification_prefs set app_types='{spam}' where user_id='$B'")"
+check "Ben cannot write Ana's prefs" "row-level security" "$(q $B "insert into notification_prefs (user_id) values ('$A')")"
+check "Ben cannot read Ana's prefs" "0" "$(q $B "select count(*) from notification_prefs where user_id='$A'")"
+q $A "select submit_review('$R',2,'changed')" >/dev/null
+check "muted type is not created (Ben muted reviews)" "1" "$(q $B "select count(*) from notifications where type='review'")"
+WB=$(q $B "insert into wishes (group_id, owner_id, title) values ('$G1','$B','The Little Prince') returning id" | awk '{print $1}')
+q $A "insert into books (group_id, owner_id, title, offer, photo_paths) values ('$G1','$A','the little prince!','give','{x}')" >/dev/null
+q $B "update notification_prefs set app_types=app_types||'{wish_match}' where user_id='$B'" >/dev/null
+q $A "insert into books (group_id, owner_id, title, offer, photo_paths) values ('$G1','$A','The Little Prince','give','{y}')" >/dev/null
+check "wish match notifies Ben (title match ignores case/punctuation)" "1" "$(q $B "select count(*) from notifications where type='wish_match'")"
+q $B "insert into wishes (group_id, owner_id, title) values ('$G1','$B','Gruffalo')" >/dev/null
+check "new wish tells Ana she has it ('wanted')" "1" "$(q $A "select count(*) from notifications where type='wanted'")"
+
+echo "== organiser tools"
+check "Ben (member) cannot see stats" "only organisers" "$(q $B "select org_stats('$G1')")"
+check "Ana sees stats" "members" "$(q $A "select org_stats('$G1')")"
+check "Ben cannot promote himself" "only organisers" "$(q $B "select org_set_role('$G1','$B','organiser')")"
+check "Ana cannot demote the last organiser (herself)" "at least one organiser" "$(q $A "select org_set_role('$G1','$A','member')")"
+check "Ben cannot hide Ana's book" "only organisers" "$(q $B "select org_hide_book('$BA', true, 'x')")"
+BX=$(q $B "insert into books (group_id, owner_id, title, offer, photo_paths) values ('$G1','$B','Spam book','give','{z}') returning id" | awk '{print $1}')
+check "Ana hides Ben's listing" "" "$(q $A "select org_hide_book('$BX', true, 'spam')")"
+check "Cleo/others no longer see hidden book" "0" "$(q $C "select count(*) from books where id='$BX'")"
+check "owner still sees his hidden book" "1" "$(q $B "select count(*) from books where id='$BX'")"
+check "Ben reports a chat (copyright)" "INSERT 0 1" "$(q $B "insert into reports (group_id, reporter_id, target_type, target_id, category, reason) values ('$G1','$B','request','$R','copyright','test')")"
+check "Ana notified about the report" "1" "$(q $A "select count(*) from notifications where type='report_new'")"
+RP=$(q $A "select id from reports order by id desc limit 1" | tr -d ' ')
+check "Ana can read the reported chat" "Saturday" "$(q $A "select string_agg(body,' ') from org_report_context($RP)")"
+check "Ben cannot read report context" "only organisers" "$(q $B "select * from org_report_context($RP)")"
+check "Ben cannot resolve reports directly" "permission denied" "$(q $B "update reports set resolved_at=now()")"
+check "Ana resolves the report" "" "$(q $A "select org_resolve_report($RP, 'Talked to both')")"
+check "Ben cannot announce" "only organisers" "$(q $B "select org_announce('$G1','hi all')")"
+check "Ana announces to everyone (2 members)" "2" "$(q $A "select org_announce('$G1','Swap day next Saturday!')")"
+check "Ana received the announcement" "Swap day" "$(q $A "select data->>'text' from notifications where type='announcement'")"
+check "Ben muted announcements, so got none" "0" "$(q $B "select count(*) from notifications where type='announcement'")"
+check "Ben cannot list invites" "only organisers" "$(q $B "select * from org_invites('$G1')")"
+INV=$(q $A "select id from org_invites('$G1') limit 1" | tr -d ' ')
+check "Ana revokes an invite" "" "$(q $A "select org_revoke_invite('$INV')")"
+check "moderation log is recorded" "hide_book" "$(q $A "select string_agg(action,' ') from moderation_log")"
+check "Ben cannot read the moderation log" "0" "$(q $B "select count(*) from moderation_log")"
+check "Ana removes and bans Ben" "" "$(q $A "select org_remove_member('$G1','$B','spam', true)")"
+NEWCODE=$(q $A "select create_invite('$G1')" | tr -d ' ')
+check "banned Ben cannot rejoin with a new code" "invalid or expired" "$(q $B "select join_group('$NEWCODE','Ben','DK','2720','{}','v')")"
+check "Ben no longer sees group books" "0" "$(q $B "select count(*) from books where group_id='$G1'")"
+check "Ana unbans Ben" "" "$(q $A "select org_unban('$G1','$B')")"
+check "Ben can rejoin after unban" "$G1" "$(q $B "select join_group('$NEWCODE','Ben','DK','2720','{}','v')")"
+
+echo "== platform admin"
+check "normal user is not platform admin" "f" "$(q $A "select is_platform_admin()")"
+check "normal user cannot see overview" "only platform admins" "$(q $A "select * from admin_overview()")"
+su postgres -c "psql -d bs -q -c \"insert into platform_admins values ('$C') on conflict do nothing\""
+check "platform admin sees all groups (2)" "2" "$(q $C "select count(*) from admin_overview()")"
+check "platform admin sees open reports" "" "$(q $C "select count(*) from admin_reports()")"
+check "users cannot make themselves platform admin" "permission denied" "$(q $A "insert into platform_admins values ('$A')")"
+check "handover reminders run" "" "$(su postgres -c "psql -d bs -tA -c 'select send_handover_reminders()'")"
+
 echo; echo "RESULT: $pass passed, $fail failed"

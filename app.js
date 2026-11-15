@@ -271,6 +271,7 @@
       <label class="field"><span class="label">${esc(t('postal'))}</span>
         <input id="onb-postal" class="input" maxlength="10" autocomplete="postal-code" inputmode="text" value="${esc(ui.onbPostal || (S.me ? S.me.postal || '' : ''))}" data-input="onbPostal" placeholder="${esc(t('postalPh'))}"></label>
       <p class="muted small">${icon('pin', 14)} ${esc(t('postalHint'))}</p>
+      <details class="card pad-m notif-setup" open><summary class="h3">${esc(t('notifSettings'))}</summary><p class="muted small">${esc(t('notifSettingsHint'))}</p>${prefsEditor(false)}</details>
       <div class="notice">${icon('shield', 20)} <span>${esc(t('p2pNote'))}</span></div>
       <label class="toggle agree"><input id="onb-agree" type="checkbox" data-action="toggleAgree" ${ui.onbAgree ? 'checked' : ''}>
         <span>${esc(t('acceptTerms'))} <a class="ulink" href="#/terms">${esc(t('termsLink'))}</a></span></label>
@@ -338,7 +339,7 @@
     const langs = UI_LANGS.map((c) => `<button class="lang-btn ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}" aria-label="${esc(STRINGS[c].langNames[c])}">${c.toUpperCase()}</button>`).join('');
     return `<header class="top"><a class="brand" href="#/">${'<span class="logo">' + icon('logo', 20) + '</span>'}
       <span><span class="brand-name">${esc(t('appName'))}</span><span class="brand-group">${esc(groupLabel())}</span></span></a>
-      <div class="langs">${langs}</div></header>`;
+      <div class="langs">${bellHtml()}${langs}</div></header>`;
   }
 
   function nav(route) {
@@ -353,7 +354,7 @@
   }
 
   function viewBrowse() {
-    const others = S.books.filter((b) => b.owner !== MINE && b.status !== 'gone');
+    const others = S.books.filter((b) => b.owner !== MINE && b.status !== 'gone' && !b.hidden);
     const q = ui.q.trim().toLowerCase();
     const filtered = others.filter((b) =>
       (ui.fLang === 'all' || b.lang === ui.fLang) &&
@@ -425,7 +426,10 @@
         <dt>${esc(t('condition'))}</dt><dd>${esc(t(condKey))}</dd>
         ${b.isbn ? `<dt>${esc(t('isbn'))}</dt><dd>${esc(b.isbn)}</dd>` : ''}
       </dl>
-      ${b.owner !== MINE ? `<a class="btn ghost big" href="#/member/${esc(b.owner)}">${icon('swapArrows')} ${esc(t('tailored'))}</a>` : ''}
+      ${b.owner !== MINE ? `<a class="btn ghost big" href="#/member/${esc(b.owner)}">${icon('swapArrows')} ${esc(t('tailored'))}</a>
+        <div class="center"><button class="link small" data-action="openReport" data-type="book" data-v="${esc(b.id)}">${icon('flag', 14)} ${esc(t('reportBook'))}</button></div>` : ''}
+      ${b.hidden ? `<div class="notice warn">${esc(t('hiddenBadge'))}</div>` : ''}
+      ${isOrganiser() && b.owner !== MINE ? `<div class="center"><button class="link small" data-action="admHide" data-v="${esc(b.id)}" data-hide="${b.hidden ? '0' : '1'}">${esc(t(b.hidden ? 'unhideListing' : 'hideListing'))}</button></div>` : ''}
       ${more.length && b.owner !== MINE ? `<h2 class="h2">${esc(t('moreFrom', { name: firstName(b.owner) }))}</h2><div class="hscroll flush">${more.map((x) => bookCard(x, 'row')).join('')}</div>` : ''}
     </main>`;
   }
@@ -464,6 +468,7 @@
         }).join('')}</ul>` : `<div class="muted">${esc(t('nothingHere'))}</div>`}
       </section>
       <section class="card pad-m"><h2 class="h3">${esc(t('reviewsTitle'))}</h2>${reviewsList(id)}</section>
+      <div class="center"><button class="link small" data-action="openReport" data-type="member" data-v="${esc(id)}">${icon('flag', 14)} ${esc(t('reportMember'))}</button></div>
       <h2 class="h2">${esc(t('theirShelf'))}</h2>
       ${theirs.length ? `<div class="grid">${theirs.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('nothingHere'))}</div>`}
     </main>`;
@@ -564,7 +569,7 @@
     } else if (th.status === 'accepted') {
       control = `<div class="handover"><div class="h3">${icon('calendar', 20)} ${esc(t('handover'))}</div>
         <div class="row-gap"><label class="sr" for="hdate">${esc(t('handover'))}</label><input id="hdate" type="date" class="input" value="${nextSaturdayISO()}">
-        <label class="sr" for="hwhere">${esc(t('handoverPh'))}</label><input id="hwhere" class="input grow" maxlength="60" value="${esc(t('handoverPh'))}"></div>
+        <label class="sr" for="hwhere">${esc(t('handoverPh'))}</label><input id="hwhere" class="input grow" maxlength="60" value="${esc((LIVE && live.group && live.group.handover_place) || (S.groupSettings && S.groupSettings.handover_place) || t('handoverPh'))}"></div>
         <button class="btn primary" data-action="confirmHandover" data-v="${esc(th.id)}">${esc(t('confirmHandover'))}</button>
         <div class="muted small">${esc(t('reminderNote'))}</div></div>`;
     } else if (th.status === 'scheduled') {
@@ -582,7 +587,7 @@
     return `<main class="chat">
       <div class="chat-head pad"><button class="back" data-action="go" data-v="#/messages">${icon('back', 20)}</button>
         <div class="grow"><a class="bold ulink" href="#/member/${esc(th.with)}">${esc(memberName(th.with))}</a> <span class="muted small">${icon('pin', 12)} ${esc(near(th.with).label)}</span><br><span class="status st-${th.status}">${esc(t(STATUS[th.status]))}</span></div>
-        <button class="icon-btn" data-action="report" aria-label="${esc(t('report'))}" title="${esc(t('report'))}">${icon('flag', 18)}</button></div>
+        <button class="icon-btn" data-action="openReport" data-type="request" data-v="${esc(th.id)}" aria-label="${esc(t('report'))}" title="${esc(t('report'))}">${icon('flag', 18)}</button></div>
       <section class="card bundle pinned">
         <div class="h3">${esc(isOwner ? t('theyWant', { name: other }) : t('youWant'))}</div>${bookLines}
         ${offered ? `<div class="h3">${esc(isOwner ? t('theyOffer') : t('youOffer'))}</div>${offered}` : ''}
@@ -771,6 +776,10 @@
             <button class="icon-btn" data-action="removeWish" data-v="${esc(w.id)}" aria-label="${esc(t('remove'))}">${icon('x', 16)}</button></li>`;
         }).join('')}</ul>` : `<p class="muted">${esc(t('wishEmpty'))}</p>`}
         <button class="btn ghost" data-action="addWish">${icon('plus', 20)} ${esc(t('addWish'))}</button></section>
+      <section class="card pad-m" id="notif-settings"><h2 class="h3">${esc(t('notifSettings'))}</h2><p class="muted small">${esc(t('notifSettingsHint'))}</p>${prefsEditor(isOrganiser())}
+        <button class="btn primary" data-action="savePrefs">${esc(t('saveSettings'))}</button></section>
+      ${isOrganiser() ? `<a class="btn ghost big" href="#/admin">${icon('shield', 20)} ${esc(t('openAdmin'))}</a>` : ''}
+      ${(LIVE && live.isAdmin) ? `<a class="btn ghost big" href="#/platform">${icon('shield', 20)} ${esc(t('openPlatform'))}</a>` : ''}
       <h2 class="h2">${esc(t('myShelf'))}</h2>
       ${mine.length ? `<div class="grid">${mine.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('shelfEmpty'))}</div>`}
       <section class="card pad-m"><h2 class="h3">${esc(t('settings'))}</h2>
@@ -792,6 +801,9 @@
   }
   let lastRoute = null;
   function render() {
+    if (!S.notifPrefs) S.notifPrefs = DEFAULT_PREFS();
+    if (!S.notifications) S.notifications = [];
+    if (!S.reports) S.reports = [];
     document.documentElement.lang = S.lang;
     document.title = t('appName');
     const r = route();
@@ -808,10 +820,12 @@
     else if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : viewOnboarding();
     else {
       const v = { '': viewBrowse, book: () => viewBook(r.id), requests: viewRequests, messages: viewMessages,
-        chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms }[r.name] || viewBrowse;
+        chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms,
+        notifications: viewNotifications, admin: () => viewAdmin(r.id), platform: viewPlatform }[r.name] || viewBrowse;
       body = header() + v() + nav(r.name);
     }
-    $app.innerHTML = body + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
+    $app.innerHTML = body + reportSheet() + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
+    if (routeChanged && r.name === 'profile' && r.id === 'notifications') { const el = document.getElementById('notif-settings'); if (el) el.scrollIntoView(); }
     if (focusId && !routeChanged) {
       const el = document.getElementById(focusId);
       if (el) { el.focus(); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) {} }
@@ -876,6 +890,7 @@
       setStatus(cur.accepted, 'reserved');
       setStatus(cur.offered, 'reserved');
       sysMsg(cur, 'sysAccepted', { name: owner });
+      S.notifications.unshift({ id: uid('n'), type: 'request_answered', data: { request_id: cur.id, actor: owner, status: 'accepted' }, at: Date.now(), read: false });
       cur.unread = route().name !== 'chat' || route().id !== cur.id;
       save(); render();
     }, 2500);
@@ -1376,7 +1391,7 @@
     const photos = paths.map((p) => urls[p]).filter(Boolean);
     return { id: r.id, isbn: r.isbn || '', title: r.title, author: r.author || '—', description: r.description || '', notes: r.notes || '',
       lang: r.lang, topics: r.topics || [], age: r.age || '3–6', cond: r.condition, offer: r.offer, price: (r.price_cents || 0) / 100,
-      owner: r.owner_id === live.uid ? MINE : r.owner_id, added: Date.parse(r.created_at), status: r.status,
+      owner: r.owner_id === live.uid ? MINE : r.owner_id, added: Date.parse(r.created_at), status: r.status, hidden: !!r.hidden,
       photoPaths: paths, photos: photos, photo: photos[0] || '' };
   }
   function mapThread(r) {
@@ -1407,7 +1422,12 @@
   async function loadMembership() {
     const m = await Backend.myMembership(live.uid);
     if (m) {
-      live.group = { id: m.group_id, name: m.groups ? m.groups.name : '', role: m.role };
+      live.group = { id: m.group_id, name: m.groups ? m.groups.name : '', role: m.role, handover_place: m.groups ? m.groups.handover_place : '', handover_day: m.groups ? m.groups.handover_day : null };
+      try {
+        const pr = await Backend.getPrefs(live.uid);
+        if (pr) S.notifPrefs = { app: pr.app_types, email: pr.email_types, mode: pr.email_mode };
+        live.isAdmin = await Backend.isPlatformAdmin();
+      } catch (e) { /* settings are optional */ }
       S.me = { name: m.display_name, country: m.country, postal: m.postal_code };
       if (m.interested_langs && m.interested_langs.length) S.interested = m.interested_langs;
       S.agreed = { version: m.terms_version, at: Date.now() };
@@ -1418,7 +1438,9 @@
   function refreshAll() {
     if (!LIVE || !live.group) return Promise.resolve();
     if (refreshing) return refreshing;
-    refreshing = Promise.all([Backend.loadGroup(live.group.id), Backend.loadThreads()]).then((res) => {
+    refreshing = Promise.all([Backend.loadGroup(live.group.id), Backend.loadThreads(), Backend.loadNotifications().catch(() => [])]).then((res) => {
+      S.notifications = res[2].map((n) => { const d = Object.assign({}, n.data); if (d.actor === live.uid) d.actor = MINE;
+        return { id: n.id, type: n.type, data: d, at: Date.parse(n.created_at), read: !!n.read_at }; });
       const g = res[0];
       Object.keys(MEMBERS).forEach((k) => delete MEMBERS[k]);
       g.members.forEach((m) => {
@@ -1509,8 +1531,9 @@
         if (!p.code) throw new Error('inviteRequired');
         await Backend.joinGroup(p);
       }
+      await Backend.savePrefs(live.uid, Object.assign({ lang: S.lang }, S.notifPrefs)).catch(() => {});
       await loadMembership(); await refreshAll();
-      location.hash = live.newInvite ? '#/profile' : '#/';
+      location.hash = live.newInvite ? '#/admin/invites' : '#/';
     } catch (e) { ui.onbError = friendlyError(e); }
     finally { live.busy = false; render(); }
   }
@@ -1616,6 +1639,313 @@
     };
   }
 
+  // ===================== notifications, reports, organiser panel, platform admin =====================
+  const NOTIF_TYPES = ['request_new', 'message', 'request_answered', 'handover_set', 'handover_reminder', 'exchange_done', 'wish_match', 'wanted', 'review', 'announcement'];
+  const ORG_TYPES = ['report_new', 'member_joined'];
+  const DEFAULT_PREFS = () => ({ app: NOTIF_TYPES.concat(ORG_TYPES), email: ['request_new', 'message', 'request_answered', 'handover_reminder', 'wish_match', 'announcement', 'report_new'], mode: 'instant' });
+  const REPORT_CATS = ['no_show', 'inappropriate', 'copyright', 'spam', 'safety', 'other'];
+  const N_ICON = { request_new: 'bag', message: 'chat', request_answered: 'check', handover_set: 'calendar', handover_reminder: 'calendar', exchange_done: 'star',
+    wish_match: 'heart', wanted: 'swapArrows', review: 'star', announcement: 'logo', report_new: 'flag', member_joined: 'user' };
+  if (!S.notifPrefs) S.notifPrefs = DEFAULT_PREFS();
+  if (!S.notifications) S.notifications = LIVE ? [] : clone(window.SAMPLE_NOTIFS || []);
+  if (!S.reports) S.reports = LIVE ? [] : clone(window.SAMPLE_REPORTS || []);
+  const isOrganiser = () => (LIVE ? !!(live.group && live.group.role === 'organiser') : true);
+
+  function notifText(n) {
+    const d = n.data || {};
+    const name = d.actor ? firstName(d.actor) : (d.name || '');
+    switch (n.type) {
+      case 'message': return (d.count > 1 ? t('n_message_many', { n: d.count, name: name }) : t('n_message', { name: name })) + (d.snippet ? ': “' + d.snippet + '”' : '');
+      case 'request_answered': return t(d.status === 'declined' ? 'n_request_declined' : 'n_request_accepted', { name: name });
+      case 'handover_set': case 'handover_reminder':
+        return t('n_' + n.type, { name: name, when: d.when ? fmtDate(new Date(String(d.when).slice(0, 10) + 'T10:00:00')) : '', where: d.where || '' });
+      case 'wish_match': case 'wanted': return t('n_' + n.type, { name: name, title: d.title || '' });
+      case 'review': return t('n_review', { name: name, n: d.rating });
+      case 'announcement': return t('n_announcement', { text: d.text || '' });
+      case 'report_new': return t('n_report_new', { category: t('rc_' + (d.category || 'other')) });
+      case 'member_joined': return t('n_member_joined', { name: d.name || name });
+      default: return t('n_' + n.type, { name: name });
+    }
+  }
+  function notifLink(n) {
+    const d = n.data || {};
+    if (n.type === 'report_new') return '#/admin/reports';
+    if (n.type === 'member_joined') return '#/admin/members';
+    if (n.type === 'review') return '#/profile';
+    if (d.request_id) return '#/chat/' + d.request_id;
+    if (d.book_id) return '#/book/' + d.book_id;
+    return '';
+  }
+  const visibleNotifs = () => S.notifications.filter((n) => S.notifPrefs.app.indexOf(n.type) >= 0).sort((a, b) => b.at - a.at);
+  const unreadCount = () => visibleNotifs().filter((n) => !n.read).length;
+
+  function bellHtml() {
+    const n = unreadCount();
+    return `<a class="bell" href="#/notifications" aria-label="${esc(t('notifBell'))}${n ? ' (' + n + ')' : ''}">${icon('M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9zM10 20a2.2 2.2 0 0 0 4 0', 22)}${n ? `<span class="count">${n > 9 ? '9+' : n}</span>` : ''}</a>`;
+  }
+
+  function viewNotifications() {
+    const list = visibleNotifs();
+    return `<main class="pad">
+      <div class="row-between"><h1 class="h1">${esc(t('notifTitle'))}</h1>${unreadCount() ? `<button class="link" data-action="readAllNotifs">${esc(t('markAllRead'))}</button>` : ''}</div>
+      ${list.length ? `<div class="notifs">${list.map((n) => `<button class="notif ${n.read ? '' : 'unread'}" data-action="openNotif" data-v="${esc(n.id)}">
+          <span class="notif-ic">${icon(N_ICON[n.type] || 'logo', 20)}</span>
+          <span class="grow"><span class="notif-text">${esc(notifText(n))}</span><span class="muted tiny block">${esc(fmtDate(new Date(n.at)))} · ${esc(fmtTime(n.at))}</span></span>
+          ${n.read ? '' : '<span class="dot" aria-hidden="true"></span>'}</button>`).join('')}</div>`
+      : `<div class="card pad-m empty">${esc(t('notifEmpty'))}</div>`}
+      <a class="btn ghost big" href="#/profile/notifications">${icon('M4 6h16M4 12h10M4 18h6', 20)} ${esc(t('notifSettings'))}</a>
+    </main>`;
+  }
+
+  function prefsEditor(withOrg) {
+    const p = S.notifPrefs;
+    const types = NOTIF_TYPES.concat(withOrg ? ORG_TYPES : []);
+    const pill = (ch, type) => { const on = p[ch].indexOf(type) >= 0;
+      return `<button class="ch-pill ${on ? 'on' : ''}" data-action="togglePref" data-ch="${ch}" data-v="${type}" aria-pressed="${on}">${icon(ch === 'app' ? 'M7 3h10v18H7zM11 18h2' : 'M3 6h18v12H3zM3 7l9 6 9-6', 16)} ${esc(t(ch === 'app' ? 'chApp' : 'chEmail'))}</button>`; };
+    return `<div class="prefs">${types.map((tp) => `<div class="pref-row"><span class="grow small bold">${esc(t('tl_' + tp))}</span>${pill('app', tp)}${pill('email', tp)}</div>`).join('')}</div>
+      <label class="field"><span class="label">${esc(t('emailMode'))}</span>
+        <select class="input" data-change="prefMode">${['instant', 'daily', 'off'].map((m) => `<option value="${m}"${p.mode === m ? ' selected' : ''}>${esc(t('email' + m[0].toUpperCase() + m.slice(1)))}</option>`).join('')}</select></label>`;
+  }
+
+  // ----- report sheet (overlay) -----
+  function reportSheet() {
+    const r = ui.report; if (!r) return '';
+    return `<div class="sheet-bg" data-action="closeReport"></div><section class="sheet" role="dialog" aria-modal="true" aria-label="${esc(t('reportTitle'))}">
+      <h2 class="h2 tight">${icon('flag', 20)} ${esc(t('reportTitle'))}</h2>
+      <span class="label">${esc(t('reportWhat'))}</span>
+      <div class="row-wrap">${REPORT_CATS.map((c) => `<button class="pill ${r.cat === c ? 'on' : ''}" data-action="reportCat" data-v="${c}">${esc(t('rc_' + c))}</button>`).join('')}</div>
+      <label class="label" for="rep-text">${esc(t('reportDetails'))}</label>
+      <textarea id="rep-text" class="input" rows="3" maxlength="500"></textarea>
+      <div class="row-gap"><button class="btn ghost grow" data-action="closeReport">${esc(t('cancel'))}</button><button class="btn primary grow" data-action="sendReport">${esc(t('sendReport'))}</button></div>
+    </section>`;
+  }
+
+  // ----- organiser panel -----
+  function demoAdmin() {
+    const now = Date.now();
+    return { loaded: true, ctx: (ui.adm && ui.adm.ctx) || {},
+      stats: { members: Object.keys(MEMBERS).length + 1, books_available: S.books.filter((b) => b.status === 'available' && !b.hidden).length,
+        books_gone_year: S.books.filter((b) => b.status === 'gone').length, requests_open: S.threads.filter((x) => ['pending', 'accepted', 'scheduled'].indexOf(x.status) >= 0).length,
+        reports_open: S.reports.filter((r) => !r.resolved).length, hidden_books: S.books.filter((b) => b.hidden).length },
+      invites: S.demoInvites || (S.demoInvites = [{ id: 'i1', created_at: now - 5 * 864e5, expires_at: now + 25 * 864e5, revoked: false }]),
+      reports: S.reports, log: S.modLog || (S.modLog = []), bans: S.demoBans || (S.demoBans = []) };
+  }
+  async function loadAdmin() {
+    if (ui.adm && ui.adm.loading) return;
+    ui.adm = Object.assign(ui.adm || {}, { loading: true });
+    try {
+      if (LIVE) {
+        const g = live.group.id;
+        const res = await Promise.all([Backend.orgStats(g), Backend.orgInvites(g), Backend.orgReports(g), Backend.orgLog(g), Backend.orgBans(g)]);
+        ui.adm = { loaded: true, ctx: ui.adm.ctx || {}, stats: res[0],
+          invites: res[1].map((i) => ({ id: i.id, created_at: Date.parse(i.created_at), expires_at: i.expires_at ? Date.parse(i.expires_at) : 0, revoked: i.revoked })),
+          reports: res[2].map((r) => ({ id: r.id, from: r.reporter_id === live.uid ? MINE : r.reporter_id, type: r.target_type, target: r.target_id, cat: r.category, text: r.reason,
+            at: Date.parse(r.created_at), resolved: !!r.resolved_at, resolution: r.resolution })),
+          log: res[3].map((l) => ({ actor: l.actor_id === live.uid ? MINE : l.actor_id, action: l.action, target: l.target, reason: l.reason, at: Date.parse(l.created_at) })),
+          bans: res[4].map((b) => ({ user: b.user_id, reason: b.reason, at: Date.parse(b.created_at) })) };
+      } else ui.adm = demoAdmin();
+    } catch (e) { ui.adm = { loaded: true, error: friendlyError(e), ctx: {} }; }
+    render();
+  }
+  function reportTarget(r) {
+    if (r.type === 'book') { const b = book(r.target); return b ? `<a class="ulink" href="#/book/${esc(b.id)}">${esc(b.title)}</a>${b.hidden ? ` <span class="badge b-res">${esc(t('hiddenBadge'))}</span>` : ''}` : esc(r.target); }
+    if (r.type === 'member') return MEMBERS[r.target] ? memberLink(r.target) : '—';
+    return `<button class="link small" data-action="admCtx" data-v="${esc(r.id)}">${esc(t('viewConversation'))}</button>`;
+  }
+  function viewAdmin(tab) {
+    if (!isOrganiser()) return `<main class="pad">${esc(t('noResults'))}</main>`;
+    if (!ui.adm || !ui.adm.loaded) { setTimeout(loadAdmin, 0); return `<main class="pad"><h1 class="h1">${esc(t('adminTitle'))}</h1><p class="muted">${esc(t('loading'))}</p></main>`; }
+    const a = ui.adm; tab = tab || 'overview';
+    const tabs = ['overview', 'members', 'reports', 'invites', 'settings'].map((k) => `<a class="pill ${tab === k ? 'on' : ''}" href="#/admin/${k}">${esc(t('tab' + k[0].toUpperCase() + k.slice(1)))}${k === 'reports' && a.stats && a.stats.reports_open ? ` <span class="count-inline">${a.stats.reports_open}</span>` : ''}</a>`).join('');
+    let body = '';
+    if (a.error) body = `<div class="notice warn">${esc(a.error)}</div>`;
+    else if (tab === 'overview') {
+      const st = a.stats || {};
+      const tile = (n, k) => `<div class="stat"><div class="stat-n">${esc(n == null ? '–' : n)}</div><div class="stat-l">${esc(t(k))}</div></div>`;
+      body = `<div class="stats six">${tile(st.members, 'stMembers')}${tile(st.books_available, 'stAvailable')}${tile(st.books_gone_year, 'stGoneYear')}${tile(st.requests_open, 'stOpenRequests')}${tile(st.reports_open, 'stOpenReports')}${tile(st.hidden_books, 'stHidden')}</div>
+        <section class="card pad-m"><h2 class="h3">${icon('logo', 20)} ${esc(t('announceTitle'))}</h2>
+          <label class="sr" for="adm-ann">${esc(t('announceTitle'))}</label><textarea id="adm-ann" class="input" rows="3" maxlength="500" placeholder="${esc(t('announcePh'))}"></textarea>
+          <button class="btn primary" data-action="admAnnounce">${icon('send', 20)} ${esc(t('announceSend'))}</button></section>`;
+    } else if (tab === 'members') {
+      const ids = [MINE].concat(Object.keys(MEMBERS));
+      const role = (id) => (id === MINE ? (LIVE ? live.group.role : 'organiser') : ((MEMBERS[id] && MEMBERS[id].role) || 'member'));
+      body = `<div class="adm-list">${ids.map((id) => {
+        const r = role(id); const listed = S.books.filter((b) => b.owner === id && b.status === 'available').length;
+        return `<div class="adm-row">${avatarHtml(id, 'sm')}<div class="grow"><div class="bold">${id === MINE ? esc(memberName(id)) : memberLink(id)} ${r === 'organiser' ? `<span class="badge b-swap">${esc(t('roleOrganiser'))}</span>` : ''}</div>
+          <div class="muted small">${icon('pin', 12)} ${esc(near(id).label || (S.me && S.me.postal) || '')} · ${listed} ${esc(t('booksN'))}</div>${ratingHtml(id, 12)}</div>
+          ${id === MINE ? '' : `<div class="adm-actions"><button class="btn ghost sm" data-action="admRole" data-v="${esc(id)}" data-role="${r === 'organiser' ? 'member' : 'organiser'}">${esc(t(r === 'organiser' ? 'makeMember' : 'makeOrganiser'))}</button>
+            <button class="btn danger sm" data-action="admRemove" data-v="${esc(id)}">${esc(t('removeMember'))}</button></div>`}</div>`;
+      }).join('')}</div>
+      ${a.bans && a.bans.length ? `<h2 class="h3">${esc(t('bannedTitle'))}</h2><div class="adm-list">${a.bans.map((b) => `<div class="adm-row"><div class="grow"><div class="bold">${esc(b.name || b.user.slice(0, 8))}</div><div class="muted small">${esc(b.reason)}</div></div><button class="btn ghost sm" data-action="admUnban" data-v="${esc(b.user)}">${esc(t('unban'))}</button></div>`).join('')}</div>` : ''}`;
+    } else if (tab === 'reports') {
+      const open = (a.reports || []).filter((r) => !r.resolved); const done = (a.reports || []).filter((r) => r.resolved);
+      const card = (r) => `<div class="card pad-m report">
+        <div class="row-between"><span class="badge ${r.resolved ? 'b-give' : 'b-sell'}">${esc(t('rc_' + (r.cat || 'other')))}</span><span class="muted tiny">${esc(fmtDate(new Date(r.at)))}</span></div>
+        <div class="small">${esc(t('reportedBy', { name: firstName(r.from) }))} · ${reportTarget(r)}</div>
+        ${r.text ? `<p class="small">“${esc(r.text)}”</p>` : ''}
+        ${a.ctx[r.id] ? `<div class="ctx">${a.ctx[r.id].map((m) => `<div class="small"><b>${esc(m.kind === 'system' ? '·' : firstName(m.from))}</b> ${esc(m.body || '')}</div>`).join('') || '—'}</div>` : ''}
+        ${r.resolved ? `<div class="muted small">${icon('check', 14)} ${esc(r.resolution || '')}</div>` : `<div class="row-wrap">
+          <button class="btn primary sm" data-action="admResolve" data-v="${esc(r.id)}">${esc(t('resolve'))}</button>
+          ${r.type === 'book' && book(r.target) ? `<button class="btn ghost sm" data-action="admHide" data-v="${esc(r.target)}" data-hide="${book(r.target).hidden ? '0' : '1'}">${esc(t(book(r.target).hidden ? 'unhideListing' : 'hideListing'))}</button>` : ''}
+          ${r.type === 'member' && MEMBERS[r.target] ? `<button class="btn danger sm" data-action="admRemove" data-v="${esc(r.target)}">${esc(t('removeMember'))}</button>` : ''}</div>`}
+      </div>`;
+      const hidden = S.books.filter((b) => b.hidden);
+      body = (open.length ? `<h2 class="h3">${esc(t('openReports'))}</h2>${open.map(card).join('')}` : `<div class="card pad-m empty">${esc(t('noReports'))}</div>`) +
+        (hidden.length ? `<h2 class="h3">${esc(t('hiddenListings'))}</h2><div class="adm-list">${hidden.map((b) => `<div class="adm-row">${cover(b, 'xs')}<div class="grow"><a class="bold ulink" href="#/book/${esc(b.id)}">${esc(b.title)}</a><div class="muted small">${esc(memberName(b.owner))}</div></div><button class="btn ghost sm" data-action="admHide" data-v="${esc(b.id)}" data-hide="0">${esc(t('unhideListing'))}</button></div>`).join('')}</div>` : '') +
+        (done.length ? `<h2 class="h3">${esc(t('resolvedReports'))}</h2>${done.map(card).join('')}` : '');
+    } else if (tab === 'invites') {
+      const now = Date.now();
+      body = `<section class="card pad-m invite-card">${live.newInvite ? `<div class="invite-code">${esc(live.newInvite)}</div><p class="muted small">${esc(t('inviteShare'))}</p><button class="btn primary" data-action="copyInvite">${icon('send', 20)} ${esc(t('copyLink'))}</button>`
+          : `<p class="muted small">${esc(t('inviteHint'))}</p><button class="btn primary" data-action="createInvite">${icon('plus', 20)} ${esc(t('createInvite'))}</button>`}</section>
+        <h2 class="h3">${esc(t('invitesTitle'))}</h2><div class="adm-list">${(a.invites || []).map((i) => {
+          const status = i.revoked ? t('inviteRevoked') : (i.expires_at && i.expires_at < now ? t('inviteExpired') : t('inviteExpires', { date: fmtDate(new Date(i.expires_at)) }));
+          return `<div class="adm-row"><div class="grow"><div class="small bold">${esc(fmtDate(new Date(i.created_at)))}</div><div class="muted small">${esc(status)}</div></div>${!i.revoked && (!i.expires_at || i.expires_at > now) ? `<button class="btn ghost sm" data-action="admRevoke" data-v="${esc(i.id)}">${esc(t('revoke'))}</button>` : ''}</div>`;
+        }).join('')}</div>`;
+    } else if (tab === 'settings') {
+      const g = LIVE ? live.group : (S.groupSettings || (S.groupSettings = { name: t('groupName'), handover_place: t('handoverPh'), handover_day: 'sat' }));
+      body = `<section class="card pad-m"><h2 class="h3">${esc(t('groupSettings'))}</h2>
+          <label class="label" for="gs-name">${esc(t('groupNameLabel'))}</label><input id="gs-name" class="input" maxlength="80" value="${esc(g.name || '')}">
+          <label class="label" for="gs-place">${esc(t('handoverPlace'))}</label><input id="gs-place" class="input" maxlength="80" value="${esc(g.handover_place || '')}">
+          <label class="label" for="gs-day">${esc(t('handoverDay'))}</label><select id="gs-day" class="input"><option value="">${esc(t('anyDay'))}</option>${['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((d) => `<option value="${d}"${g.handover_day === d ? ' selected' : ''}>${esc(t('days')[d])}</option>`).join('')}</select>
+          <button class="btn primary" data-action="admSaveGroup">${esc(t('saveSettings'))}</button></section>
+        <section class="card pad-m"><h2 class="h3">${esc(t('modLog'))}</h2>${(a.log || []).length ? `<ul class="reviews">${a.log.map((l) => `<li><div class="small"><b>${esc(firstName(l.actor))}</b> · ${esc(l.action)}${l.reason ? ' – ' + esc(l.reason) : ''}</div><div class="muted tiny">${esc(fmtDate(new Date(l.at)))}</div></li>`).join('')}</ul>` : `<p class="muted">${esc(t('noLog'))}</p>`}</section>`;
+    }
+    return `<main class="pad"><button class="back" data-action="go" data-v="#/profile">${icon('back', 20)} ${esc(t('back'))}</button>
+      <h1 class="h1">${esc(t('adminTitle'))}</h1><p class="muted bold">${esc(groupLabel())}</p><div class="row-wrap tabs">${tabs}</div>${body}</main>`;
+  }
+
+  // ----- platform admin (all groups) -----
+  async function loadPlatform() {
+    if (ui.plat && ui.plat.loading) return;
+    ui.plat = { loading: true };
+    try {
+      if (LIVE) { const r = await Promise.all([Backend.adminOverview(), Backend.adminReports()]); ui.plat = { loaded: true, groups: r[0], reports: r[1] }; }
+      else ui.plat = { loaded: true, groups: [{ group_id: 'demo', name: t('groupName'), created_at: new Date().toISOString(), members: Object.keys(MEMBERS).length + 1, books: S.books.length, open_reports: S.reports.filter((x) => !x.resolved).length, organisers: S.me ? S.me.name : '' }], reports: [] };
+    } catch (e) { ui.plat = { loaded: true, error: friendlyError(e), groups: [], reports: [] }; }
+    render();
+  }
+  function viewPlatform() {
+    if (LIVE && !live.isAdmin) return `<main class="pad">${esc(t('noResults'))}</main>`;
+    if (!ui.plat || !ui.plat.loaded) { setTimeout(loadPlatform, 0); return `<main class="pad"><h1 class="h1">${esc(t('platformTitle'))}</h1><p class="muted">${esc(t('loading'))}</p></main>`; }
+    const p = ui.plat;
+    return `<main class="pad"><button class="back" data-action="go" data-v="#/profile">${icon('back', 20)} ${esc(t('back'))}</button>
+      <h1 class="h1">${esc(t('platformTitle'))}</h1>${p.error ? `<div class="notice warn">${esc(p.error)}</div>` : ''}
+      <h2 class="h3">${esc(t('groupsTitle'))}</h2><div class="adm-list">${p.groups.map((g) => `<div class="adm-row"><div class="grow"><div class="bold">${esc(g.name)}</div>
+        <div class="muted small">${esc(String(g.members))} ${esc(t('stMembers').toLowerCase())} · ${esc(String(g.books))} ${esc(t('booksN'))} · ${esc(String(g.open_reports))} ${esc(t('stOpenReports').toLowerCase())}</div><div class="muted tiny">${esc(g.organisers || '')} · ${esc(fmtDate(new Date(g.created_at)))}</div></div>
+        ${LIVE ? `<button class="btn danger sm" data-action="platDelete" data-v="${esc(g.group_id)}" data-name="${esc(g.name)}">${esc(t('deleteGroup'))}</button>` : ''}</div>`).join('')}</div>
+      <h2 class="h3">${esc(t('allReports'))}</h2>${p.reports.length ? `<div class="adm-list">${p.reports.map((r) => `<div class="adm-row"><div class="grow"><span class="badge b-sell">${esc(t('rc_' + r.category))}</span> <span class="small bold">${esc(r.group_name)}</span><div class="small">${esc(r.reason || '')}</div><div class="muted tiny">${esc(fmtDate(new Date(r.created_at)))}</div></div></div>`).join('')}</div>` : `<p class="muted">${esc(t('noReports'))}</p>`}
+    </main>`;
+  }
+
+  // ----- actions -----
+  function markRead(ids) {
+    S.notifications.forEach((n) => { if (!ids || ids.indexOf(n.id) >= 0) n.read = true; });
+    if (LIVE) Backend.markNotificationsRead(live.uid, ids).catch(() => {}); else save();
+  }
+  function demoLog(action, target, reason) { (S.modLog = S.modLog || []).unshift({ actor: MINE, action: action, target: target || '', reason: reason || '', at: Date.now() }); save(); }
+  async function admDo(fn, ok) {
+    try { await fn(); if (ok) toast(ok); } catch (e) { toast(friendlyError(e)); }
+    if (LIVE) await refreshAll().catch(() => {});
+    ui.adm.loaded = false; loadAdmin();
+  }
+  Object.assign(A, {
+    openNotif: (el) => {
+      const n = S.notifications.find((x) => String(x.id) === el.dataset.v); if (!n) return;
+      markRead([n.id]); const link = notifLink(n);
+      if (link) go(link); else render();
+    },
+    readAllNotifs: () => { markRead(null); render(); },
+    togglePref: (el) => {
+      const arr = S.notifPrefs[el.dataset.ch]; const i = arr.indexOf(el.dataset.v);
+      if (i >= 0) arr.splice(i, 1); else arr.push(el.dataset.v);
+      if (!LIVE) save(); render();
+    },
+    savePrefs: async () => {
+      if (LIVE) { try { await Backend.savePrefs(live.uid, Object.assign({ lang: S.lang }, S.notifPrefs)); toast(t('saved2')); } catch (e) { toast(friendlyError(e)); } }
+      else { save(); toast(t('saved2')); }
+    },
+    openReport: (el) => { ui.report = { type: el.dataset.type, id: el.dataset.v, cat: 'other' }; render(); },
+    reportCat: (el) => { const txt = document.getElementById('rep-text'); ui.reportText = txt ? txt.value : ''; ui.report.cat = el.dataset.v; render(); const t2 = document.getElementById('rep-text'); if (t2) t2.value = ui.reportText || ''; },
+    closeReport: () => { ui.report = null; render(); },
+    sendReport: async () => {
+      const r = ui.report; const text = (document.getElementById('rep-text').value || '').trim().slice(0, 500);
+      if (LIVE) { try { await Backend.report(live.group.id, live.uid, r.type, r.id, text, r.cat); } catch (e) { toast(friendlyError(e)); return; } }
+      else { S.reports.unshift({ id: uid('rep'), from: MINE, type: r.type, target: r.id, cat: r.cat, text: text, at: Date.now(), resolved: false }); save(); }
+      ui.report = null; toast(t('reported'));
+    },
+    admAnnounce: () => {
+      const text = (document.getElementById('adm-ann').value || '').trim();
+      if (text.length < 2) return;
+      if (LIVE) admDo(async () => { const n = await Backend.orgAnnounce(live.group.id, text); toast(t('announced', { n: n })); });
+      else { S.notifications.unshift({ id: uid('n'), type: 'announcement', data: { text: text, actor: MINE }, at: Date.now(), read: false }); demoLog('announce', '', text); admDo(() => {}, t('announced', { n: Object.keys(MEMBERS).length + 1 })); }
+    },
+    admRole: (el) => {
+      const id = el.dataset.v; const role = el.dataset.role;
+      if (LIVE) admDo(() => Backend.orgSetRole(live.group.id, id, role), t('saved2'));
+      else { MEMBERS[id].role = role; demoLog('set_role:' + role, id); admDo(() => {}, t('saved2')); }
+    },
+    admRemove: (el) => {
+      const id = el.dataset.v; const name = memberName(id);
+      const reason = window.prompt(t('removeReasonPrompt', { name: name }));
+      if (reason === null) return;
+      const ban = window.confirm(t('banConfirm', { name: name }));
+      if (LIVE) admDo(() => Backend.orgRemoveMember(live.group.id, id, reason, ban), t('saved2'));
+      else {
+        if (ban) S.demoBans.push({ user: id, name: name, reason: reason, at: Date.now() });
+        delete MEMBERS[id]; S.books = S.books.filter((b) => b.owner !== id);
+        demoLog(ban ? 'remove_and_ban' : 'remove', id, reason); admDo(() => {}, t('saved2'));
+      }
+    },
+    admUnban: (el) => {
+      if (LIVE) admDo(() => Backend.orgUnban(live.group.id, el.dataset.v), t('saved2'));
+      else { S.demoBans = S.demoBans.filter((b) => b.user !== el.dataset.v); demoLog('unban', el.dataset.v); admDo(() => {}, t('saved2')); }
+    },
+    admHide: (el) => {
+      const id = el.dataset.v; const hide = el.dataset.hide === '1';
+      if (LIVE) admDo(() => Backend.orgHideBook(id, hide, ''), t('saved2'));
+      else { const b = book(id); if (b) b.hidden = hide; demoLog(hide ? 'hide_book' : 'unhide_book', id); admDo(() => {}, t('saved2')); }
+    },
+    admResolve: (el) => {
+      const note = window.prompt(t('resolvePrompt')); if (note === null) return;
+      const id = el.dataset.v;
+      if (LIVE) admDo(() => Backend.orgResolveReport(Number(id), note), t('saved2'));
+      else { const r = S.reports.find((x) => String(x.id) === id); if (r) { r.resolved = true; r.resolution = note; } demoLog('resolve_report', id, note); admDo(() => {}, t('saved2')); }
+    },
+    admCtx: async (el) => {
+      const id = el.dataset.v;
+      try {
+        if (LIVE) {
+          const rows = await Backend.orgReportContext(Number(id));
+          ui.adm.ctx[id] = rows.slice().reverse().map((m) => ({ from: m.sender_id === live.uid ? MINE : m.sender_id, kind: m.kind, body: m.kind === 'system' ? t(m.sys_key || '') : m.body }));
+        } else {
+          const r = S.reports.find((x) => String(x.id) === id); const th = r && S.threads.find((x) => x.id === r.target);
+          ui.adm.ctx[id] = th ? th.messages.slice(-30).map((m) => ({ from: m.from, kind: m.from === 'system' ? 'system' : 'user', body: m.from === 'system' ? msgText(m) : m.text })) : [];
+        }
+      } catch (e) { toast(friendlyError(e)); }
+      render();
+    },
+    admRevoke: (el) => {
+      if (LIVE) admDo(() => Backend.orgRevokeInvite(el.dataset.v), t('saved2'));
+      else { const i = S.demoInvites.find((x) => x.id === el.dataset.v); if (i) i.revoked = true; demoLog('revoke_invite', el.dataset.v); admDo(() => {}, t('saved2')); }
+    },
+    admSaveGroup: () => {
+      const f = { name: document.getElementById('gs-name').value.trim().slice(0, 80), handover_place: document.getElementById('gs-place').value.trim().slice(0, 80), handover_day: document.getElementById('gs-day').value || null };
+      if (f.name.length < 2) { toast(t('groupNameRequired')); return; }
+      if (LIVE) admDo(async () => { await Backend.updateGroup(live.group.id, f); Object.assign(live.group, f); }, t('saved2'));
+      else { S.groupSettings = f; save(); toast(t('saved2')); render(); }
+    },
+    platDelete: (el) => {
+      const typed = window.prompt(t('deleteGroupConfirm', { name: el.dataset.name }));
+      if (typed !== el.dataset.name) return;
+      Backend.adminDeleteGroup(el.dataset.v).then(() => { ui.plat = null; render(); }).catch((e) => toast(friendlyError(e)));
+    }
+  });
+  if (!LIVE) {
+    // demo: invite codes work locally so the panel can be explored
+    A.createInvite = () => { const c = Math.random().toString(36).slice(2, 10).toUpperCase(); live.newInvite = c; S.demoInvites.unshift({ id: uid('i'), created_at: Date.now(), expires_at: Date.now() + 30 * 864e5, revoked: false }); render(); };
+    A.copyInvite = () => { if (navigator.clipboard) navigator.clipboard.writeText(live.newInvite).then(() => toast(t('copied'))); };
+  }
+
   $app.addEventListener('click', (e) => {
     const el = e.target.closest('[data-action]');
     if (!el || !$app.contains(el)) return;
@@ -1655,6 +1985,7 @@
     const el = e.target; if (!el.dataset) return;
     if (el.dataset.change === 'photo' && el.files && el.files[0]) handlePhoto(el.files[0]);
     else if (el.dataset.change === 'onbCountry') ui.onbCountry = el.value;
+    else if (el.dataset.change === 'prefMode') { S.notifPrefs.mode = el.value; if (!LIVE) save(); }
     else if (el.dataset.change === 'avatar' && el.files && el.files[0]) handleAvatar(el.files[0]);
     else if (el.dataset.change === 'barcodePhoto' && el.files && el.files[0]) scanPhoto(el.files[0]);
   });

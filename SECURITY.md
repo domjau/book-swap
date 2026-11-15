@@ -39,8 +39,10 @@ The prototype is therefore not a place to put real personal data. Anyone with ac
 ## Live version (Supabase)
 
 - `config.js` contains only the **publishable** key, which is designed to be public. All access control is in the database (see `supabase/migrations/001_init.sql`): RLS on every table, column-level grants, and status changes only through checked functions. The `service_role` / secret key is never used by the app.
-- `supabase/tests/rls_test.sh` runs 58 cross-user and cross-group checks, and all pass.
+- `supabase/tests/rls_test.sh` runs 107 cross-user and cross-group checks, and all pass.
 - Photos are in a private bucket and displayed via signed URLs that expire after 1 hour.
+- Organiser and platform-admin powers exist only as checked database functions, and every organiser action is written to a moderation log. Organisers can read a chat only after it has been reported.
+- The email sender (Edge Function) uses the service-role key **on the server only**, is protected by its own secret, and HTML-escapes everything it puts in an email.
 - Sign-in is passwordless (email OTP). The sign-in tokens are removed from the address bar right after login.
 
 ## Security plan for the production version

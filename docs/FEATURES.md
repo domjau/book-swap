@@ -33,8 +33,14 @@
 | Member page with tailored offer: their books you want + your books they want, pre-ticked | ✅ |
 | "Wanted by …" on your own books, "On your wish list" on others' | ✅ |
 | Real accounts, shared database, invite-only groups | 🟠 |
-| Push + email notifications, handover reminder | 🟠 |
-| Report / block, organiser moderation | 🟠 (report button is mocked) |
+| In-app notifications (bell) for 10 member types + 2 organiser types, chat notifications bundled | ✅ |
+| Notification choices per type (app / email) at sign-up and in profile; email right away / daily / never | ✅ |
+| Email notifications in the member's language (Edge Function, scheduled) | ✅ (needs setup) |
+| Handover reminder the day before | ✅ (needs schedule) |
+| Push notifications on the phone | ⚪ |
+| Reports with reasons (didn't show up, inappropriate, piracy, spam, safety, other) on chats, listings and members | ✅ |
+| Organiser panel: stats, announcements, members (roles, remove, block), reports (read reported chat, hide listing, resolve), invites (create, revoke), group settings, moderation log | ✅ |
+| Platform admin: all groups, all open reports, delete group | ✅ |
 | Installable PWA with offline shell | 🟠 (manifest done) |
 
 ## Finding books

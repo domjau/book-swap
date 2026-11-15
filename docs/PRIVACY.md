@@ -31,6 +31,19 @@ Book lookups send **only the ISBN or the search text** to Google Books / Open Li
 
 Phone photos often carry GPS coordinates in their EXIF metadata. The app redraws every photo on a canvas before saving, which removes all metadata. The production server will do the same again. Users are asked to photograph only the book: its cover and its condition. At least one photo is required and at most 4 are allowed, each resized to 720 px. Another family's photos are never copied when the same ISBN is added again.
 
+## Notifications
+
+- Notifications are stored per person and visible only to that person. Everyone chooses per type whether they want them in the app, by email, or both, and whether emails come right away, once a day, or never. The choice is offered at sign-up and can be changed in Profile → Notifications.
+- Emails are sent only for notifications not already read in the app. They contain a short snippet (max 80 characters) of chat messages.
+- The email sender runs on the server with elevated rights and reads only what it needs: pending notifications, settings, display names and the recipient's email address.
+
+## Organisers and moderation
+
+- Organisers can see members' display names, postal codes, listings and reviews (the same as every member), plus reports and the moderation log.
+- Organisers can read a chat **only if it has been reported**, through a checked function that returns the last 30 messages of that conversation.
+- Every organiser action (role changes, removals, bans, hiding listings, resolving reports, announcements, revoking invites) is written to a moderation log that all organisers of the group can see.
+- Platform admins (the people running the service) can see a list of groups with counts and all open reports, and can delete a group. They are added by hand in the database.
+
 ## Country and postal codes
 
 - Only the country and postal code are stored, never the street or house number. In big cities a postal code covers thousands of households.

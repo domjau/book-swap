@@ -45,6 +45,8 @@ The camera only works over HTTPS or on `localhost`.
 - **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that Book Swap is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
 - **Reviews with little books:** after a handover, each side rates the other 1–5 little books, with an optional comment. Ratings appear on profiles, member pages and book pages.
 - **Profile pictures** and **sold / donated / exchanged** counts for every member.
+- **Notifications:** a bell with the latest updates. At sign-up and in the profile, each person chooses which of 10 types they get in the app and/or by email, and whether emails come right away, once a day, or never.
+- **Organiser panel:** stats, announcements to all members, member roles, removing and blocking members, reports with reasons (including reading a *reported* chat), hiding listings, invite codes and group settings. Every action is logged. There's also a **platform admin** view across all groups.
 - **Profile stats:** books listed, given away and received, money saved, a book-language mix, favourite topics and badges.
 - **Settings:** export my data (JSON) and delete everything.
 

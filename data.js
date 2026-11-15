@@ -119,3 +119,14 @@ window.SAMPLE_REVIEWS = [
   { id: 'r3', request: 'x3', from: 'mette', to: 'ana', rating: 5, comment: '', at: D(45) },
   { id: 'r4', request: 'x4', from: 'sofia', to: 'jonas', rating: 3, comment: 'Came a week late, but all good.', at: D(12) }
 ];
+
+/* Demo notifications and one open report, so the bell and the organiser panel have something to show. */
+window.SAMPLE_NOTIFS = [
+  { id: 'n1', type: 'request_new', data: { request_id: 't1', actor: 'mette' }, at: D(0.2), read: false },
+  { id: 'n2', type: 'wish_match', data: { book_id: 'b7', title: 'Room on the Broom', actor: 'mette' }, at: D(1), read: false },
+  { id: 'n3', type: 'announcement', data: { text: 'Book swap table at school next Saturday, 10:00–12:00!', actor: 'jonas' }, at: D(2), read: true },
+  { id: 'n4', type: 'member_joined', data: { actor: 'sofia', name: 'Sofía (Rodríguez)' }, at: D(4), read: true }
+];
+window.SAMPLE_REPORTS = [
+  { id: 'rep1', from: 'ana', type: 'book', target: 'b13', cat: 'spam', text: 'Same book listed many times.', at: D(1), resolved: false }
+];

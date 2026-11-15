@@ -63,7 +63,7 @@
 
     // ---------- membership ----------
     async myMembership(uid) {
-      const rows = check(await sb.from('members').select('group_id, role, display_name, country, postal_code, interested_langs, terms_version, groups(name, handover_place)').eq('user_id', uid).limit(1));
+      const rows = check(await sb.from('members').select('group_id, role, display_name, country, postal_code, interested_langs, terms_version, groups(name, handover_place, handover_day)').eq('user_id', uid).limit(1));
       return rows && rows[0] ? rows[0] : null;
     },
     async createGroup(p) {
@@ -159,9 +159,51 @@
       check(await sb.from('members').update({ avatar_path: path }).eq('group_id', groupId).eq('user_id', uid));
       if (oldPath) await sb.storage.from(BUCKET).remove([oldPath]);
     },
-    async report(groupId, uid, type, id, reason) {
-      check(await sb.from('reports').insert({ group_id: groupId, reporter_id: uid, target_type: type, target_id: String(id), reason: reason || '' }));
+    async report(groupId, uid, type, id, reason, category) {
+      check(await sb.from('reports').insert({ group_id: groupId, reporter_id: uid, target_type: type, target_id: String(id), reason: reason || '', category: category || 'other' }));
     },
+
+    // ---------- notifications ----------
+    async loadNotifications() {
+      return check(await sb.from('notifications').select('*').order('created_at', { ascending: false }).limit(100));
+    },
+    async markNotificationsRead(uid, ids) {
+      let q = sb.from('notifications').update({ read_at: new Date().toISOString() }).eq('user_id', uid).is('read_at', null);
+      if (ids && ids.length) q = q.in('id', ids);
+      check(await q);
+    },
+    async getPrefs(uid) {
+      const rows = check(await sb.from('notification_prefs').select('*').eq('user_id', uid).limit(1));
+      return rows && rows[0] ? rows[0] : null;
+    },
+    async savePrefs(uid, p) {
+      const row = { user_id: uid, app_types: p.app, email_types: p.email, email_mode: p.mode, lang: p.lang };
+      const existing = await this.getPrefs(uid);
+      if (existing) check(await sb.from('notification_prefs').update({ app_types: p.app, email_types: p.email, email_mode: p.mode, lang: p.lang, updated_at: new Date().toISOString() }).eq('user_id', uid));
+      else check(await sb.from('notification_prefs').insert(row));
+    },
+
+    // ---------- organiser tools ----------
+    async orgStats(g) { return check(await sb.rpc('org_stats', { p_group: g })); },
+    async orgInvites(g) { return check(await sb.rpc('org_invites', { p_group: g })); },
+    async orgRevokeInvite(id) { check(await sb.rpc('org_revoke_invite', { p_invite: id })); },
+    async orgSetRole(g, u, role) { check(await sb.rpc('org_set_role', { p_group: g, p_user: u, p_role: role })); },
+    async orgRemoveMember(g, u, reason, ban) { check(await sb.rpc('org_remove_member', { p_group: g, p_user: u, p_reason: reason || '', p_ban: !!ban })); },
+    async orgBans(g) { return check(await sb.rpc('org_bans', { p_group: g })); },
+    async orgUnban(g, u) { check(await sb.rpc('org_unban', { p_group: g, p_user: u })); },
+    async orgHideBook(id, hidden, reason) { check(await sb.rpc('org_hide_book', { p_book: id, p_hidden: hidden, p_reason: reason || '' })); },
+    async orgReports(g) { return check(await sb.from('reports').select('*').eq('group_id', g).order('created_at', { ascending: false }).limit(200)); },
+    async orgResolveReport(id, note) { check(await sb.rpc('org_resolve_report', { p_report: id, p_resolution: note || '' })); },
+    async orgReportContext(id) { return check(await sb.rpc('org_report_context', { p_report: id })); },
+    async orgAnnounce(g, text) { return check(await sb.rpc('org_announce', { p_group: g, p_text: text })); },
+    async orgLog(g) { return check(await sb.from('moderation_log').select('*').eq('group_id', g).order('created_at', { ascending: false }).limit(100)); },
+    async updateGroup(g, fields) { check(await sb.from('groups').update(fields).eq('id', g)); },
+
+    // ---------- platform admin ----------
+    async isPlatformAdmin() { const r = await sb.rpc('is_platform_admin'); return !r.error && r.data === true; },
+    async adminOverview() { return check(await sb.rpc('admin_overview')); },
+    async adminReports() { return check(await sb.rpc('admin_reports')); },
+    async adminDeleteGroup(g) { check(await sb.rpc('admin_delete_group', { p_group: g })); },
 
     // ---------- realtime ----------
     subscribe(onChange) {
@@ -169,6 +211,7 @@
       sb.channel('my-requests')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, onChange)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, onChange)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, onChange)
         .subscribe();
     }
   };

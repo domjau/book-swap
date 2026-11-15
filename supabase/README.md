@@ -3,11 +3,42 @@
 ## Set up a new project
 
 1. Create a Supabase project (EU region), with **automatic RLS on** and **"expose new tables" off**.
-2. Open **SQL Editor → New query**, paste the whole of [`migrations/001_init.sql`](migrations/001_init.sql) and click **Run**. It should finish with "Success. No rows returned". Then do the same with [`migrations/002_reviews_avatars.sql`](migrations/002_reviews_avatars.sql) (reviews and profile pictures). Always run the migrations in number order, each one once.
+2. Open **SQL Editor → New query**, paste the whole of [`migrations/001_init.sql`](migrations/001_init.sql) and click **Run**. It should finish with "Success. No rows returned". Then do the same with [`002_reviews_avatars.sql`](migrations/002_reviews_avatars.sql) (reviews and profile pictures) and [`003_notifications_admin.sql`](migrations/003_notifications_admin.sql) (notifications, organiser tools, platform admin). Always run the migrations in number order, each one once.
 3. **Authentication → URL Configuration**: set **Site URL** to the app's address, e.g. `https://domjau.github.io/book-swap/`, and add the same under **Redirect URLs**.
 4. **Authentication → Emails → SMTP Settings**: connect an email provider (e.g. Brevo, Resend or your domain's mailbox). Until then, sign-in emails only reach members of your Supabase team.
    Then, under **Authentication → Emails → Templates**, add the code to the **Magic Link** and **Confirm signup** templates, for example `<p>Your code: <strong>{{ .Token }}</strong></p>`. On phones, typing the code is more reliable than the link, because email apps often open links in a different browser.
 5. Put the **Project URL** and the **publishable key** in `config.js`. **Never** put the secret / service_role key in the app.
+
+## Notification emails (optional, recommended)
+
+In-app notifications (the bell) work as soon as migration 003 has run. To also send **emails**:
+
+1. **Deploy the email function.** Go to Supabase → **Edge Functions → Deploy a new function → Via editor**. Name it `send-notifications`, paste [`functions/send-notifications/index.ts`](functions/send-notifications/index.ts), and deploy. Then open the function's settings and turn **Verify JWT** off; the function checks its own secret instead.
+2. **Add secrets** under Edge Functions → **Secrets**:
+   | Name | Value |
+   |---|---|
+   | `SMTP_HOST` | `smtp.gmail.com` |
+   | `SMTP_PORT` | `465` |
+   | `SMTP_USER` | `pasakabookswap@gmail.com` |
+   | `SMTP_PASS` | the Gmail **app password** |
+   | `SMTP_FROM` | `Knygų keitykla <pasakabookswap@gmail.com>` |
+   | `APP_URL` | `https://domjau.github.io/book-swap/` |
+   | `CRON_SECRET` | a long random text you make up (e.g. 40 letters and numbers) |
+3. **Schedule it.** Under **Database → Extensions**, enable **pg_cron** and **pg_net**. Then open [`migrations/004_schedules.sql`](migrations/004_schedules.sql), replace `YOUR_CRON_SECRET` (twice) with your secret, and run it in the SQL editor. This sets up:
+   - handover reminders at 07:00 UTC;
+   - "right away" emails every 5 minutes;
+   - a daily summary at 17:00 UTC.
+
+Email logic tests: `functions/send-notifications/logic_test.mjs` (12 checks).
+
+## Organisers and platform admins
+
+- Whoever **starts a group** is its organiser and sees **Profile → Organiser panel**, with tabs for overview and announcements, members, reports, invites, and settings with the moderation log.
+- To make yourself a **platform admin**, which lets you see all groups and all open reports, run this once in the SQL editor with your own email:
+  ```sql
+  insert into public.platform_admins (user_id)
+  select id from auth.users where email = 'you@example.com';
+  ```
 
 ## What the schema does
 
@@ -19,11 +50,12 @@
 
 ## Security tests
 
-`tests/rls_test.sh` runs 58 checks against a local PostgreSQL with a small Supabase imitation (`tests/local_supabase_stub.sql`). It covers three users in two groups: reading, writing and status changes across groups, posting as someone else, and photo upload and read rules.
+`tests/rls_test.sh` runs 107 checks against a local PostgreSQL with a small Supabase imitation (`tests/local_supabase_stub.sql`). It covers three users in two groups: reading, writing and status changes across groups, posting as someone else, and photo upload and read rules.
 
 ```bash
 sudo -u postgres psql -f supabase/tests/local_supabase_stub.sql
 sudo -u postgres psql -d bs -f supabase/migrations/001_init.sql
 sudo -u postgres psql -d bs -f supabase/migrations/002_reviews_avatars.sql
-bash supabase/tests/rls_test.sh      # expects: 58 passed, 0 failed
+sudo -u postgres psql -d bs -f supabase/migrations/003_notifications_admin.sql
+bash supabase/tests/rls_test.sh      # expects: 107 passed, 0 failed
 ```
