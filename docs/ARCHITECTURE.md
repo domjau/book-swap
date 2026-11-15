@@ -40,17 +40,20 @@ scan barcode / type ISBN / search title
    → best for Lithuanian and other small-language books
         │ not found
         ▼
-2. Google Books  → title, author, description, language, categories, cover
-        │ gaps
-        ▼
-3. Open Library  → fills missing title / author / cover / subjects
+2. In parallel:
+   Google Books   → isbn:<13 digits>, then isbn:<10 digits>, then a plain search
+   Open Library   → books API (edition), search index (bigger coverage,
+                    language, subjects), then the work record for a description
+   → results are merged; missing fields are filled from the other source
         │ nothing
         ▼
 4. Manual entry (title + photo is enough). The ISBN is still saved,
    so the next family with this book gets it pre-filled.
 ```
 
-Topics are suggested by matching catalogue categories and description against keyword lists in `data.js`.
+Topics are suggested by matching catalogue categories, subjects and description against keyword lists in `data.js` (short keywords must be whole words, so "pet" doesn't match "petit").
+
+**Coverage limits.** Free catalogues miss many European and small-language editions. For production, a server-side lookup (Edge Function with caching) can add national library catalogues such as the BnF (France), DNB (Germany) and LIBIS (Lithuania), or a paid service like ISBNdb. The shared catalogue means every book only has to be typed in once.
 
 ## 2. Production target
 

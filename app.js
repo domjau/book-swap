@@ -755,8 +755,11 @@
   function cleanIsbn(s) { return String(s || '').toUpperCase().replace(/[^0-9X]/g, ''); }
   function mapLang(code) { const c = (code || '').slice(0, 2).toLowerCase(); return BOOK_LANGS.indexOf(c) >= 0 ? c : 'other'; }
   function suggestTopics(text) {
-    const s = (text || '').toLowerCase();
-    return TOPICS.filter((tp) => tp.keywords.some((k) => s.indexOf(k) >= 0)).slice(0, 3).map((tp) => tp.id);
+    // Short keywords must be whole words ("pet" matches "pets", not "petit");
+    // longer ones are word stems ("dinosaur" matches "dinosaurs").
+    const s = ' ' + norm(text) + ' ';
+    const hit = (k) => { k = norm(k); return k.length <= 4 ? new RegExp(' ' + k + '(s|es)? ').test(s) : s.indexOf(' ' + k) >= 0; };
+    return TOPICS.filter((tp) => tp.keywords.some(hit)).slice(0, 3).map((tp) => tp.id);
   }
   function httpsImg(u) { return u ? String(u).replace(/^http:/, 'https:').replace('&edge=curl', '') : ''; }
   function fromGoogle(item) {
@@ -775,39 +778,80 @@
     try { const r = await fetch(url, { signal: ctl.signal, referrerPolicy: 'no-referrer' }); if (!r.ok) throw new Error(r.status); return await r.json(); }
     finally { clearTimeout(timer); }
   }
+  // ISBN-13 (978…) → ISBN-10, because some catalogues only index the old 10-digit form.
+  function isbn13to10(isbn) {
+    if (isbn.length !== 13 || isbn.indexOf('978') !== 0) return '';
+    const core = isbn.slice(3, 12); let sum = 0;
+    for (let i = 0; i < 9; i++) sum += (10 - i) * Number(core[i]);
+    const c = (11 - (sum % 11)) % 11;
+    return core + (c === 10 ? 'X' : String(c));
+  }
+  function isbn10to13(isbn) {
+    if (isbn.length !== 10) return isbn;
+    const core = '978' + isbn.slice(0, 9); let sum = 0;
+    for (let i = 0; i < 12; i++) sum += Number(core[i]) * (i % 2 ? 3 : 1);
+    return core + String((10 - (sum % 10)) % 10);
+  }
+  // Open Library uses 3-letter language codes.
+  const OL_LANG = { lit: 'lt', spa: 'es', eng: 'en', dan: 'da', fre: 'fr', fra: 'fr', ger: 'de', deu: 'de', pol: 'pl', rus: 'ru', ukr: 'uk', swe: 'sv', nor: 'no', nob: 'no', ita: 'it', por: 'pt', lav: 'lv' };
+  const tryJson = (url) => fetchJson(url).catch(() => null);
+
+  async function googleByIsbn(isbn13, isbn10) {
+    const pick = (g) => (g && g.items && g.items.length ? fromGoogle(g.items[0]) : null);
+    return pick(await tryJson('https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn13))
+      || (isbn10 && pick(await tryJson('https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn10)))
+      || pick(await tryJson('https://www.googleapis.com/books/v1/volumes?q=' + isbn13));
+  }
+  async function openLibraryByIsbn(isbn13, isbn10) {
+    // a) the "books" API (edition record)
+    const keys = ['ISBN:' + isbn13].concat(isbn10 ? ['ISBN:' + isbn10] : []);
+    const o = await tryJson('https://openlibrary.org/api/books?format=json&jscmd=data&bibkeys=' + keys.join(','));
+    const d = o && (o[keys[0]] || o[keys[1]]);
+    // b) the search index (much larger coverage, has languages and the work id for a description)
+    const sr = await tryJson('https://openlibrary.org/search.json?limit=1&fields=key,title,subtitle,author_name,language,subject,cover_i&q=isbn:' + isbn13);
+    const doc = sr && sr.docs && sr.docs[0];
+    if (!d && !doc) return null;
+    const subjects = ((d && d.subjects) || []).map((x) => x.name).concat((doc && doc.subject) || []).slice(0, 40).join(' ');
+    const title = (d && d.title) || (doc && [doc.title, doc.subtitle].filter(Boolean).join(': ')) || '';
+    const author = (d && d.authors ? d.authors.map((a) => a.name).join(', ') : '') || (doc && doc.author_name ? doc.author_name.slice(0, 3).join(', ') : '');
+    const langs = (doc && doc.language) || [];
+    const lang = langs.length === 1 && OL_LANG[langs[0]] ? OL_LANG[langs[0]] : 'other';
+    let cover = httpsImg(d && d.cover && (d.cover.medium || d.cover.large));
+    if (!cover && doc && doc.cover_i) cover = 'https://covers.openlibrary.org/b/id/' + Number(doc.cover_i) + '-M.jpg';
+    let description = '';
+    if (doc && doc.key && /^\/works\/OL\d+W$/.test(doc.key)) {
+      const w = await tryJson('https://openlibrary.org' + doc.key + '.json');
+      if (w && w.description) description = typeof w.description === 'string' ? w.description : (w.description.value || '');
+    }
+    return { title: title, author: author, description: description, lang: lang, topics: suggestTopics(subjects + ' ' + title), cover: cover, source: 'Open Library' };
+  }
+  function mergeFound(a, b) {
+    if (!a) return b; if (!b) return a;
+    const out = Object.assign({}, a);
+    ['title', 'author', 'description', 'cover'].forEach((k) => { if (!out[k]) out[k] = b[k]; });
+    if (out.lang === 'other' && b.lang !== 'other') out.lang = b.lang;
+    if (!out.topics.length) out.topics = b.topics;
+    out.source = a.source + ' + ' + b.source;
+    return out;
+  }
+
   async function lookupIsbn(raw) {
-    const isbn = cleanIsbn(raw);
+    let isbn = cleanIsbn(raw);
     if (isbn.length !== 10 && isbn.length !== 13) { ui.addMsg = t('invalidIsbn'); ui.addMsgKind = 'warn'; render(); return; }
+    if (isbn.length === 10) isbn = isbn10to13(isbn);
+    const isbn10 = isbn13to10(isbn);
     // 1. Our own catalogue – best for small-language books
-    const local = S.books.find((b) => b.isbn === isbn);
+    const local = S.books.find((b) => b.isbn && (b.isbn === isbn || b.isbn === isbn10));
     if (local) {
       startDraft({ isbn: isbn, title: local.title, author: local.author, description: local.description, lang: local.lang, topics: local.topics.slice(), cover: local.cover || local.photo || '', age: local.age });
       ui.addMsg = t('foundLocal'); ui.addMsgKind = 'ok'; render(); return;
     }
     ui.busy = true; ui.addMsg = ''; render();
-    let found = null;
-    try {
-      const g = await fetchJson('https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn);
-      if (g.items && g.items.length) found = fromGoogle(g.items[0]);
-    } catch (e) { /* try the next source */ }
-    try {
-      const o = await fetchJson('https://openlibrary.org/api/books?bibkeys=ISBN:' + isbn + '&format=json&jscmd=data');
-      const d = o['ISBN:' + isbn];
-      if (d) {
-        const subjects = (d.subjects || []).map((x) => x.name).join(' ');
-        const ol = { isbn: isbn, title: d.title || '', author: (d.authors || []).map((a) => a.name).join(', '),
-          description: '', lang: 'other', topics: suggestTopics(subjects + ' ' + (d.title || '')),
-          cover: httpsImg(d.cover && (d.cover.medium || d.cover.large)), source: 'Open Library' };
-        if (!found) found = ol;
-        else {
-          ['title', 'author', 'cover'].forEach((k) => { if (!found[k]) found[k] = ol[k]; });
-          if (!found.topics.length) found.topics = ol.topics;
-          found.source += ' + Open Library';
-        }
-      }
-    } catch (e) { /* ignore */ }
+    // 2. Google Books and Open Library at the same time; combine what they know.
+    const results = await Promise.all([googleByIsbn(isbn, isbn10).catch(() => null), openLibraryByIsbn(isbn, isbn10).catch(() => null)]);
+    const found = mergeFound(results[0], results[1]);
     ui.busy = false;
-    if (found) {
+    if (found && found.title) {
       found.isbn = isbn;
       startDraft(found);
       ui.addMsg = t('foundIn', { src: found.source }); ui.addMsgKind = 'ok';

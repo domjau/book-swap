@@ -77,7 +77,7 @@ window.STRINGS = {
     confirmDelete: 'Tikrai ištrinti visus duomenis šiame įrenginyje?',
     privacy: 'Saugome tik vardą ir knygas. Jokių adresų ar telefonų – perdavimai vyksta mokykloje.',
     // misc
-    langNames: { lt: 'lietuvių', es: 'ispanų', en: 'anglų', da: 'danų', other: 'kita' },
+    langNames: { lt: 'lietuvių', es: 'ispanų', en: 'anglų', da: 'danų', fr: 'prancūzų', de: 'vokiečių', pl: 'lenkų', ru: 'rusų', uk: 'ukrainiečių', lv: 'latvių', sv: 'švedų', no: 'norvegų', it: 'italų', pt: 'portugalų', other: 'kita' },
     today: 'šiandien', nextSaturday: 'šeštadienį'
   },
 
@@ -145,7 +145,7 @@ window.STRINGS = {
     settings: 'Ajustes', exportData: 'Descargar mis datos', deleteAccount: 'Borrar cuenta y datos',
     confirmDelete: '¿Seguro que quieres borrar todos los datos de este dispositivo?',
     privacy: 'Solo guardamos tu nombre y tus libros. Sin direcciones ni teléfonos: las entregas son en la escuela.',
-    langNames: { lt: 'lituano', es: 'español', en: 'inglés', da: 'danés', other: 'otro' },
+    langNames: { lt: 'lituano', es: 'español', en: 'inglés', da: 'danés', fr: 'francés', de: 'alemán', pl: 'polaco', ru: 'ruso', uk: 'ucraniano', lv: 'letón', sv: 'sueco', no: 'noruego', it: 'italiano', pt: 'portugués', other: 'otro' },
     today: 'hoy', nextSaturday: 'el sábado'
   },
 
@@ -213,7 +213,7 @@ window.STRINGS = {
     settings: 'Settings', exportData: 'Download my data', deleteAccount: 'Delete account and data',
     confirmDelete: 'Really delete all data on this device?',
     privacy: 'We only store your name and books. No addresses or phone numbers – handovers happen at school.',
-    langNames: { lt: 'Lithuanian', es: 'Spanish', en: 'English', da: 'Danish', other: 'Other' },
+    langNames: { lt: 'Lithuanian', es: 'Spanish', en: 'English', da: 'Danish', fr: 'French', de: 'German', pl: 'Polish', ru: 'Russian', uk: 'Ukrainian', lv: 'Latvian', sv: 'Swedish', no: 'Norwegian', it: 'Italian', pt: 'Portuguese', other: 'Other' },
     today: 'today', nextSaturday: 'Saturday'
   }
 };

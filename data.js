@@ -1,5 +1,5 @@
 /* Topics, sample members and sample books for the prototype. */
-window.BOOK_LANGS = ['lt', 'es', 'en', 'da', 'other'];
+window.BOOK_LANGS = ['lt', 'es', 'en', 'da', 'fr', 'de', 'pl', 'ru', 'uk', 'lv', 'sv', 'no', 'it', 'pt', 'other'];
 window.AGES = ['0–3', '3–6', '7–9', '10+'];
 
 window.TOPICS = [
@@ -8,7 +8,7 @@ window.TOPICS = [
     keywords: ['dinosaur', 'dino'] },
   { id: 'fairies', color: '#7A3E9D', names: { lt: 'Fėjos ir magija', es: 'Hadas y magia', en: 'Fairies & magic' },
     icon: 'M15 2l1.3 2.7L19 6l-2.7 1.3L15 10l-1.3-2.7L11 6l2.7-1.3zM12 10L3 19M20 13v4M18 15h4M6 4v2M5 5h2',
-    keywords: ['fair', 'magic', 'witch', 'wizard', 'princess', 'dragon', 'fantasy'] },
+    keywords: ['fairy', 'fairies', 'magic', 'witch', 'wizard', 'princess', 'dragon', 'fantasy'] },
   { id: 'animals', color: '#2F6B4F', names: { lt: 'Gyvūnai', es: 'Animales', en: 'Animals' },
     icon: 'M12 13c-3 0-5.5 3-5.5 5a2.5 2.5 0 0 0 3 2.3c1.6-.4 3.4-.4 5 0a2.5 2.5 0 0 0 3-2.3c0-2-2.5-5-5.5-5zM5.5 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM18.5 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM9 7.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM15 7.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
     keywords: ['animal', 'bear', 'cat', 'dog', 'mouse', 'pet', 'farm', 'zoo', 'bird', 'gorilla', 'nature'] },

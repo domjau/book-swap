@@ -3,7 +3,7 @@
 There are two kinds of language in the app:
 
 - **App (UI) language:** the language of the buttons and text. Currently `lt`, `es`, `en`.
-- **Book language:** the language a book is written in, used as a filter. Currently `lt`, `es`, `en`, `da`, `other` (see `BOOK_LANGS` in `data.js`).
+- **Book language:** the language a book is written in, used as a filter. Currently `lt`, `es`, `en`, `da`, `fr`, `de`, `pl`, `ru`, `uk`, `lv`, `sv`, `no`, `it`, `pt`, `other` (see `BOOK_LANGS` in `data.js`).
 
 A Spanish-speaking family can use the app in Spanish and browse Lithuanian books.
 
