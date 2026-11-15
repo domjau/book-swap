@@ -78,7 +78,7 @@
   let S = LIVE ? Object.assign(fresh(), pickPrefs(load() || {})) : (migrate(load()) || fresh());
   function pickPrefs(o) {
     const out = {};
-    ['lang', 'interested', 'cart', 'cartMeta'].forEach((k) => { if (o[k] !== undefined) out[k] = o[k]; });
+    ['lang', 'interested', 'cart', 'cartMeta', 'toured'].forEach((k) => { if (o[k] !== undefined) out[k] = o[k]; });
     return out;
   }
   if (LIVE) Object.keys(MEMBERS).forEach((k) => delete MEMBERS[k]); // members come from the server
@@ -257,6 +257,7 @@
       <input type="checkbox" data-action="toggleInterest" data-v="${c}" ${S.interested.indexOf(c) >= 0 ? 'checked' : ''}> ${esc(langName(c))}</label>`).join('');
     return `<main class="onboard">
       <div class="lockup"><div class="logo-big">${icon('seku', 48)}</div><span class="wordmark">seku seku</span></div>
+      ${LIVE && !S.me ? `<p class="step-label">${esc(t('step2of2'))}</p>` : ''}
       <h1>${esc(t('welcomeTitle'))}</h1>
       ${S.me ? `<div class="notice warn">${esc(S.agreed && S.agreed.version === TERMS.version ? t('profileIncomplete') : t('termsUpdated'))}</div>` : ''}
       <p class="lead">${esc(t('welcomeText'))}</p>
@@ -292,21 +293,76 @@
             <input id="onb-group" class="input" maxlength="80" value="${esc(ui.onbGroup || '')}" data-input="onbGroup" placeholder="${esc(t('groupNamePh'))}"></label>`}`;
   }
 
+  // What the platform is, before anyone signs up: free, scan + photo, how a swap works, and the usual questions.
+  function langPills(cls) {
+    return `<div class="row-wrap ${cls || ''}" role="group" aria-label="${esc(t('appLanguage'))}">${UI_LANGS.map((c) =>
+      `<button class="pill small ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}" aria-pressed="${S.lang === c}">${esc(STRINGS[c].langNames[c])}</button>`).join('')}</div>`;
+  }
+  // Hero: two homes, a book travelling between them along a dotted path (single-line style of the logo).
+  const HERO_SVG = `<svg class="hero-art" viewBox="0 0 340 176" role="img" aria-hidden="true">
+    <path d="M70 70 C 120 6, 220 6, 270 70" fill="none" stroke="#C9BFA9" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 9"/>
+    <g transform="translate(152 14) rotate(-14)"><rect x="0" y="0" width="34" height="42" rx="4" fill="#E3C16F"/><rect x="0" y="0" width="7" height="42" rx="3" fill="#C9A24C"/><path d="M13 13h14M13 20h10" stroke="#7A5B14" stroke-width="2.5" stroke-linecap="round"/></g>
+    <path d="M196 30c3-4 9-1 6 4l-6 6-6-6c-3-5 3-8 6-4z" fill="#C77B6A"/>
+    <path d="M128 36c2-3 7-1 5 3l-5 4-5-4c-2-4 3-6 5-3z" fill="#E3C16F"/>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+      <path d="M22 158V98l48-34 48 34v60" stroke="#5C7A61"/><path d="M222 158V98l48-34 48 34v60" stroke="#C77B6A"/>
+    </g>
+    <g><rect x="38" y="118" width="11" height="38" rx="2.5" fill="#A55A3F"/><rect x="52" y="112" width="11" height="44" rx="2.5" fill="#4E5B83"/><rect x="66" y="122" width="11" height="34" rx="2.5" fill="#E3C16F"/>
+      <rect x="83" y="114" width="11" height="42" rx="2.5" fill="#4F7357" transform="rotate(12 88 156)"/></g>
+    <g><rect x="240" y="116" width="11" height="40" rx="2.5" fill="#7D5A86"/><rect x="254" y="122" width="11" height="34" rx="2.5" fill="#3F716B"/>
+      <rect x="268" y="112" width="11" height="44" rx="2.5" fill="#A0525B"/><rect x="284" y="120" width="11" height="36" rx="2.5" fill="#E3C16F" opacity=".35"/></g>
+    <path d="M8 158h324" stroke="#2E2E2A" stroke-width="3" stroke-linecap="round"/>
+  </svg>`;
+  function introHtml(ctaAction) {
+    const chips = t('freeChips').map((c) => `<span class="free-chip">${icon('check', 16)} ${esc(c)}</span>`).join('');
+    const flow = t('flow').map((f, i) => `<li class="flow-step"><span class="flow-ic c${i}">${icon(f[0], 30)}</span><b>${esc(f[1])}</b><span>${esc(f[2])}</span></li>`).join('');
+    const steps = t('how').map((h, i) => `<li class="how-step"><span class="how-ic c${i}">${icon(h[0], 24)}</span>
+      <div><h3>${esc(h[1])}</h3><p>${esc(h[2])}</p></div></li>`).join('');
+    const why = t('why').map((w) => `<li>${icon(w[0], 22)}<div><b>${esc(w[1])}</b><span>${esc(w[2])}</span></div></li>`).join('');
+    const faq = t('faq').map((f) => `<details class="faq"><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join('');
+    const cta = `<button class="btn primary big" data-action="${ctaAction || 'toSignup'}">${esc(t('introCta'))}</button>`;
+    return `<div class="intro-top"><div class="brand-row"><div class="logo">${icon('seku', 24)}</div><span class="wordmark small">seku seku</span></div>${langPills('langs-top')}</div>
+      <div class="hero">${HERO_SVG}</div>
+      <h1 class="intro-h">${esc(t('introTitle'))}</h1>
+      <p class="lead">${esc(t('introLead'))}</p>
+      <div class="free-chips">${chips}</div>
+      ${cta}
+      <section class="flow-sec" aria-labelledby="flow-h"><h2 id="flow-h">${esc(t('flowTitle'))}</h2><ol class="flow">${flow}</ol></section>
+      <section aria-labelledby="how-h"><h2 id="how-h">${esc(t('howTitle'))}</h2><ol class="how-list">${steps}</ol></section>
+      <section class="why" aria-labelledby="why-h"><h2 id="why-h">${esc(t('whyTitle'))}</h2><ul>${why}</ul></section>
+      <section class="faqs" aria-labelledby="faq-h"><h2 id="faq-h">${esc(t('faqTitle'))}</h2>${faq}</section>`;
+  }
+
+  function viewIntro() { // demo mode: the same intro, then the profile form
+    return `<main class="onboard intro">${introHtml('startSignup')}
+      <button class="btn primary big" data-action="startSignup">${esc(t('introCta'))}</button></main>`;
+  }
+
   function viewSignIn() {
-    const langs = UI_LANGS.map((c) => `<button class="pill ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}">${esc(STRINGS[c].langNames[c])}</button>`).join('');
     const step = live.authStep;
-    return `<main class="onboard">
-      <div class="lockup"><div class="logo-big">${icon('seku', 48)}</div><span class="wordmark">seku seku</span></div>
-      <h1>${esc(t('welcomeTitle'))}</h1>
-      <p class="lead">${esc(t('welcomeText'))}</p>
-      <div class="field"><span class="label">${esc(t('appLanguage'))}</span><div class="row-wrap">${langs}</div></div>
-      ${step === 'email' ? `
+    if (step === 'email') {
+      return `<main class="onboard intro">${introHtml()}
+      <section id="signup" class="card pad-m signup">
+        <p class="step-label">${esc(t('step1of2'))}</p>
+        <h2>${esc(t('signupTitle'))}</h2>
+        <p class="muted small">${esc(t('signupHint'))}</p>
         <form data-action-submit="sendCode">
           <label class="field"><span class="label">${esc(t('emailLabel'))}</span>
             <input id="si-email" class="input" type="email" required maxlength="200" autocomplete="email" inputmode="email" value="${esc(live.authEmail)}" placeholder="${esc(t('emailPh'))}"></label>
           <button class="btn primary big" type="submit" ${live.busy ? 'disabled' : ''}>${esc(live.busy ? t('loading') : t('sendCode'))}</button>
         </form>
-        <p class="muted small">${esc(t('noPassword'))}</p>` : `
+        <p class="muted small">${esc(t('noPassword'))}</p>
+        ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
+      </section>
+      <p class="center"><a class="ulink" href="?demo=1">${esc(t('tryDemo'))}</a></p>
+      <p class="muted small center"><a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></p>
+    </main>`;
+    }
+    return `<main class="onboard">
+      <div class="lockup"><div class="logo-big">${icon('seku', 48)}</div><span class="wordmark">seku seku</span></div>
+      <p class="step-label">${esc(t('step1of2'))}</p>
+      <h1>${esc(t('signupTitle'))}</h1>
+      ${`
         <div class="notice ok">${icon('check', 20)} <span>${esc(t('checkEmail', { email: live.authEmail }))}</span></div>
         <form data-action-submit="verifyCode">
           <label class="field"><span class="label">${esc(t('codeLabel'))}</span>
@@ -317,6 +373,29 @@
       ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
       <p class="muted small center"><a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></p>
     </main>`;
+  }
+
+  // First-run tour after sign-up: four short cards, shown once (replay from the profile).
+  function tourSheet() {
+    const steps = t('tour'); const n = steps.length; const i = Math.min(ui.tourStep || 0, n);
+    const name = (S.me && S.me.name ? S.me.name.split(' ')[0] : '');
+    const dots = `<div class="tour-dots" aria-hidden="true">${Array.from({ length: n + 1 }, (_, k) => `<span class="${k === i ? 'on' : ''}"></span>`).join('')}</div>`;
+    let body;
+    if (i === 0) {
+      body = `<div class="tour-ic hello">${icon('seku', 44)}</div><h2 id="tour-h">${esc(t('tourHello', { name: name }))}</h2><p>${esc(t('tourIntro'))}</p>
+        <ol class="tour-mini">${steps.map((st) => `<li>${icon(st[0], 18)} ${esc(st[1])}</li>`).join('')}</ol>`;
+    } else {
+      const st = steps[i - 1];
+      body = `<p class="step-label">${esc(t('stepOf', { n: i, total: n }))}</p><div class="tour-ic">${icon(st[0], 40)}</div><h2 id="tour-h">${esc(st[1])}</h2><p>${esc(st[2])}</p>`;
+    }
+    const last = i === n;
+    const buttons = last
+      ? `<button class="btn primary big" data-action="tourAdd">${icon('barcode', 20)} ${esc(t('tourAddFirst'))}</button>
+         <button class="btn ghost big" data-action="tourSkip">${esc(t('tourLookAround'))}</button>`
+      : `<button class="btn primary big" data-action="tourNext">${esc(t('tourNext'))}</button>
+         <div class="row-between">${i > 0 ? `<button class="link" data-action="tourBack">${esc(t('tourBack'))}</button>` : '<span></span>'}
+         <button class="link" data-action="tourSkip">${esc(t('tourSkip'))}</button></div>`;
+    return `<div class="sheet-bg"></div><div class="sheet tour" role="dialog" aria-modal="true" aria-labelledby="tour-h">${dots}<div class="tour-body">${body}</div>${buttons}</div>`;
   }
 
   function viewLoading() {
@@ -779,6 +858,7 @@
         <p class="muted small">${esc(t('privacy'))}</p>
         <a class="btn ghost" href="#/terms">${icon('doc', 20)} ${esc(t('viewTerms'))}</a>
         ${S.agreed ? `<p class="muted tiny center">${esc(t('acceptedOn', { date: fmtDate(new Date(S.agreed.at)) }))}</p>` : ''}
+        <button class="btn ghost" data-action="tourReplay">${icon('doc', 20)} ${esc(t('howItWorks'))}</button>
         <button class="btn ghost" data-action="exportData">${icon('download', 20)} ${esc(t('exportData'))}</button>
         ${LIVE ? `<p class="muted small">${esc(t('signedInAs', { email: live.email }))}</p><button class="btn ghost" data-action="signOut">${esc(t('signOut'))}</button>` : ''}
         <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(LIVE ? t('leaveGroup') : t('deleteAccount'))}</button></section>
@@ -810,12 +890,13 @@
     if (r.name === 'join' && r.id) { live.invite = r.id.toUpperCase().slice(0, 12); ui.onbMode = 'join'; }
     if (LIVE && !live.ready) body = viewLoading();
     else if (LIVE && !live.uid) body = r.name === 'terms' ? viewTerms() : viewSignIn();
-    else if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : viewOnboarding();
+    else if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : (!LIVE && !S.me && !ui.introDone ? viewIntro() : viewOnboarding());
     else {
       const v = { '': viewBrowse, book: () => viewBook(r.id), requests: viewRequests, messages: viewMessages,
         chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms,
         notifications: viewNotifications, admin: () => viewAdmin(r.id), platform: () => viewAdmin('admins') }[r.name] || viewBrowse;
       body = header() + v() + nav(r.name);
+      if (!S.toured && r.name === '') body += tourSheet();
     }
     $app.innerHTML = body + reportSheet() + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
     if (routeChanged && r.name === 'profile' && r.id === 'notifications') { const el = document.getElementById('notif-settings'); if (el) el.scrollIntoView(); }
@@ -1228,6 +1309,13 @@
     setLang: (el) => { S.lang = el.dataset.v; save(); render(); },
     toggleInterest: (el) => { const v = el.dataset.v; const i = S.interested.indexOf(v); if (i >= 0) S.interested.splice(i, 1); else S.interested.push(v); save(); render(); },
     toggleAgree: (el) => { ui.onbAgree = el.checked; },
+    toSignup: () => { const f = document.getElementById('signup'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); const e = document.getElementById('si-email'); if (e) setTimeout(() => e.focus({ preventScroll: true }), 350); },
+    startSignup: () => { ui.introDone = true; render(); window.scrollTo(0, 0); },
+    tourNext: () => { ui.tourStep = (ui.tourStep || 0) + 1; render(); },
+    tourBack: () => { ui.tourStep = Math.max(0, (ui.tourStep || 0) - 1); render(); },
+    tourSkip: () => { S.toured = true; ui.tourStep = 0; save(); render(); },
+    tourAdd: () => { S.toured = true; ui.tourStep = 0; ui.addMode = 'shelf'; save(); go('#/add'); },
+    tourReplay: () => { S.toured = false; ui.tourStep = 0; save(); go('#/'); render(); },
     join: () => {
       const name = (document.getElementById('onb-name').value || '').trim().slice(0, 40);
       const country = document.getElementById('onb-country').value;

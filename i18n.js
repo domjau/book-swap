@@ -563,7 +563,7 @@ Object.assign(window.STRINGS.es, { booksN: 'libros' });
 
 /* Open network: no communities or organisers; moderation by admins */
 Object.assign(window.STRINGS.en, {
-  tagline: 'Swap books in your language',
+  tagline: "Children's books, family to family",
   welcomeText: "Share children's books with other families nearby – swap, sell or give them away.",
   adminTitle: 'Admin panel', openAdmin: 'Admin panel', tabAdmins: 'Admins', tabLog: 'Log',
   adminsTitle: 'Admins', adminsHint: 'Admins see reports and hidden listings, can remove or block members and send announcements to everyone. The person must have signed up first.',
@@ -577,7 +577,7 @@ Object.assign(window.STRINGS.en, {
   privacy: 'We only store your name, country, postal code and books. No addresses or phone numbers – you agree on a public place to meet.'
 });
 Object.assign(window.STRINGS.lt, {
-  tagline: 'Keiskis knygomis savo kalba',
+  tagline: 'Vaikiškos knygos iš šeimos į šeimą',
   welcomeText: 'Dalinkitės vaikiškomis knygomis su šeimomis netoliese – mainykite, parduokite ar padovanokite.',
   adminTitle: 'Administravimas', openAdmin: 'Administravimas', tabAdmins: 'Administratoriai', tabLog: 'Žurnalas',
   adminsTitle: 'Administratoriai', adminsHint: 'Administratoriai mato pranešimus apie problemas ir paslėptus skelbimus, gali pašalinti ar užblokuoti narius ir siųsti pranešimus visiems. Žmogus pirmiausia turi užsiregistruoti.',
@@ -591,7 +591,7 @@ Object.assign(window.STRINGS.lt, {
   privacy: 'Saugome tik vardą, šalį, pašto kodą ir knygas. Jokių adresų ar telefonų – susitariate susitikti viešoje vietoje.'
 });
 Object.assign(window.STRINGS.es, {
-  tagline: 'Intercambia libros en tu idioma',
+  tagline: 'Libros infantiles de familia en familia',
   welcomeText: 'Comparte libros infantiles con familias cercanas: intercambia, vende o regala.',
   adminTitle: 'Panel de administración', openAdmin: 'Panel de administración', tabAdmins: 'Administradores', tabLog: 'Registro',
   adminsTitle: 'Administradores', adminsHint: 'Los administradores ven las denuncias y los anuncios ocultos, pueden eliminar o bloquear miembros y enviar avisos a todos. La persona debe haberse registrado antes.',
@@ -603,4 +603,170 @@ Object.assign(window.STRINGS.es, {
   reported: 'Denunciado a los administradores de seku seku.', handoverPh: 'Biblioteca o cafetería cercana',
   defaultMsg: '¡Hola! Me gustarían estos libros. ¿Dónde y cuándo te viene bien?',
   privacy: 'Solo guardamos tu nombre, país, código postal y libros. Sin direcciones ni teléfonos: quedáis en un lugar público.'
+});
+
+// ---- intro (before sign-up) and the first-run tour (after sign-up)
+Object.assign(window.STRINGS.en, {
+  introTitle: 'Pass your books on. Find new ones nearby.',
+  introLead: 'seku seku connects readers who live close to each other. Swap, sell or give away the books you have read – in any language.',
+  freeChips: ['100% free', 'No ads', 'No password'],
+  introCta: 'Create a free account',
+  howTitle: 'How it works',
+  how: [
+    ['barcode', 'Scan the barcode', 'Point your camera at the ISBN on the back. Title, author and description fill in by themselves.'],
+    ['camera', 'Snap a photo', 'Take a quick picture of your copy so others can see its condition. Done in under a minute.'],
+    ['search', 'Find books near you', 'Browse by language, topic and distance. Ask for one book, or several from the same person at once.'],
+    ['chat', 'Meet and swap', 'Agree on a time and a public place in the chat. Swap, sell or give away – it is up to you.']
+  ],
+  faqTitle: 'Good to know',
+  faq: [
+    ['Does it cost anything?', 'No. seku seku is free to use – no fees, no ads, no subscription. If you sell a book, the buyer pays you directly when you meet.'],
+    ['Do I need a password?', 'No. Enter your email and we send you a 6-digit code. Next time, the same email signs you in.'],
+    ['Who can see my details?', 'Only signed-in members, and only your name, country and postal code – never your address, email or phone number. You decide where to meet.'],
+    ['Which books can I share?', 'Any physical book you own, in any language. Copies, scans and e-book files are not allowed.'],
+    ['What if something goes wrong?', 'seku seku puts people in touch; the swap itself is between you and the other person. Meet in a public place, pay at the handover, and use the flag button to report anything odd – an admin checks every report.']
+  ],
+  signupTitle: 'Create your free account',
+  signupHint: 'Already have one? Enter the same email to sign in.',
+  step1of2: 'Step 1 of 2 · Your email',
+  step2of2: 'Step 2 of 2 · Your profile',
+  tryDemo: 'Just looking? Try the demo with sample books',
+  tourHello: 'Welcome, {name}!',
+  tourIntro: "You're in. Here's how to get going – four quick steps.",
+  tour: [
+    ['plus', 'Add your books', 'Tap + at the bottom, scan the barcode and take a photo. Then choose: swap, sell or give away.'],
+    ['heart', 'Make a wish list', "In +, choose “I'm looking for it”. We tell you as soon as someone lists a book on your list."],
+    ['bag', 'Ask for books', 'Open a book and tap “Add to request”. Books from the same person go into one request, so you can collect several at once.'],
+    ['chat', 'Meet and rate', 'Agree on a time and a public place in the chat, and pay only when you meet. Afterwards tap “Mark as handed over” and rate each other.']
+  ],
+  tourNext: 'Next', tourBack: 'Back', tourSkip: 'Skip', tourAddFirst: 'Add my first book', tourLookAround: 'Look around first',
+  howItWorks: 'How seku seku works', stepOf: '{n} of {total}'
+});
+Object.assign(window.STRINGS.lt, {
+  introTitle: 'Perleiskite savo knygas. Raskite naujų netoliese.',
+  introLead: 'seku seku suveda netoli vienas kito gyvenančius skaitytojus. Keiskitės, parduokite ar padovanokite perskaitytas knygas – bet kuria kalba.',
+  freeChips: ['Visiškai nemokama', 'Be reklamų', 'Be slaptažodžių'],
+  introCta: 'Susikurti nemokamą paskyrą',
+  howTitle: 'Kaip tai veikia',
+  how: [
+    ['barcode', 'Nuskenuokite brūkšninį kodą', 'Nukreipkite kamerą į ISBN kodą ant galinio viršelio. Pavadinimas, autorius ir aprašymas užsipildys patys.'],
+    ['camera', 'Nufotografuokite', 'Greitai nufotografuokite savo knygą, kad kiti matytų jos būklę. Užtrunka mažiau nei minutę.'],
+    ['search', 'Raskite knygų netoliese', 'Ieškokite pagal kalbą, temą ir atstumą. Paprašykite vienos knygos arba iškart kelių iš to paties žmogaus.'],
+    ['chat', 'Susitikite ir apsikeiskite', 'Pokalbyje susitarkite dėl laiko ir viešos vietos. Keiskitės, parduokite ar padovanokite – kaip norite.']
+  ],
+  faqTitle: 'Verta žinoti',
+  faq: [
+    ['Ar tai kainuoja?', 'Ne. seku seku naudotis nemokama – jokių mokesčių, reklamų ar prenumeratų. Jei parduodate knygą, pirkėjas sumoka jums tiesiogiai susitikus.'],
+    ['Ar reikia slaptažodžio?', 'Ne. Įveskite el. paštą ir atsiųsime 6 skaitmenų kodą. Kitą kartą prisijungsite tuo pačiu el. paštu.'],
+    ['Kas mato mano duomenis?', 'Tik prisijungę nariai ir tik jūsų vardą, šalį bei pašto kodą – niekada adreso, el. pašto ar telefono. Kur susitikti, sprendžiate jūs.'],
+    ['Kokiomis knygomis galima dalintis?', 'Bet kokiomis savo popierinėmis knygomis, bet kuria kalba. Kopijos, skenuotos knygos ir el. knygų failai neleidžiami.'],
+    ['O jei kas nors nepavyks?', 'seku seku tik suveda žmones – mainai vyksta tarp jūsų ir kito žmogaus. Susitikite viešoje vietoje, mokėkite perdavimo metu, o įtartiną elgesį praneškite vėliavėlės mygtuku – administratorius peržiūri kiekvieną pranešimą.']
+  ],
+  signupTitle: 'Susikurkite nemokamą paskyrą',
+  signupHint: 'Jau turite? Įveskite tą patį el. paštą ir prisijungsite.',
+  step1of2: '1 žingsnis iš 2 · El. paštas',
+  step2of2: '2 žingsnis iš 2 · Jūsų profilis',
+  tryDemo: 'Tik apsižvalgote? Išbandykite demonstracinę versiją su pavyzdinėmis knygomis',
+  tourHello: 'Sveiki, {name}!',
+  tourIntro: 'Viskas paruošta. Štai kaip pradėti – keturi trumpi žingsniai.',
+  tour: [
+    ['plus', 'Pridėkite savo knygų', 'Apačioje spustelėkite +, nuskenuokite brūkšninį kodą ir nufotografuokite. Tada pasirinkite: keistis, parduoti ar padovanoti.'],
+    ['heart', 'Susikurkite norų sąrašą', 'Skiltyje + pasirinkite „Ieškau šios knygos“. Pranešime, kai tik kas nors įkels knygą iš jūsų sąrašo.'],
+    ['bag', 'Prašykite knygų', 'Atidarykite knygą ir spustelėkite „Pridėti į prašymą“. To paties žmogaus knygos sujungiamos į vieną prašymą, tad galite pasiimti kelias iš karto.'],
+    ['chat', 'Susitikite ir įvertinkite', 'Pokalbyje susitarkite dėl laiko ir viešos vietos, mokėkite tik susitikę. Po to spustelėkite „Pažymėti kaip perduota“ ir įvertinkite vienas kitą.']
+  ],
+  tourNext: 'Toliau', tourBack: 'Atgal', tourSkip: 'Praleisti', tourAddFirst: 'Pridėti pirmą knygą', tourLookAround: 'Pirma apsižvalgysiu',
+  howItWorks: 'Kaip veikia seku seku', stepOf: '{n} iš {total}'
+});
+Object.assign(window.STRINGS.es, {
+  introTitle: 'Pasa tus libros. Encuentra otros cerca.',
+  introLead: 'seku seku pone en contacto a lectores que viven cerca. Intercambia, vende o regala los libros que ya has leído, en cualquier idioma.',
+  freeChips: ['Totalmente gratis', 'Sin anuncios', 'Sin contraseñas'],
+  introCta: 'Crear una cuenta gratis',
+  howTitle: 'Cómo funciona',
+  how: [
+    ['barcode', 'Escanea el código de barras', 'Apunta la cámara al ISBN de la contraportada. El título, el autor y la descripción se rellenan solos.'],
+    ['camera', 'Haz una foto', 'Una foto rápida de tu ejemplar para que se vea su estado. Listo en menos de un minuto.'],
+    ['search', 'Encuentra libros cerca', 'Busca por idioma, tema y distancia. Pide un libro o varios a la misma persona a la vez.'],
+    ['chat', 'Quedad e intercambiad', 'Acordad hora y un lugar público en el chat. Intercambia, vende o regala: tú decides.']
+  ],
+  faqTitle: 'Bueno saber',
+  faq: [
+    ['¿Cuesta algo?', 'No. Usar seku seku es gratis: sin comisiones, sin anuncios, sin suscripción. Si vendes un libro, te pagan directamente al quedar.'],
+    ['¿Necesito contraseña?', 'No. Escribe tu correo y te enviamos un código de 6 cifras. La próxima vez entras con el mismo correo.'],
+    ['¿Quién ve mis datos?', 'Solo los miembros registrados, y solo tu nombre, país y código postal; nunca tu dirección, correo ni teléfono. Tú decides dónde quedar.'],
+    ['¿Qué libros puedo compartir?', 'Cualquier libro en papel que tengas, en cualquier idioma. No se permiten copias, escaneos ni archivos de libros electrónicos.'],
+    ['¿Y si algo sale mal?', 'seku seku pone en contacto a personas; el intercambio es entre tú y la otra persona. Quedad en un lugar público, paga en la entrega y usa el botón de la bandera para denunciar algo raro: un administrador revisa cada denuncia.']
+  ],
+  signupTitle: 'Crea tu cuenta gratis',
+  signupHint: '¿Ya tienes una? Escribe el mismo correo para entrar.',
+  step1of2: 'Paso 1 de 2 · Tu correo',
+  step2of2: 'Paso 2 de 2 · Tu perfil',
+  tryDemo: '¿Solo mirando? Prueba la demo con libros de ejemplo',
+  tourHello: '¡Hola, {name}!',
+  tourIntro: 'Ya estás dentro. Así se empieza, en cuatro pasos rápidos.',
+  tour: [
+    ['plus', 'Añade tus libros', 'Toca + abajo, escanea el código de barras y haz una foto. Luego elige: intercambiar, vender o regalar.'],
+    ['heart', 'Haz tu lista de deseos', 'En +, elige «Busco este libro». Te avisamos en cuanto alguien publique un libro de tu lista.'],
+    ['bag', 'Pide libros', 'Abre un libro y toca «Añadir al pedido». Los libros de la misma persona van en un solo pedido, así recoges varios a la vez.'],
+    ['chat', 'Quedad y valorad', 'Acordad hora y un lugar público en el chat, y paga solo al quedar. Después toca «Marcar como entregado» y valoraos.']
+  ],
+  tourNext: 'Siguiente', tourBack: 'Atrás', tourSkip: 'Saltar', tourAddFirst: 'Añadir mi primer libro', tourLookAround: 'Primero echo un vistazo',
+  howItWorks: 'Cómo funciona seku seku', stepOf: '{n} de {total}'
+});
+
+// ---- intro, children's-books version (visual)
+Object.assign(window.STRINGS.en, {
+  introTitle: "Children's books, passed from family to family.",
+  introLead: "The books your kids have outgrown are exactly what another family's kids are ready for. Swap, sell or give them away to families nearby – in your language.",
+  flowTitle: 'Add a book in under a minute',
+  flow: [['barcode', 'Scan', 'the ISBN on the back'], ['camera', 'Snap', 'a photo of your copy'], ['check', 'Done', 'details fill in by themselves']],
+  howTitle: 'Then find your next favourites',
+  how: [
+    ['search', 'Find books nearby', 'Filter by language, age and topic – dinosaurs, fairies, bedtime and more.'],
+    ['bag', 'Ask for a bundle', 'Pick several books from the same family and send one request.'],
+    ['chat', 'Meet and swap', 'Agree on a time and place in the chat. Swap, sell or give away.']
+  ],
+  whyTitle: 'Why it matters',
+  why: [
+    ['heart', 'Every book is loved twice', 'Stories keep being read instead of gathering dust.'],
+    ['books', 'Books in your own language', 'Hard-to-find Lithuanian, Spanish and other titles, right around the corner.'],
+    ['swapArrows', 'Good for families and the planet', 'Save money and shelf space, and buy a little less new.']
+  ]
+});
+Object.assign(window.STRINGS.lt, {
+  introTitle: 'Vaikiškos knygos – iš šeimos į šeimą.',
+  introLead: 'Knygos, iš kurių jūsų vaikai išaugo, kaip tik tinka kitos šeimos vaikams. Keiskitės, parduokite ar padovanokite jas šeimoms netoliese – savo kalba.',
+  flowTitle: 'Knygą pridėsite per mažiau nei minutę',
+  flow: [['barcode', 'Kodas', 'nuskenuokite ISBN ant nugarėlės'], ['camera', 'Nuotrauka', 'nufotografuokite savo knygą'], ['check', 'Paruošta', 'duomenys užsipildo patys']],
+  howTitle: 'O tada raskite naujų mėgstamų',
+  how: [
+    ['search', 'Raskite knygų netoliese', 'Rinkitės pagal kalbą, amžių ir temą – dinozaurai, fėjos, pasakos prieš miegą ir kt.'],
+    ['bag', 'Prašykite kelių iš karto', 'Išsirinkite kelias tos pačios šeimos knygas ir išsiųskite vieną prašymą.'],
+    ['chat', 'Susitikite ir apsikeiskite', 'Pokalbyje susitarkite dėl laiko ir vietos. Keiskitės, parduokite ar padovanokite.']
+  ],
+  whyTitle: 'Kodėl tai svarbu',
+  why: [
+    ['heart', 'Kiekviena knyga mylima dukart', 'Istorijos skaitomos toliau, o ne dulka lentynoje.'],
+    ['books', 'Knygos jūsų kalba', 'Sunkiai randamos lietuviškos, ispaniškos ir kitos knygos – visai šalia.'],
+    ['swapArrows', 'Gera šeimai ir planetai', 'Sutaupote pinigų ir vietos lentynoje, o naujų perkate šiek tiek mažiau.']
+  ]
+});
+Object.assign(window.STRINGS.es, {
+  introTitle: 'Libros infantiles que pasan de familia en familia.',
+  introLead: 'Los libros que tus hijos ya no leen son justo los que otros niños están listos para descubrir. Intercámbialos, véndelos o regálalos a familias cercanas, en tu idioma.',
+  flowTitle: 'Añade un libro en menos de un minuto',
+  flow: [['barcode', 'Escanea', 'el ISBN de la contraportada'], ['camera', 'Foto', 'de tu ejemplar'], ['check', 'Listo', 'los datos se rellenan solos']],
+  howTitle: 'Y luego encuentra nuevos favoritos',
+  how: [
+    ['search', 'Busca libros cerca', 'Filtra por idioma, edad y tema: dinosaurios, hadas, cuentos para dormir y más.'],
+    ['bag', 'Pide varios a la vez', 'Elige varios libros de la misma familia y envía una sola petición.'],
+    ['chat', 'Quedad e intercambiad', 'Acordad hora y lugar en el chat. Intercambia, vende o regala.']
+  ],
+  whyTitle: 'Por qué importa',
+  why: [
+    ['heart', 'Cada libro se quiere dos veces', 'Las historias se siguen leyendo en vez de acumular polvo.'],
+    ['books', 'Libros en tu idioma', 'Títulos en lituano, español y otros idiomas difíciles de encontrar, a la vuelta de la esquina.'],
+    ['swapArrows', 'Bueno para tu familia y el planeta', 'Ahorras dinero y espacio, y compras un poco menos nuevo.']
+  ]
 });
