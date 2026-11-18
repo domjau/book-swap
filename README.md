@@ -43,7 +43,8 @@ The camera only works over HTTPS or on `localhost`.
 - **Add a book, scan first:** scan the ISBN barcode with the phone camera (full-resolution frames are decoded by the phone's built-in BarcodeDetector where available, otherwise by ZXing in WebAssembly; autofocus and 2× zoom where supported), take a photo of the barcode as a backup, type the ISBN, or search by title. Title, author, language, topics and a **description** are filled in. The official cover is never used, only your own photos. There's an optional *About this copy* note for wear and tear. Details are filled in from:
   1. books already in the app (the shared catalogue, which is the best source for Lithuanian books),
   2. Google Books (description, cover, language, categories),
-  3. Open Library (fills in any gaps).
+  3. Open Library (fills in any gaps),
+  4. the National Library of Lithuania's open data on data.gov.lt (live version only, through the `isbn-lookup` Edge Function; asked when the others find nothing, and always for Lithuanian ISBNs).
 
   Topics are suggested from the catalogue categories. If the book isn't found, it can be entered by hand.
 - **Photos:** 1–4 photos of your own copy are **required** for every listing (cover and wear only). They are resized to 720 px on the phone and redrawn on a canvas, which removes EXIF and GPS data.

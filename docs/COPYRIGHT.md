@@ -34,3 +34,9 @@ If the service runs in the EU, it is a hosting service under the **Digital Servi
 4. Keep a simple log of reports and actions.
 
 Planned admin tools: a report queue for organisers, a "hide" action on listings, photos and messages, and the ability to suspend users.
+
+## Book data from the National Library of Lithuania
+
+Titles, authors, languages and age groups can come from the open data set *Bibliografiniai įrašai* of the Martynas Mažvydas National Library of Lithuania, published on data.gov.lt. Only bibliographic facts are used (no covers, no text from the book). When the library supplied the details, the add-book message shows the credit line "Data: Martynas Mažvydas National Library of Lithuania, data.gov.lt." (LT/ES/EN).
+
+**To confirm:** the licence shown on the data set's page on data.gov.lt (most Lithuanian open data is CC BY 4.0, which only asks for this kind of credit). If it says something else, update this section and the `lnbCredit` text in `i18n.js`.

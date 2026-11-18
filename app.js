@@ -1092,7 +1092,22 @@
     ['title', 'author', 'description'].forEach((k) => { if (!out[k]) out[k] = b[k]; });
     if (out.lang === 'other' && b.lang !== 'other') out.lang = b.lang;
     if (!out.topics.length) out.topics = b.topics;
+    if (!out.age && b.age) out.age = b.age;
+    if (!out.id && b.id) out.id = b.id;
+    out.lnb = !!(a.lnb || b.lnb);
     out.source = a.source + ' + ' + b.source;
+    return out;
+  }
+
+  // Lithuanian national library (LNB open data on data.gov.lt), through our isbn-lookup Edge Function.
+  async function lnbByIsbn(isbn13) {
+    const b = window.Backend && await Backend.lookupLnb(isbn13);
+    if (!b || !b.title) return null;
+    const out = {
+      isbn: isbn13, title: b.title, author: b.author || '', description: '', lang: mapLang(b.lang),
+      topics: suggestTopics((b.subjects || '') + ' ' + b.title), source: t('lnbName'), lnb: true
+    };
+    if (AGES.indexOf(b.age) >= 0) out.age = b.age; // otherwise the form's default age stays
     return out;
   }
 
@@ -1110,13 +1125,24 @@
     }
     ui.busy = true; ui.busyIsbn = isbn; ui.addMsg = ''; render();
     // 2. Google Books and Open Library at the same time; combine what they know.
+    //    The Lithuanian national library is asked as well for Lithuanian ISBNs (978-609, 978-9955, 978-9986),
+    //    and otherwise only when neither of the big catalogues has a title.
+    const ltIsbn = /^978(609|9955|9986)/.test(isbn);
+    const lnbAsk = ltIsbn ? lnbByIsbn(isbn) : null;
     const results = await Promise.all([googleByIsbn(isbn, isbn10).catch(() => null), openLibraryByIsbn(isbn, isbn10).catch(() => null)]);
-    const found = await findDescription(mergeFound(results[0], results[1])).catch(() => mergeFound(results[0], results[1]));
+    let merged = mergeFound(results[0], results[1]);
+    if (lnbAsk || !(merged && merged.title)) {
+      const lnb = await (lnbAsk || lnbByIsbn(isbn));
+      // For Lithuanian books the library's title, author and language are the most reliable.
+      merged = ltIsbn ? mergeFound(lnb, merged) : mergeFound(merged, lnb);
+    }
+    if (merged && ltIsbn && merged.lang === 'other') merged.lang = 'lt'; // Lithuanian ISBN ranges
+    const found = await findDescription(merged).catch(() => merged);
     ui.busy = false; ui.busyIsbn = '';
     if (found && found.title) {
       found.isbn = isbn;
       startDraft(found);
-      ui.addMsg = t('foundIsbn', { isbn: isbn, src: found.source }) + (found.description ? '' : ' ' + t('noDescFound')); ui.addMsgKind = 'ok';
+      ui.addMsg = t('foundIsbn', { isbn: isbn, src: found.source }) + (found.description ? '' : ' ' + t('noDescFound')) + (found.lnb ? ' ' + t('lnbCredit') : ''); ui.addMsgKind = 'ok';
     } else {
       startDraft({ isbn: isbn });
       ui.addMsg = t('notFoundIsbn', { isbn: isbn }); ui.addMsgKind = 'warn';
