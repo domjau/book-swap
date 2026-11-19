@@ -8,7 +8,7 @@
 // - normalises the ISBN and searches the forms cataloguers actually use (hyphenated 13 and 10, bare digits);
 // - checks every hit really carries this ISBN;
 // - caches hits for 90 days and misses for 14 days in public.isbn_lookup_cache (migration 006);
-// - at most 4 small requests per lookup, 4 s each, 9 s in total; never bulk-downloads;
+// - at most 4 small requests per lookup, 8 s each, 24 s in total; never bulk-downloads;
 // - fair use: 30 library calls per member per hour, 300 per hour for the whole app (cache hits are free);
 // - any failure (timeout, API down, quota) answers { found: false } so the app just carries on.
 //
@@ -20,8 +20,8 @@ import { toIsbn13, candidates, bestRecord, mapRecord, queryUrl, rowsOf } from '.
 
 const HIT_DAYS = 90;
 const MISS_DAYS = 14;
-const PER_REQUEST_MS = 4000;
-const TOTAL_MS = 9000;
+const PER_REQUEST_MS = 8000;
+const TOTAL_MS = 24000;
 const USER_PER_HOUR = 30;
 const ALL_PER_HOUR = 300;
 const ALLOWED_ORIGINS = ['https://domjau.github.io', 'http://localhost:8000', 'http://127.0.0.1:8000'];
@@ -41,11 +41,20 @@ const reply = (req: Request, body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors(req), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
 async function fetchJson(url: string, ms: number) {
+  // Logs (Edge Functions → isbn-lookup → Logs) say how long the library took to answer and where it stalled.
+  const t0 = Date.now(); let stage = 'connect';
   const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), ms);
   try {
-    const r = await fetch(url, { signal: ctl.signal, headers: { Accept: 'application/json', 'User-Agent': 'seku-seku-isbn-lookup/1.0' } });
+    const r = await fetch(url, { signal: ctl.signal, headers: { Accept: 'application/json' } });
+    stage = 'body';
+    const headersMs = Date.now() - t0;
+    const text = await r.text();
+    console.log('lnb', r.status, 'headers ' + headersMs + 'ms', 'total ' + (Date.now() - t0) + 'ms', text.length + ' bytes', text.slice(0, 160).replace(/\s+/g, ' '));
     if (!r.ok) throw new Error('LNB HTTP ' + r.status);
-    return await r.json();
+    return JSON.parse(text);
+  } catch (e) {
+    console.warn('lnb failed at ' + stage + ' after ' + (Date.now() - t0) + 'ms:', String(e), url.slice(url.indexOf('?')).slice(0, 120));
+    throw e;
   } finally { clearTimeout(timer); }
 }
 

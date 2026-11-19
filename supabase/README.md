@@ -39,7 +39,7 @@ When Google Books and Open Library don't know a scanned ISBN (and always for Lit
 2. **Edge Functions → Deploy a new function**, name it `isbn-lookup`, and add both files from [`functions/isbn-lookup/`](functions/isbn-lookup/) (`index.ts` and `lnb.js`). In the function's settings turn **Verify JWT** off: it checks the member's sign-in itself. No secrets are needed.
 3. Try it: add a book with a Lithuanian ISBN, e.g. 978-609-01-1060-7.
 
-How it treats the library's API: it normalises the ISBN and searches the forms cataloguers use (hyphenated ISBN-13 and ISBN-10, then bare digits; this finds about 98% of the ISBNs in a 10,000-record sample), checks that a hit really has this ISBN, caches hits for 90 days and misses for 14 days, makes at most 4 requests (4 s each, 9 s in total) per lookup, and allows 30 library calls per member and 300 for the whole app per hour. Errors are not cached, and the app carries on without the library.
+How it treats the library's API: it normalises the ISBN and searches the forms cataloguers use (hyphenated ISBN-13 and ISBN-10, then bare digits; this finds about 98% of the ISBNs in a 10,000-record sample), checks that a hit really has this ISBN, caches hits for 90 days and misses for 14 days, makes at most 4 requests (8 s each, 24 s in total) per lookup, and allows 30 library calls per member and 300 for the whole app per hour. Errors are not cached, and the app carries on without the library.
 
 Helper tests: `npm i --no-save isbn3@2.0.13 && node supabase/functions/isbn-lookup/lnb_test.mjs` (25 checks) and `bash supabase/tests/isbn_lookup_test.sh` (16 checks for migration 006).
 

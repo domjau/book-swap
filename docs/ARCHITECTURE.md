@@ -54,7 +54,7 @@ scan barcode / type ISBN / search title
 3. National Library of Lithuania (LNB open data on data.gov.lt) through the
    `isbn-lookup` Edge Function: searches the ISBN in the forms cataloguers use
    (hyphenated 13 and 10, bare digits), checks the hit, caches hits 90 days and
-   misses 14 days, max 4 requests / 9 s per lookup, 30 per member per hour.
+   misses 14 days, max 4 requests / 24 s per lookup, 30 per member per hour.
    For Lithuanian ISBNs its title, author, language and age group win.
         │ nothing
         ▼
