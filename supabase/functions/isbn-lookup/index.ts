@@ -5,10 +5,11 @@
 //   POST { "isbn": "978-609-417-092-8" }  →  { found: true, book: {...}, cached: false } | { found: false }
 //
 // Smart about the library's API:
-// - normalises the ISBN and searches the forms cataloguers actually use (hyphenated 13 and 10, bare digits);
+// - normalises the ISBN and searches the forms cataloguers actually use (hyphenated 13 and 10, bare digits),
+//   the three most likely searches (exact and "contains" for the hyphenated ISBN-13, the hyphenated ISBN-10) at the same time;
 // - checks every hit really carries this ISBN;
 // - caches hits for 90 days and misses for 14 days in public.isbn_lookup_cache (migration 006);
-// - at most 4 small requests per lookup, 4 s each, 9 s in total; never bulk-downloads;
+// - at most 5 small requests per lookup (3 at once, then 2 more only if nothing was found), 8 s each, 24 s in total; never bulk-downloads;
 // - fair use: 30 library calls per member per hour, 300 per hour for the whole app (cache hits are free);
 // - any failure (timeout, API down, quota) answers { found: false } so the app just carries on.
 //
@@ -16,12 +17,12 @@
 // (that also works with the new publishable keys). SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import ISBN from 'npm:isbn3@2.0.13';
-import { toIsbn13, candidates, bestRecord, mapRecord, queryUrl, rowsOf } from './lnb.js';
+import { toIsbn13, askLibrary as askLnb } from './lnb.js';
 
 const HIT_DAYS = 90;
 const MISS_DAYS = 14;
-const PER_REQUEST_MS = 4000;
-const TOTAL_MS = 9000;
+const PER_REQUEST_MS = 8000;
+const TOTAL_MS = 24000;
 const USER_PER_HOUR = 30;
 const ALL_PER_HOUR = 300;
 const ALLOWED_ORIGINS = ['https://domjau.github.io', 'http://localhost:8000', 'http://127.0.0.1:8000'];
@@ -41,31 +42,26 @@ const reply = (req: Request, body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors(req), 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
 async function fetchJson(url: string, ms: number) {
+  // Logs (Edge Functions → isbn-lookup → Logs) say how long the library took to answer and where it stalled.
+  const t0 = Date.now(); let stage = 'connect';
   const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), ms);
   try {
-    const r = await fetch(url, { signal: ctl.signal, headers: { Accept: 'application/json', 'User-Agent': 'seku-seku-isbn-lookup/1.0' } });
+    const r = await fetch(url, { signal: ctl.signal, headers: { Accept: 'application/json' } });
+    stage = 'body';
+    const headersMs = Date.now() - t0;
+    const text = await r.text();
+    console.log('lnb', r.status, 'headers ' + headersMs + 'ms', 'total ' + (Date.now() - t0) + 'ms', text.length + ' bytes', text.slice(0, 160).replace(/\s+/g, ' '));
     if (!r.ok) throw new Error('LNB HTTP ' + r.status);
-    return await r.json();
+    return JSON.parse(text);
+  } catch (e) {
+    console.warn('lnb failed at ' + stage + ' after ' + (Date.now() - t0) + 'ms:', String(e), url.slice(url.indexOf('?')).slice(0, 120));
+    throw e;
   } finally { clearTimeout(timer); }
 }
 
 // Returns the book, null for a clean miss, or throws if the library could not be asked properly.
-async function askLibrary(isbn13: string) {
-  const started = Date.now(); let errors = 0; let asked = 0;
-  for (const c of candidates(isbn13, ISBN.parse).slice(0, 4)) {
-    const left = TOTAL_MS - (Date.now() - started);
-    if (left < 800) break;
-    try {
-      asked++;
-      const rec = bestRecord(rowsOf(await fetchJson(queryUrl(c), Math.min(PER_REQUEST_MS, left))), isbn13);
-      if (rec) return mapRecord(rec, isbn13);
-    } catch (e) {
-      errors++; console.warn('isbn-lookup', c, String(e));
-    }
-  }
-  if (!asked || errors === asked) throw new Error('library unavailable');
-  return null;
-}
+const askLibrary = (isbn13: string) =>
+  askLnb(isbn13, { parse: ISBN.parse, fetchJson, perRequestMs: PER_REQUEST_MS, totalMs: TOTAL_MS, log: console.log });
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors(req) });

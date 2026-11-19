@@ -68,7 +68,7 @@
       try {
         const res = await Promise.race([
           sb.functions.invoke('isbn-lookup', { body: { isbn: isbn } }),
-          new Promise((resolve) => setTimeout(() => resolve({ error: 'timeout' }), 12000))
+          new Promise((resolve) => setTimeout(() => resolve({ error: 'timeout' }), 26000))
         ]);
         return !res.error && res.data && res.data.found && res.data.book ? res.data.book : null;
       } catch (e) { return null; }

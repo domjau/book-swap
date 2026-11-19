@@ -97,7 +97,7 @@ export function mapRecord(rec, isbn13) {
     author: cleanAuthor(rec.leidinio_autorius),
     lang: mapLang(rec.leidinio_kalba),
     age: mapAge(rec.leidinio_auditorija),
-    year: /^\d{4}$/.test(String(rec.publikavimo_metai || '').trim()) ? String(rec.publikavimo_metai).trim() : '',
+    year: (String(rec.publikavimo_metai || '').match(/\d{4}/) || [''])[0], // "[2013]" → "2013"
     subjects: String(rec.leidinio_dalykas || '').slice(0, 400),
     forChildren: isForChildren(rec),
     source: 'LNB'
@@ -111,10 +111,53 @@ export function bestRecord(recs, isbn13) {
   return ok.sort((a, b) => score(b) - score(a))[0] || null;
 }
 
-// Spinta query: field.contains("…")&select(…)&limit(n), JSON format.
-export function queryUrl(candidate, limit = 5) {
-  const q = 'leidinio_isbn.contains(' + encodeURIComponent(JSON.stringify(String(candidate))) + ')&select(' + LNB_FIELDS.join(',') + ')&limit(' + limit + ')';
-  return LNB_URL + '/:format/json?' + q;
+// Spinta query, JSON format. mode 'contains' → leidinio_isbn.contains("…") (also finds the ISBN inside a
+// "; "-separated list); mode 'exact' → leidinio_isbn="…" (may be quicker, only matches a field that is exactly this ISBN).
+export function queryUrl(candidate, limit = 5, mode = 'contains') {
+  const v = encodeURIComponent(JSON.stringify(String(candidate)));
+  const filter = mode === 'exact' ? 'leidinio_isbn=' + v : 'leidinio_isbn.contains(' + v + ')';
+  return LNB_URL + '/:format/json?' + filter + '&select(' + LNB_FIELDS.join(',') + ')&limit(' + limit + ')';
+}
+
+// The searches worth running, best first: [candidate, mode]. The first three are started together.
+export function plan(isbn13, parse) {
+  const c = candidates(isbn13, parse);
+  const out = [];
+  if (c[0]) { out.push([c[0], 'exact']); out.push([c[0], 'contains']); }
+  if (c[1]) out.push([c[1], 'contains']);
+  for (const x of c.slice(2, 4)) out.push([x, 'contains']);
+  return out;
 }
 // Spinta answers {"_data": [...]}; accept a bare array too.
 export const rowsOf = (json) => (Array.isArray(json) ? json : (json && Array.isArray(json._data) ? json._data : []));
+
+// Asks the library for one book. Resolves with the book, null for a clean miss, and throws only when the
+// library could not be asked at all (every request failed). fetchJson(url, ms) is passed in so this can be tested.
+export async function askLibrary(isbn13, { parse, fetchJson, perRequestMs, totalMs, log = () => {} }) {
+  const started = Date.now();
+  const steps = plan(isbn13, parse);
+  let asked = 0; let errors = 0;
+  // One search: the book it finds, or null. A failure is counted, not thrown.
+  const run = async ([c, mode]) => {
+    const left = totalMs - (Date.now() - started);
+    if (left < 800) return null;
+    asked++;
+    const t0 = Date.now();
+    try {
+      const rec = bestRecord(rowsOf(await fetchJson(queryUrl(c, 5, mode), Math.min(perRequestMs, left))), isbn13);
+      log('lnb search', mode, c, rec ? 'hit' : 'miss', (Date.now() - t0) + 'ms');
+      return rec ? mapRecord(rec, isbn13) : null;
+    } catch (e) { errors++; return null; }
+  };
+  // The first three at the same time; the first real hit wins without waiting for the others.
+  const group = steps.slice(0, 3);
+  const first = await new Promise((resolve) => {
+    let pending = group.length;
+    if (!pending) return resolve(null);
+    for (const st of group) run(st).then((r) => { if (r) resolve(r); else if (--pending === 0) resolve(null); });
+  });
+  if (first) return first;
+  for (const st of steps.slice(3)) { const r = await run(st); if (r) return r; }
+  if (!asked || errors === asked) throw new Error('library unavailable');
+  return null;
+}
