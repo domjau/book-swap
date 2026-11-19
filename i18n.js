@@ -770,3 +770,17 @@ Object.assign(window.STRINGS.es, {
     ['swapArrows', 'Bueno para tu familia y el planeta', 'Ahorras dinero y espacio, y compras un poco menos nuevo.']
   ]
 });
+
+// Lithuanian national library lookup (isbn-lookup Edge Function)
+Object.assign(window.STRINGS.lt, {
+  lnbName: 'Lietuvos nacionalinė biblioteka',
+  lnbCredit: 'Duomenys: Lietuvos nacionalinė Martyno Mažvydo biblioteka, data.gov.lt.'
+});
+Object.assign(window.STRINGS.es, {
+  lnbName: 'Biblioteca Nacional de Lituania',
+  lnbCredit: 'Datos: Biblioteca Nacional Martynas Mažvydas de Lituania, data.gov.lt.'
+});
+Object.assign(window.STRINGS.en, {
+  lnbName: 'National Library of Lithuania',
+  lnbCredit: 'Data: Martynas Mažvydas National Library of Lithuania, data.gov.lt.'
+});

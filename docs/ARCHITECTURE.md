@@ -49,6 +49,13 @@ scan barcode / type ISBN / search title
    scripts removed), the Open Library edition and work records, then another
    edition of the same title and author (same language first)
    Covers are never fetched – only the owner's photos are used
+        │ no title (or always, for Lithuanian ISBNs 978-609 / 978-9955 / 978-9986)
+        ▼
+3. National Library of Lithuania (LNB open data on data.gov.lt) through the
+   `isbn-lookup` Edge Function: searches the ISBN in the forms cataloguers use
+   (hyphenated 13 and 10, bare digits), checks the hit, caches hits 90 days and
+   misses 14 days, max 4 requests / 9 s per lookup, 30 per member per hour.
+   For Lithuanian ISBNs its title, author, language and age group win.
         │ nothing
         ▼
 4. Manual entry (title + photo is enough). The ISBN is still saved,
@@ -57,7 +64,7 @@ scan barcode / type ISBN / search title
 
 Topics are suggested by matching catalogue categories, subjects and description against keyword lists in `data.js` (short keywords must be whole words, so "pet" doesn't match "petit").
 
-**Coverage limits.** Free catalogues miss many European and small-language editions. For production, a server-side lookup (Edge Function with caching) can add national library catalogues such as the BnF (France), DNB (Germany) and LIBIS (Lithuania), or a paid service like ISBNdb. The shared catalogue means every book only has to be typed in once.
+**Coverage limits.** Free catalogues miss many European and small-language editions. The Lithuanian national library is now asked through the `isbn-lookup` Edge Function (only about one in ten of its records has an ISBN, but those include most Lithuanian children's books). The same pattern can add the BnF (France) or DNB (Germany) later, or a paid service like ISBNdb. The shared catalogue means every book only has to be typed in once.
 
 ## 2. Live version (Supabase) – implemented
 

@@ -25,7 +25,7 @@
 | Requests & chat messages | Arranging the swap | The two people involved (+ admins for a reported conversation) | Device only | Server |
 | Profile stats | Fun | Only you | Calculated on device | Calculated from the above |
 
-Book lookups send **only the ISBN or the search text** to Google Books / Open Library, with no user information.
+Book lookups send **only the ISBN or the search text** to Google Books / Open Library, with no user information. Lookups in the National Library of Lithuania go through our own server (Edge Function `isbn-lookup`), which sends only the ISBN to data.gov.lt. To stop overuse, the server notes which member made a library call and when (no ISBN), and deletes these notes after one day. Results are cached per ISBN, with no user information.
 
 ## Photos
 

@@ -1,6 +1,7 @@
 drop database if exists bs; create database bs;
 \c bs
-do $$ begin if not exists (select 1 from pg_roles where rolname='anon') then create role anon nologin; end if; if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if; end $$;
+do $$ begin if not exists (select 1 from pg_roles where rolname='anon') then create role anon nologin; end if; if not exists (select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if; if not exists (select 1 from pg_roles where rolname='service_role') then create role service_role nologin bypassrls; end if; end $$;
+grant usage on schema public to service_role;
 grant usage on schema public to anon, authenticated;
 create schema auth; create schema storage;
 grant usage on schema auth, storage to anon, authenticated;

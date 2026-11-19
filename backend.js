@@ -61,6 +61,19 @@
     },
     async signOut() { if (enabled) await sb.auth.signOut(); },
 
+    // ---------- book lookup (Lithuanian national library, via the isbn-lookup Edge Function) ----------
+    // Resolves to the book or null; never throws, so the add-book flow just carries on without it.
+    async lookupLnb(isbn) {
+      if (!enabled) return null;
+      try {
+        const res = await Promise.race([
+          sb.functions.invoke('isbn-lookup', { body: { isbn: isbn } }),
+          new Promise((resolve) => setTimeout(() => resolve({ error: 'timeout' }), 12000))
+        ]);
+        return !res.error && res.data && res.data.found && res.data.book ? res.data.book : null;
+      } catch (e) { return null; }
+    },
+
     // ---------- membership ----------
     async myMembership(uid) {
       const rows = check(await sb.from('members').select('group_id, role, display_name, country, postal_code, interested_langs, terms_version, groups(name, handover_place, handover_day)').eq('user_id', uid).limit(1));

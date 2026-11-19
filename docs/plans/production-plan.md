@@ -28,8 +28,9 @@ Live app: https://domjau.github.io/book-swap/ · Repo: github.com/domjau/book-sw
 Catalogue
 - [ ] **Claude** – `catalogue` table + Python import script for the national library data (runs on your PC) + scanner checks it first
 - [ ] **Claude** – Save manually typed books to the shared catalogue so the next scan finds them
-- [ ] **Claude** – ISBNs starting 978-609 / 978-9955 / 978-9986 default to Lithuanian
-- [ ] **Claude** – "Book data: National Library of Lithuania" credit line
+- [x] **Claude** – Live lookup in the national library's open data (Edge Function `isbn-lookup`, cached) when Google Books / Open Library miss, and always for Lithuanian ISBNs. **You**: run migration 006 and deploy the function (`supabase/README.md`)
+- [x] **Claude** – ISBNs starting 978-609 / 978-9955 / 978-9986 default to Lithuanian
+- [x] **Claude** – "Book data: National Library of Lithuania" credit line (shown when the library supplied the details)
 
 Privacy and law (GDPR, DSA)
 - [ ] **Claude** – Privacy notice page in the app (LT/ES/EN)
