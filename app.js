@@ -1125,14 +1125,18 @@
     }
     ui.busy = true; ui.busyIsbn = isbn; ui.addMsg = ''; render();
     // 2. Google Books and Open Library at the same time; combine what they know.
-    //    The Lithuanian national library is asked as well for Lithuanian ISBNs (978-609, 978-9955, 978-9986),
-    //    and otherwise only when neither of the big catalogues has a title.
+    //    The Lithuanian national library is asked straight away for Lithuanian ISBNs (978-609, 978-9955, 978-9986),
+    //    and for other books as soon as the big catalogues are slow (1.5 s) or have no title, so we never wait for them in turn.
+    //    When Google/Open Library already have a title, the library's answer is not waited for.
     const ltIsbn = /^978(609|9955|9986)/.test(isbn);
-    const lnbAsk = ltIsbn ? lnbByIsbn(isbn) : null;
-    const results = await Promise.all([googleByIsbn(isbn, isbn10).catch(() => null), openLibraryByIsbn(isbn, isbn10).catch(() => null)]);
+    let lnbAsk = ltIsbn ? lnbByIsbn(isbn) : null;
+    const baseAsk = Promise.all([googleByIsbn(isbn, isbn10).catch(() => null), openLibraryByIsbn(isbn, isbn10).catch(() => null)]);
+    const slowTimer = ltIsbn ? null : setTimeout(() => { if (!lnbAsk) lnbAsk = lnbByIsbn(isbn); }, 1500);
+    const results = await baseAsk;
+    clearTimeout(slowTimer);
     let merged = mergeFound(results[0], results[1]);
-    if (lnbAsk || !(merged && merged.title)) {
-      const lnb = await (lnbAsk || lnbByIsbn(isbn));
+    if (ltIsbn || !(merged && merged.title)) {
+      const lnb = await (lnbAsk || (lnbAsk = lnbByIsbn(isbn)));
       // For Lithuanian books the library's title, author and language are the most reliable.
       merged = ltIsbn ? mergeFound(lnb, merged) : mergeFound(merged, lnb);
     }

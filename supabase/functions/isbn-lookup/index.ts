@@ -5,10 +5,11 @@
 //   POST { "isbn": "978-609-417-092-8" }  →  { found: true, book: {...}, cached: false } | { found: false }
 //
 // Smart about the library's API:
-// - normalises the ISBN and searches the forms cataloguers actually use (hyphenated 13 and 10, bare digits);
+// - normalises the ISBN and searches the forms cataloguers actually use (hyphenated 13 and 10, bare digits),
+//   the three most likely searches (exact and "contains" for the hyphenated ISBN-13, the hyphenated ISBN-10) at the same time;
 // - checks every hit really carries this ISBN;
 // - caches hits for 90 days and misses for 14 days in public.isbn_lookup_cache (migration 006);
-// - at most 4 small requests per lookup, 8 s each, 24 s in total; never bulk-downloads;
+// - at most 5 small requests per lookup (3 at once, then 2 more only if nothing was found), 8 s each, 24 s in total; never bulk-downloads;
 // - fair use: 30 library calls per member per hour, 300 per hour for the whole app (cache hits are free);
 // - any failure (timeout, API down, quota) answers { found: false } so the app just carries on.
 //
@@ -16,7 +17,7 @@
 // (that also works with the new publishable keys). SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import ISBN from 'npm:isbn3@2.0.13';
-import { toIsbn13, candidates, bestRecord, mapRecord, queryUrl, rowsOf } from './lnb.js';
+import { toIsbn13, askLibrary as askLnb } from './lnb.js';
 
 const HIT_DAYS = 90;
 const MISS_DAYS = 14;
@@ -59,22 +60,8 @@ async function fetchJson(url: string, ms: number) {
 }
 
 // Returns the book, null for a clean miss, or throws if the library could not be asked properly.
-async function askLibrary(isbn13: string) {
-  const started = Date.now(); let errors = 0; let asked = 0;
-  for (const c of candidates(isbn13, ISBN.parse).slice(0, 4)) {
-    const left = TOTAL_MS - (Date.now() - started);
-    if (left < 800) break;
-    try {
-      asked++;
-      const rec = bestRecord(rowsOf(await fetchJson(queryUrl(c), Math.min(PER_REQUEST_MS, left))), isbn13);
-      if (rec) return mapRecord(rec, isbn13);
-    } catch (e) {
-      errors++; console.warn('isbn-lookup', c, String(e));
-    }
-  }
-  if (!asked || errors === asked) throw new Error('library unavailable');
-  return null;
-}
+const askLibrary = (isbn13: string) =>
+  askLnb(isbn13, { parse: ISBN.parse, fetchJson, perRequestMs: PER_REQUEST_MS, totalMs: TOTAL_MS, log: console.log });
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors(req) });

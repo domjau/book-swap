@@ -40,7 +40,8 @@ scan barcode / type ISBN / search title
    → best for Lithuanian and other small-language books
         │ not found
         ▼
-2. In parallel:
+2. In parallel (the library is started at once for Lithuanian ISBNs, and as soon as the big
+   catalogues have no title or take over 1.5 s; it is not waited for when they already have one):
    Google Books   → isbn:<13 digits>, then isbn:<10 digits>, then a plain search
    Open Library   → books API (edition), search index (bigger coverage,
                     language, subjects), then the work record for a description
@@ -54,7 +55,7 @@ scan barcode / type ISBN / search title
 3. National Library of Lithuania (LNB open data on data.gov.lt) through the
    `isbn-lookup` Edge Function: searches the ISBN in the forms cataloguers use
    (hyphenated 13 and 10, bare digits), checks the hit, caches hits 90 days and
-   misses 14 days, max 4 requests / 24 s per lookup, 30 per member per hour.
+   misses 14 days, the 3 likeliest searches at once (max 5 requests / 24 s per lookup), 30 per member per hour.
    For Lithuanian ISBNs its title, author, language and age group win.
         │ nothing
         ▼
