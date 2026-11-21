@@ -1,6 +1,6 @@
 # seku seku – path to production
 
-Last updated: 2026-11-15. Owner: Dominykas (data controller). Tasks marked **You** need your accounts or decisions; **Claude** is code and docs.
+Last updated: 2026-11-21. Owner: Dominykas (data controller). Tasks marked **You** need your accounts or decisions; **Claude** is code and docs.
 Details on legal and safety items: "seku seku – EU compliance and safety plan" (Claude Docs). Marketing: `docs/plans/marketing-plan.md`.
 
 **Live status board:** https://claude.ai/artifact/VEtXespjHQjm9UsacC8rTw – the source of truth for task status (timeline, board, list; 71 tasks, product + marketing). Readable snapshot: `docs/plans/launch-board.md`. This file is the readable plan; the board tracks progress.
@@ -33,19 +33,19 @@ Catalogue
 - [x] **Claude** – "Book data: National Library of Lithuania" credit line (shown when the library supplied the details)
 
 Privacy and law (GDPR, DSA)
-- [ ] **Claude** – Privacy notice page in the app (LT/ES/EN)
-- [ ] **Claude** – Terms: your name, country, contact email; 18+ checkbox at sign-up
-- [ ] **Claude** – Delete my account + Download my data in the live app
-- [ ] **Claude** – Automatic clean-up (old notifications, old chats, inactive accounts)
-- [ ] **Claude** – Report button on listings and profiles; report form for non-members
-- [ ] **Claude** – Statement of reasons when an admin hides a listing or removes a member
-- [ ] **Claude** – Record of processing + one-page breach plan (in `docs/`)
+- [x] **Claude** – Privacy notice page in the app (LT/ES/EN) – `#/privacy`, plus `#/about` with the data sources
+- [ ] **Claude** – Terms: your name, country, contact email; 18+ checkbox at sign-up – 18+ checkbox and terms §1a done (21 Nov); name, country and email go in `TERMS.operator` once you choose them
+- [x] **Claude** – Delete my account + Download my data in the live app (migration 007)
+- [x] **Claude** – Automatic clean-up (old notifications, old chats) – migration 007; gone books and inactive accounts wait for email and an Edge Function
+- [x] **Claude** – Report button on listings and profiles; report page for non-members (`#/report`)
+- [x] **Claude** – Statement of reasons when an admin hides a listing or removes a member
+- [x] **Claude** – Record of processing + one-page breach plan (`docs/compliance/`)
 
 Safety and moderation
 - [ ] **You** – OpenAI API account; key saved as a Supabase secret (never in the app)
 - [ ] **Claude** – Automatic check of photos, titles, descriptions, names before publishing; "waiting for review" queue
-- [ ] **Claude** – Word lists (LT/ES/EN), auto-hide after 3 reports, new-account limits
-- [ ] **Claude** – Scam warnings in chat; display names can't impersonate admins
+- [x] **Claude** – Word lists (LT/ES/EN), auto-hide after 3 reports, new-account limits
+- [x] **Claude** – Scam warnings in chat; display names can't impersonate admins
 - [ ] **You** – Cloudflare account for Turnstile (free CAPTCHA); **Claude** adds it to sign-up
 
 Security basics

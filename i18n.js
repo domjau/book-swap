@@ -784,3 +784,56 @@ Object.assign(window.STRINGS.en, {
   lnbName: 'National Library of Lithuania',
   lnbCredit: 'Data: Martynas Mažvydas National Library of Lithuania, data.gov.lt.'
 });
+
+// Privacy and safety: privacy notice, about page, report page, 18+, delete account, moderation notices, scam warnings
+Object.assign(window.STRINGS.lt, {
+  privacyLink: 'Privatumo pranešimas', aboutLink: 'Apie seku seku ir duomenų šaltinius', reportInfoLink: 'Pranešti apie neteisėtą turinį',
+  updatedOn: 'Atnaujinta {date}', operatorUnnamed: 'savanoris, kuris prižiūri seku seku',
+  confirmAdult: 'Man yra 18 metų ar daugiau', adultRequired: 'seku seku skirta tik suaugusiesiems (18+).',
+  deleteAccount: 'Ištrinti mano paskyrą', confirmDeleteAccount: 'Tikrai ištrinti paskyrą? Jūsų profilis, knygos, nuotraukos, norai, pokalbiai ir įvertinimai bus ištrinti visam laikui.',
+  accountDeleted: 'Paskyra ištrinta. Ačiū, kad buvote su mumis!',
+  errNameNotAllowed: 'Toks vardas negalimas – jis gali atrodyti kaip administratoriaus. Pasirinkite kitą.',
+  errTextNotAllowed: 'Tekste yra netinkamų žodžių. Pataisykite ir bandykite dar kartą.',
+  errDailyLimit: 'Šiandien pasiekėte dienos limitą. Bandykite rytoj.',
+  errLastAdminDelete: 'Prieš ištrindami paskutinę administratoriaus paskyrą, pridėkite kitą administratorių.',
+  n_mod_hide_book: 'Jūsų skelbimą „{title}“ paslėpė administratorius.', n_mod_unhide_book: 'Jūsų skelbimas „{title}“ vėl matomas.',
+  n_mod_auto_hide_book: 'Jūsų skelbimas „{title}“ automatiškai paslėptas, nes apie jį pranešė 3 nariai. Administratorius jį peržiūrės.',
+  n_mod_remove: 'Administratorius pašalino jūsų profilį.', n_mod_remove_and_ban: 'Administratorius pašalino ir užblokavo jūsų paskyrą.',
+  n_mod_reason: 'Priežastis: {reason}.', n_mod_auto: 'Tai padaryta automatiškai.',
+  n_mod_appeal: 'Jei manote, kad tai klaida, parašykite mums (žr. sąlygų skyrių „Kontaktai“).',
+  scamWarning: 'Būkite atsargūs: nemokėkite iš anksto, nesidalykite banko ar kortelės duomenimis ir susitikite viešoje vietoje.'
+});
+Object.assign(window.STRINGS.es, {
+  privacyLink: 'Aviso de privacidad', aboutLink: 'Sobre seku seku y fuentes de datos', reportInfoLink: 'Denunciar contenido ilegal',
+  updatedOn: 'Actualizado el {date}', operatorUnnamed: 'el voluntario que gestiona seku seku',
+  confirmAdult: 'Tengo 18 años o más', adultRequired: 'seku seku es solo para adultos (18+).',
+  deleteAccount: 'Borrar mi cuenta', confirmDeleteAccount: '¿Seguro que quieres borrar tu cuenta? Se borrarán para siempre tu perfil, libros, fotos, deseos, chats y valoraciones.',
+  accountDeleted: 'Cuenta borrada. ¡Gracias por haber estado con nosotros!',
+  errNameNotAllowed: 'Ese nombre no está permitido: podría parecer de un administrador. Elige otro.',
+  errTextNotAllowed: 'El texto contiene palabras no permitidas. Corrígelo e inténtalo de nuevo.',
+  errDailyLimit: 'Has llegado al límite de hoy. Inténtalo mañana.',
+  errLastAdminDelete: 'Añade otro administrador antes de borrar la última cuenta de administrador.',
+  n_mod_hide_book: 'Un administrador ha ocultado tu anuncio «{title}».', n_mod_unhide_book: 'Tu anuncio «{title}» vuelve a estar visible.',
+  n_mod_auto_hide_book: 'Tu anuncio «{title}» se ha ocultado automáticamente porque 3 miembros lo han denunciado. Un administrador lo revisará.',
+  n_mod_remove: 'Un administrador ha eliminado tu perfil.', n_mod_remove_and_ban: 'Un administrador ha eliminado y bloqueado tu cuenta.',
+  n_mod_reason: 'Motivo: {reason}.', n_mod_auto: 'Se ha hecho automáticamente.',
+  n_mod_appeal: 'Si crees que es un error, escríbenos (ver «Contacto» en las condiciones).',
+  scamWarning: 'Cuidado: no pagues por adelantado, no compartas datos bancarios ni de tarjeta y quedad en un lugar público.'
+});
+Object.assign(window.STRINGS.en, {
+  privacyLink: 'Privacy notice', aboutLink: 'About seku seku and data sources', reportInfoLink: 'Report illegal content',
+  updatedOn: 'Updated {date}', operatorUnnamed: 'the volunteer who runs seku seku',
+  confirmAdult: 'I am 18 or older', adultRequired: 'seku seku is for adults only (18+).',
+  deleteAccount: 'Delete my account', confirmDeleteAccount: 'Really delete your account? Your profile, books, photos, wishes, chats and reviews will be deleted for good.',
+  accountDeleted: 'Account deleted. Thank you for being part of seku seku!',
+  errNameNotAllowed: 'That name isn\'t allowed – it could look like an admin. Please choose another.',
+  errTextNotAllowed: 'The text contains words that aren\'t allowed. Please change it and try again.',
+  errDailyLimit: 'You\'ve reached today\'s limit. Please try again tomorrow.',
+  errLastAdminDelete: 'Add another admin before deleting the last admin account.',
+  n_mod_hide_book: 'An admin hid your listing "{title}".', n_mod_unhide_book: 'Your listing "{title}" is visible again.',
+  n_mod_auto_hide_book: 'Your listing "{title}" was hidden automatically because 3 members reported it. An admin will look at it.',
+  n_mod_remove: 'An admin removed your profile.', n_mod_remove_and_ban: 'An admin removed and blocked your account.',
+  n_mod_reason: 'Reason: {reason}.', n_mod_auto: 'This was done automatically.',
+  n_mod_appeal: 'If you think this is a mistake, write to us (see "Contact" in the terms).',
+  scamWarning: 'Be careful: don\'t pay in advance, never share bank or card details, and meet in a public place.'
+});

@@ -105,6 +105,18 @@
       check(await sb.from('members').delete().eq('group_id', groupId).eq('user_id', uid));
     },
 
+    // Delete my account: remove my photos (storage can't be emptied from SQL), then the account itself,
+    // which deletes profile, books, wishes, chats, reviews, reports and notifications on the server.
+    async deleteAccount(groupId, uid) {
+      if (groupId) {
+        const list = check(await sb.storage.from(BUCKET).list(groupId + '/' + uid, { limit: 1000 }));
+        const paths = (list || []).map((f) => groupId + '/' + uid + '/' + f.name);
+        if (paths.length) check(await sb.storage.from(BUCKET).remove(paths));
+      }
+      check(await sb.rpc('delete_my_account'));
+    },
+    async exportMyData() { return check(await sb.rpc('export_my_data')); },
+
     // ---------- data ----------
     async loadGroup(groupId) {
       const [members, books, wishes, reviews] = await Promise.all([

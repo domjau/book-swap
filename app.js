@@ -275,7 +275,9 @@
       <details class="card pad-m notif-setup" open><summary class="h3">${esc(t('notifSettings'))}</summary><p class="muted small">${esc(t('notifSettingsHint'))}</p>${prefsEditor(false)}</details>
       <div class="notice">${icon('shield', 20)} <span>${esc(t('p2pNote'))}</span></div>
       <label class="toggle agree"><input id="onb-agree" type="checkbox" data-action="toggleAgree" ${ui.onbAgree ? 'checked' : ''}>
-        <span>${esc(t('acceptTerms'))} <a class="ulink" href="#/terms">${esc(t('termsLink'))}</a></span></label>
+        <span>${esc(t('acceptTerms'))} <a class="ulink" href="#/terms">${esc(t('termsLink'))}</a> · <a class="ulink" href="#/privacy">${esc(t('privacyLink'))}</a></span></label>
+      <label class="toggle agree"><input id="onb-adult" type="checkbox" data-action="toggleAdult" ${ui.onbAdult ? 'checked' : ''}>
+        <span>${esc(t('confirmAdult'))}</span></label>
       ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
       <button class="btn primary big" data-action="join" ${LIVE && live.busy ? 'disabled' : ''}>${esc(LIVE && live.busy ? t('loading') : (S.me ? t('continue') : t('join')))}</button>
       ${LIVE ? `<p class="muted small center">${esc(t('signedInAs', { email: live.email }))} · <button class="link small" data-action="signOut">${esc(t('signOut'))}</button></p>` : `<p class="muted small center">${esc(t('demoNote'))}</p>`}
@@ -355,7 +357,7 @@
         ${ui.onbError ? `<div class="notice warn" role="alert">${esc(ui.onbError)}</div>` : ''}
       </section>
       <p class="center"><a class="ulink" href="?demo=1">${esc(t('tryDemo'))}</a></p>
-      <p class="muted small center"><a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></p>
+      <p class="muted small center"><a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a> · <a class="ulink" href="#/privacy">${esc(t('privacyLink'))}</a> · <a class="ulink" href="#/report">${esc(t('reportInfoLink'))}</a></p>
     </main>`;
     }
     return `<main class="onboard">
@@ -413,6 +415,48 @@
       ${T.sections.map((sec) => `<h2 class="h3">${esc(sec[0])}</h2><p>${esc(sec[1]).split('{contact}').join(contact)}</p>`).join('')}
     </main>`;
   }
+
+  // Pages anyone can open, signed in or not.
+  const contactLink = () => `<a class="ulink" href="${esc(TERMS.contact)}" target="_blank" rel="noopener noreferrer">${esc(TERMS.operator && TERMS.operator.email ? TERMS.operator.email : TERMS.contact)}</a>`;
+  const operatorText = () => {
+    const o = TERMS.operator || {};
+    return o.name ? o.name + (o.country ? ' (' + o.country + ')' : '') : t('operatorUnnamed');
+  };
+  const fillPage = (text) => esc(text).split('{contact}').join(contactLink()).split('{operator}').join(esc(operatorText()));
+  function viewPrivacy() {
+    const P = PRIVACY[S.lang] || PRIVACY.en;
+    return `<main class="pad terms">
+      <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
+      <h1 class="h1">${esc(P.title)}</h1>
+      <p class="muted small">${esc(t('updatedOn', { date: PRIVACY.updated }))}</p>
+      <p class="lead">${esc(P.intro)}</p>
+      ${P.sections.map((sec) => `<h2 class="h3">${esc(sec[0])}</h2><p>${fillPage(sec[1])}</p>`).join('')}
+      <p><a class="ulink" href="#/about">${esc(t('aboutLink'))}</a> · <a class="ulink" href="#/report">${esc(t('reportInfoLink'))}</a> · <a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></p>
+    </main>`;
+  }
+  function viewAbout() {
+    const P = ABOUT[S.lang] || ABOUT.en;
+    return `<main class="pad terms">
+      <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
+      <h1 class="h1">${esc(P.title)}</h1>
+      <p class="lead">${esc(P.intro)}</p>
+      <h2 class="h3">${esc(P.sourcesTitle)}</h2>
+      <ul class="plain-list">${P.sources.map((x) => `<li><b>${esc(x[0])}</b><br>${esc(x[1])} <a class="ulink" href="${esc(x[2])}" target="_blank" rel="noopener noreferrer">${esc(x[2].replace(/^https:\/\//, '').replace(/\/$/, ''))}</a></li>`).join('')}</ul>
+      <p class="muted">${esc(P.photosNote)}</p>
+      <p><a class="ulink" href="#/privacy">${esc(t('privacyLink'))}</a> · <a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></p>
+    </main>`;
+  }
+  function viewReportInfo() {
+    const P = REPORT_INFO[S.lang] || REPORT_INFO.en;
+    return `<main class="pad terms">
+      <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
+      <h1 class="h1">${icon('flag', 24)} ${esc(P.title)}</h1>
+      <p class="lead">${esc(P.intro)}</p>
+      <ol>${P.steps.map((x) => `<li><p>${fillPage(x)}</p></li>`).join('')}</ol>
+      <p class="muted">${esc(P.note)}</p>
+    </main>`;
+  }
+  const PUBLIC_VIEWS = { terms: viewTerms, privacy: viewPrivacy, about: viewAbout, report: viewReportInfo };
 
   function header() {
     const langs = UI_LANGS.map((c) => `<button class="lang-btn ${S.lang === c ? 'on' : ''}" data-action="setLang" data-v="${c}" aria-label="${esc(STRINGS[c].langNames[c])}">${c.toUpperCase()}</button>`).join('');
@@ -661,7 +705,8 @@
     }
     const msgs = th.messages.map((m) => m.from === 'system'
       ? `<div class="sys">${esc(msgText(m))}</div>`
-      : `<div class="msg ${m.from === MINE ? 'mine' : ''}"><div class="bubble">${esc(m.text)}</div><div class="muted tiny">${esc(fmtTime(m.at))}</div></div>`).join('');
+      : `<div class="msg ${m.from === MINE ? 'mine' : ''}"><div class="bubble">${esc(m.text)}</div><div class="muted tiny">${esc(fmtTime(m.at))}</div>
+          ${m.from !== MINE && looksLikeScam(m.text) ? `<div class="scam-warn" role="note">${icon('shield', 14)} ${esc(t('scamWarning'))}</div>` : ''}</div>`).join('');
     const canChat = th.status !== 'declined';
     return `<main class="chat">
       <div class="chat-head pad"><button class="back" data-action="go" data-v="#/messages">${icon('back', 20)}</button>
@@ -857,11 +902,13 @@
       <section class="card pad-m"><h2 class="h3">${esc(t('settings'))}</h2>
         <p class="muted small">${esc(t('privacy'))}</p>
         <a class="btn ghost" href="#/terms">${icon('doc', 20)} ${esc(t('viewTerms'))}</a>
+        <a class="btn ghost" href="#/privacy">${icon('shield', 20)} ${esc(t('privacyLink'))}</a>
+        <a class="btn ghost" href="#/about">${icon('books', 20)} ${esc(t('aboutLink'))}</a>
         ${S.agreed ? `<p class="muted tiny center">${esc(t('acceptedOn', { date: fmtDate(new Date(S.agreed.at)) }))}</p>` : ''}
         <button class="btn ghost" data-action="tourReplay">${icon('doc', 20)} ${esc(t('howItWorks'))}</button>
         <button class="btn ghost" data-action="exportData">${icon('download', 20)} ${esc(t('exportData'))}</button>
         ${LIVE ? `<p class="muted small">${esc(t('signedInAs', { email: live.email }))}</p><button class="btn ghost" data-action="signOut">${esc(t('signOut'))}</button>` : ''}
-        <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(LIVE ? t('leaveGroup') : t('deleteAccount'))}</button></section>
+        <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(t('deleteAccount'))}</button></section>
     </main>`;
   }
 
@@ -889,11 +936,12 @@
     let body;
     if (r.name === 'join' && r.id) { live.invite = r.id.toUpperCase().slice(0, 12); ui.onbMode = 'join'; }
     if (LIVE && !live.ready) body = viewLoading();
-    else if (LIVE && !live.uid) body = r.name === 'terms' ? viewTerms() : viewSignIn();
-    else if (needsOnboarding()) body = r.name === 'terms' ? viewTerms() : (!LIVE && !S.me && !ui.introDone ? viewIntro() : viewOnboarding());
+    else if (LIVE && !live.uid) body = PUBLIC_VIEWS[r.name] ? PUBLIC_VIEWS[r.name]() : viewSignIn();
+    else if (needsOnboarding()) body = PUBLIC_VIEWS[r.name] ? PUBLIC_VIEWS[r.name]() : (!LIVE && !S.me && !ui.introDone ? viewIntro() : viewOnboarding());
     else {
       const v = { '': viewBrowse, book: () => viewBook(r.id), requests: viewRequests, messages: viewMessages,
         chat: () => viewChat(r.id), add: viewAdd, profile: viewProfile, member: () => viewMember(r.id), terms: viewTerms,
+        privacy: viewPrivacy, about: viewAbout, report: viewReportInfo,
         notifications: viewNotifications, admin: () => viewAdmin(r.id), platform: () => viewAdmin('admins') }[r.name] || viewBrowse;
       body = header() + v() + nav(r.name);
       if (!S.toured && r.name === '') body += tourSheet();
@@ -927,6 +975,9 @@
   // A simple guard, not a guarantee – reports and moderation remain the main tool.
   const COPY_PATTERNS = /\.(pdf|epub|mobi|azw3?|djvu|cbz|cbr|fb2)(\b|$)|drive\.google|docs\.google|dropbox|wetransfer|mega\.nz|mediafire|z-?lib|libgen|annas-archive|scribd|t\.me\//i;
   const looksLikeCopySharing = (text) => COPY_PATTERNS.test(text);
+  // Messages that ask for money up front, bank or card details, or move the talk elsewhere get a gentle warning.
+  const SCAM_PATTERNS = /\b(iban|swift|bic|western union|moneygram|gift ?card|crypto|bitcoin|usdt|whats ?app|telegram|signal|viber|card (number|details)|cvv|pin code|courier|shipping fee|delivery fee|deposit|pay (first|in advance|now)|advance payment|sumokėk(ite)? (iš anksto|pirma)|avansu|kortelės (numer|duomen)|kurjer|depozit|paga(r)? (antes|por adelantado)|por adelantado|tarjeta|transferencia|mensajero)\b|https?:\/\//i;
+  const looksLikeScam = (text) => SCAM_PATTERNS.test(String(text || ''));
   function sysMsg(th, key, vars) { th.messages.push({ from: 'system', key: key, vars: vars || {}, text: '', at: Date.now() }); }
   function msgText(m) {
     if (!m.key) return m.text || '';
@@ -1339,6 +1390,7 @@
     setLang: (el) => { S.lang = el.dataset.v; save(); render(); },
     toggleInterest: (el) => { const v = el.dataset.v; const i = S.interested.indexOf(v); if (i >= 0) S.interested.splice(i, 1); else S.interested.push(v); save(); render(); },
     toggleAgree: (el) => { ui.onbAgree = el.checked; },
+    toggleAdult: (el) => { ui.onbAdult = el.checked; },
     toSignup: () => { const f = document.getElementById('signup'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); const e = document.getElementById('si-email'); if (e) setTimeout(() => e.focus({ preventScroll: true }), 350); },
     startSignup: () => { ui.introDone = true; render(); window.scrollTo(0, 0); },
     tourNext: () => { ui.tourStep = (ui.tourStep || 0) + 1; render(); },
@@ -1356,6 +1408,7 @@
       if (!postal) return fail(t('postalRequired'), 'onb-postal');
       if (!validPostal(country, postal)) return fail(t('postalInvalid', { country: countryName(country) }), 'onb-postal');
       if (!document.getElementById('onb-agree').checked) return fail(t('termsRequired'), 'onb-agree');
+      if (!document.getElementById('onb-adult').checked) return fail(t('adultRequired'), 'onb-adult');
       if (LIVE) return liveJoin(name, country, postal);
       S.me = { name: name, country: country, postal: postal };
       S.agreed = { version: TERMS.version, at: Date.now() };
@@ -1493,6 +1546,10 @@
     if (/token.*(expired|invalid)|otp/i.test(m)) return t('codeInvalid');
     if (/not authorized|not allowed for this/i.test(m)) return t('errEmailNotAllowed');
     if (/blocked/i.test(m)) return t('errBlocked');
+    if (/name not allowed/i.test(m)) return t('errNameNotAllowed');
+    if (/text not allowed/i.test(m)) return t('errTextNotAllowed');
+    if (/daily limit/i.test(m)) return t('errDailyLimit');
+    if (/another admin before deleting/i.test(m)) return t('errLastAdminDelete');
     if (/sign up first/i.test(m)) return t('errNoAccount');
     if (/at least one admin/i.test(m)) return t('errLastAdmin');
     if (/failed to fetch|network/i.test(m)) return t('errOffline');
@@ -1717,9 +1774,16 @@
         liveAct(() => Backend.updateProfile(live.group.id, live.uid, { country: cc, postal_code: v }).then(() => { S.me.country = cc; S.me.postal = v; }), t('saved'));
       },
       deleteAll: async () => {
-        if (!window.confirm(t('confirmLeave'))) return;
-        const ok = await liveAct(() => Backend.leaveGroup(live.group.id, live.uid));
-        if (ok) { await Backend.signOut(); live.group = null; S = fresh(); location.hash = '#/'; render(); }
+        if (!window.confirm(t('confirmDeleteAccount'))) return;
+        const ok = await liveAct(() => Backend.deleteAccount(live.group.id, live.uid));
+        if (ok) { await Backend.signOut(); live.uid = null; live.group = null; S = fresh(); live.authStep = 'email'; location.hash = '#/'; toast(t('accountDeleted')); }
+      },
+      exportData: async () => {
+        const data = await liveAct(() => Backend.exportMyData());
+        if (!data || data === true) return;
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'seku-seku-my-data.json';
+        document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
       },
       createInvite: async () => {
         const code = await liveAct(() => Backend.createInvite(live.group.id));
@@ -1752,7 +1816,7 @@
   const DEFAULT_PREFS = () => ({ app: NOTIF_TYPES.concat(ORG_TYPES), email: ['request_new', 'message', 'request_answered', 'handover_reminder', 'wish_match', 'announcement', 'report_new'], mode: 'instant' });
   const REPORT_CATS = ['no_show', 'inappropriate', 'copyright', 'spam', 'safety', 'other'];
   const N_ICON = { request_new: 'bag', message: 'chat', request_answered: 'check', handover_set: 'calendar', handover_reminder: 'calendar', exchange_done: 'star',
-    wish_match: 'heart', wanted: 'swapArrows', review: 'star', announcement: 'logo', report_new: 'flag', member_joined: 'user' };
+    wish_match: 'heart', wanted: 'swapArrows', review: 'star', announcement: 'logo', report_new: 'flag', member_joined: 'user', moderation: 'shield' };
   if (!S.notifPrefs) S.notifPrefs = DEFAULT_PREFS();
   if (!S.notifications) S.notifications = LIVE ? [] : clone(window.SAMPLE_NOTIFS || []);
   if (!S.reports) S.reports = LIVE ? [] : clone(window.SAMPLE_REPORTS || []);
@@ -1771,6 +1835,7 @@
       case 'announcement': return t('n_announcement', { text: d.text || '' });
       case 'report_new': return t('n_report_new', { category: t('rc_' + (d.category || 'other')) });
       case 'member_joined': return t('n_member_joined', { name: d.name || name });
+      case 'moderation': return t('n_mod_' + (d.action || 'hide_book'), { title: d.title || '' }) + (d.reason ? ' ' + t('n_mod_reason', { reason: d.reason }) : '') + ' ' + t(d.automatic ? 'n_mod_auto' : 'n_mod_appeal');
       default: return t('n_' + n.type, { name: name });
     }
   }
@@ -1779,11 +1844,13 @@
     if (n.type === 'report_new') return '#/admin/reports';
     if (n.type === 'member_joined') return '#/admin/members';
     if (n.type === 'review') return '#/profile';
+    if (n.type === 'moderation') return d.action && d.action.indexOf('book') >= 0 && d.target ? '#/book/' + d.target : '#/terms';
     if (d.request_id) return '#/chat/' + d.request_id;
     if (d.book_id) return '#/book/' + d.book_id;
     return '';
   }
-  const visibleNotifs = () => S.notifications.filter((n) => S.notifPrefs.app.indexOf(n.type) >= 0).sort((a, b) => b.at - a.at);
+  // Moderation notices (statement of reasons) are always shown, whatever the settings.
+  const visibleNotifs = () => S.notifications.filter((n) => n.type === 'moderation' || S.notifPrefs.app.indexOf(n.type) >= 0).sort((a, b) => b.at - a.at);
   const unreadCount = () => visibleNotifs().filter((n) => !n.read).length;
 
   function bellHtml() {
