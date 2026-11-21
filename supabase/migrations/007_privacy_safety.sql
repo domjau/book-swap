@@ -194,7 +194,7 @@ alter table public.banned_emails enable row level security;
 revoke all on public.banned_emails from anon, authenticated;
 
 create or replace function public._email_hash(p_email text)
-returns text language sql immutable as $$ select encode(sha256(convert_to(lower(trim(coalesce(p_email, ''))), 'UTF8')), 'hex') $$;
+returns text language sql immutable set search_path = '' as $$ select encode(sha256(convert_to(lower(trim(coalesce(p_email, ''))), 'UTF8')), 'hex') $$;
 
 -- Deletes the caller's account and everything that belongs to it: profile, books, wish list, requests
 -- and chats, reviews, reports, notifications and settings (all cascade from auth.users).
