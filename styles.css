@@ -224,6 +224,8 @@ textarea.input { resize: vertical; line-height: 1.4; }
 .wish-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .wish-list li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #EEE8DB; }
 .wish-list li .badge { margin-left: 0; display: inline-flex; gap: 4px; align-items: center; }
+.got-meta { display: block; margin-top: 2px; }
+.wish-list li > .badge { white-space: nowrap; flex-shrink: 0; }
 .seg.two { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 10px; }
 .safety { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; font-weight: 500; color: var(--muted); border-top: 1px solid #EEE8DB; padding-top: 10px; }
 .agree { align-items: flex-start; margin-top: 14px; line-height: 1.4; }

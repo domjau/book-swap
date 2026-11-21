@@ -133,6 +133,13 @@
       }));
     },
 
+    // "Books I got" (migration 009). Resolves to null if the table is not there yet, so the app can fall back.
+    async loadReceived() {
+      const res = await sb.from('received_books').select('title, author, isbn, lang, topics, how, price_cents, received_at')
+        .order('received_at', { ascending: false }).limit(2000);
+      return res.error ? null : res.data;
+    },
+
     async addBook(groupId, uid, book, photoDataUrls) {
       const paths = [];
       try {

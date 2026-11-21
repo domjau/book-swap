@@ -784,3 +784,26 @@ Object.assign(window.STRINGS.en, {
   lnbName: 'National Library of Lithuania',
   lnbCredit: 'Data: Martynas Mažvydas National Library of Lithuania, data.gov.lt.'
 });
+
+// "Books I got": books received in finished exchanges, without anything about who they came from
+Object.assign(window.STRINGS.lt, {
+  gotTitle: 'Mano gautos knygos',
+  gotHint: 'Knygos, kurias gavote per baigtus mainus. Matote tik jūs, o apie kitą narį čia nieko nesaugoma.',
+  gotEmpty: 'Kai baigsite pirmus mainus, gautos knygos atsiras čia.',
+  gotBought: 'Pirkta, {price}', gotSwapped: 'Mainais', gotGift: 'Dovana',
+  gotDownload: 'Atsisiųsti sąrašą (CSV)'
+});
+Object.assign(window.STRINGS.es, {
+  gotTitle: 'Libros que he recibido',
+  gotHint: 'Libros que recibiste en intercambios terminados. Solo tú los ves y no se guarda nada sobre el otro miembro.',
+  gotEmpty: 'Cuando termines tu primer intercambio, los libros que recibas aparecerán aquí.',
+  gotBought: 'Comprado, {price}', gotSwapped: 'Intercambiado', gotGift: 'Regalo',
+  gotDownload: 'Descargar la lista (CSV)'
+});
+Object.assign(window.STRINGS.en, {
+  gotTitle: 'Books I got',
+  gotHint: 'Books you received in finished exchanges. Only you can see this, and nothing about the other member is kept here.',
+  gotEmpty: 'Once you finish your first exchange, the books you get will show up here.',
+  gotBought: 'Bought, {price}', gotSwapped: 'Swapped', gotGift: 'Gift',
+  gotDownload: 'Download the list (CSV)'
+});

@@ -32,6 +32,7 @@
 | "From your wish list" and "They want your books" rows | ✅ |
 | Member page with tailored offer: their books you want + your books they want, pre-ticked | ✅ |
 | "Wanted by …" on your own books, "On your wish list" on others' | ✅ |
+| "Books I got" on the profile: books received in finished exchanges (bought / swapped / gift, date), CSV download, nothing about the other member | ✅ |
 | Real accounts, shared database, one open network with open sign-up | ✅ |
 | In-app notifications (bell) for 10 member types + 2 admin types, chat notifications bundled | ✅ |
 | Notification choices per type (app / email) at sign-up and in profile; email right away / daily / never | ✅ |
