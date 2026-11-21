@@ -29,7 +29,7 @@ In-app notifications (the bell) work as soon as migration 003 has run. To also s
    - "right away" emails every 5 minutes;
    - a daily summary at 17:00 UTC.
 
-Email logic tests: `functions/send-notifications/logic_test.mjs` (12 checks).
+Email logic tests: `functions/send-notifications/logic_test.mjs` (15 checks).
 
 ## Lithuanian national library lookup (optional, recommended)
 
@@ -42,6 +42,23 @@ When Google Books and Open Library don't know a scanned ISBN (and always for Lit
 How it treats the library's API: it normalises the ISBN and searches the forms cataloguers use (hyphenated ISBN-13 and ISBN-10, then bare digits; this finds about 98% of the ISBNs in a 10,000-record sample), checks that a hit really has this ISBN, caches hits for 90 days and misses for 14 days, starts the three most likely searches at the same time (exact and "contains" for the hyphenated ISBN-13, and the hyphenated ISBN-10), then at most two more only if nothing was found (8 s each, 24 s in total), and allows 30 library calls per member and 300 for the whole app per hour. Errors are not cached, and the app carries on without the library.
 
 Helper tests: `npm i --no-save isbn3@2.0.13 && node supabase/functions/isbn-lookup/lnb_test.mjs` (35 checks) and `bash supabase/tests/isbn_lookup_test.sh` (16 checks for migration 006).
+
+## Privacy and safety (migration 007)
+
+Run [`migrations/007_privacy_safety.sql`](migrations/007_privacy_safety.sql) in the SQL editor, then the security advisor. It adds:
+
+- **Delete my account** and **Download my data** on the server (`delete_my_account()`, `export_my_data()`). The app removes the person's photos first. The last admin can't delete their account. A blocked member's email is kept as a SHA-256 hash so deleting and re-creating the account doesn't lift the block.
+- **Automatic clean-up** (`cleanup_old_data()`): read notifications after 90 days, all after a year, chats of finished or declined swaps after 12 months (finished swaps stay because reviews hang on them), declined requests after 12 months, unanswered ones after 6 months. It runs daily at 03:30 UTC once **pg_cron** is on. If pg_cron was off when you ran 007, run this after turning it on:
+  ```sql
+  select cron.schedule('cleanup-old-data', '30 3 * * *', $$ select public.cleanup_old_data(); $$);
+  ```
+- **Statement of reasons**: when an admin hides a listing or removes a member, and when a listing is hidden automatically, the member gets a `moderation` notification (always shown in the app and always emailed) with the reason and how to object.
+- **Auto-hide** of a listing after reports from 3 different members, until an admin looks at it.
+- **Daily limits**: books 40 (new accounts, first 7 days) / 100, requests 5 / 20, chat messages 100 / 300. Admins have none.
+- **Blocked words** (LT/ES/EN) in listings, wish lists, names, chat and reviews. Add more in the SQL editor: `insert into public.blocked_terms (term, prefix) values ('word', false);` (`prefix = true` also blocks words that start with it).
+- **Names that pose as admins** (admin, moderator, seku seku, support, official …) are refused, except for real admins.
+
+Tests: `bash supabase/tests/privacy_safety_test.sh` (50 checks).
 
 ## Admins
 
