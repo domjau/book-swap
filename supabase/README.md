@@ -60,6 +60,10 @@ Run [`migrations/007_privacy_safety.sql`](migrations/007_privacy_safety.sql) in 
 
 Tests: `bash supabase/tests/privacy_safety_test.sh` (50 checks).
 
+## Shared catalogue (migration 008)
+
+Run [`migrations/008_catalogue.sql`](migrations/008_catalogue.sql) after 007, then the security advisor. Every listing with an ISBN saves its typed-in details (title, author, description, language, topics, age; no photos, no member id) in `catalogue`. The app checks it right after the books on the shelves and before Google Books, so the next family that scans the same book gets the details instantly, even when the first listing is gone. Members can read it; only the trigger writes it. Tests: `bash supabase/tests/catalogue_test.sh` (10 checks).
+
 ## Admins
 
 There is **one open network**: anyone can sign up with their email, and everyone sees everyone's listings. There are no communities, invite codes or organisers. Moderation is done by **admins**.

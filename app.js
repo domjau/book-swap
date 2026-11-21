@@ -1195,6 +1195,15 @@
       ui.addMsg = t('foundLocalIsbn', { isbn: isbn }); ui.addMsgKind = 'ok'; render(); return;
     }
     ui.busy = true; ui.busyIsbn = isbn; ui.addMsg = ''; render();
+    // 1b. The shared catalogue: what members typed in for this ISBN before, even if that listing is gone
+    const shared = LIVE ? await Backend.catalogueLookup(isbn) : null;
+    if (shared && shared.title) {
+      ui.busy = false; ui.busyIsbn = '';
+      const d = { isbn: isbn, title: shared.title, author: shared.author || '', description: shared.description || '', lang: shared.lang || 'other', topics: (shared.topics || []).slice() };
+      if (AGES.indexOf(shared.age) >= 0) d.age = shared.age;
+      startDraft(d);
+      ui.addMsg = t('foundLocalIsbn', { isbn: isbn }); ui.addMsgKind = 'ok'; render(); return;
+    }
     // 2. Google Books and Open Library at the same time; combine what they know.
     //    The Lithuanian national library is asked straight away for Lithuanian ISBNs (978-609, 978-9955, 978-9986),
     //    and for other books as soon as the big catalogues are slow (1.5 s) or have no title, so we never wait for them in turn.

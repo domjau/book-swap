@@ -12,6 +12,7 @@
 | Search by title / author | ✅ |
 | Swap / sell (price) / give away | ✅ |
 | Scan ISBN → prefill from own catalogue, Google Books, Open Library | ✅ |
+| Shared catalogue: typed-in details saved per ISBN for the next scan | ✅ |
 | Search by title when adding | ✅ |
 | Manual entry fallback | ✅ |
 | 1–4 own photos required (cover and wear), 720 px, metadata stripped | ✅ |

@@ -74,6 +74,15 @@
       } catch (e) { return null; }
     },
 
+    // Shared catalogue: details other members typed in for this ISBN (migration 008). Null when unknown or not set up.
+    async catalogueLookup(isbn13) {
+      if (!enabled) return null;
+      try {
+        const res = await sb.from('catalogue').select('isbn13, title, author, description, lang, topics, age').eq('isbn13', isbn13).limit(1);
+        return !res.error && res.data && res.data[0] ? res.data[0] : null;
+      } catch (e) { return null; }
+    },
+
     // ---------- membership ----------
     async myMembership(uid) {
       const rows = check(await sb.from('members').select('group_id, role, display_name, country, postal_code, interested_langs, terms_version, groups(name, handover_place, handover_day)').eq('user_id', uid).limit(1));
