@@ -21,10 +21,10 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 - Supabase now; may move elsewhere later. Sign-in emails currently via the app's Gmail account.
 
 ## Stack
-- Static app, no build step: `index.html`, `app.js` (hash routes, views return HTML strings), `i18n.js`, `data.js`, `terms.js`, `config.js`, `backend.js`, `styles.css`. Served from GitHub Pages.
+- Static app, no build step: `index.html`, `app.js` (hash routes, views return HTML strings), `i18n.js`, `data.js`, `terms.js`, `privacy.js`, `config.js`, `backend.js`, `styles.css`, `sw.js` (service worker: always-fresh app files, offline shell; add new app files to its SHELL list). Served from GitHub Pages.
 - Supabase (EU): Postgres with RLS on every table, `SECURITY DEFINER` RPCs for state changes, private `book-photos` bucket, realtime, Edge Functions `send-notifications` and `isbn-lookup` (national library lookup, cached).
 - One open network: a single group `network_id()`; admins are rows in `platform_admins`.
-- Vendored libs in `vendor/` (supabase-js, zxing-wasm). Strict CSP in `index.html` – new external hosts must be added there.
+- Vendored libs in `vendor/` (supabase-js, zxing-wasm, the Outfit font). Strict CSP in `index.html` – new external hosts must be added there.
 
 ## Rules
 - Escape everything rendered with `esc()`; events via `data-action` delegation, never inline handlers.
@@ -37,7 +37,9 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 ## Tests
 - `bash supabase/tests/rls_test.sh` (001–003, 107 checks) and `bash supabase/tests/network_test.sh` (001–005, 46 checks) against local Postgres with `supabase/tests/local_supabase_stub.sql`.
 - `bash supabase/tests/isbn_lookup_test.sh` (fresh DB with 001–003, 005, 006; 16 checks) and `node supabase/functions/isbn-lookup/lnb_test.mjs` (35 checks; needs `npm i --no-save isbn3@2.0.13`).
+- `bash supabase/tests/privacy_safety_test.sh` (fresh DB with 001–003, 005–007; 50 checks) and `bash supabase/tests/catalogue_test.sh` (005–008; 10 checks).
 - Email logic: see the first line of `supabase/functions/send-notifications/logic_test.mjs`.
+- All database tests at once: `sudo bash supabase/tests/run_all.sh`. Browser smoke test: `python3 -m http.server 8080` then `node tests/smoke.mjs`. GitHub Actions runs everything on every push.
 - Demo mode: open `?demo=1` (sample data, localStorage only).
 
 ## Commits

@@ -15,7 +15,7 @@ Books come before people: an empty shelf kills a swap app.
 
 **Week 1 (16–22 Nov) – get ready**
 - [ ] Finish Phase 0 of the production plan (email codes, notifications, contact email)
-- [ ] Privacy notice, delete account and 18+ checkbox live (Claude)
+- [x] Privacy notice, delete account and 18+ checkbox live (Claude) – in PR #6; live after merge + migration 007
 - [ ] Reserve @sekuseku (or similar) on Instagram and Facebook
 - [ ] Pick 5 founding families (teachers and active parents)
 
@@ -133,12 +133,12 @@ Dominykas
 - [ ] Sign-in email arrives within a minute in Gmail, Outlook and iCloud inboxes
 - [ ] Tested on an older iPhone and an Android phone, in LT, ES and EN
 - [ ] Supabase plan that doesn't pause, backups and error alerts before January
-- [ ] "Add to home screen" prompt
+- [x] "Add to home screen" prompt
 
 **Materials (Claude can design in the brand style)**
-- [ ] A4 poster with QR code, LT and EN
-- [ ] Instagram templates: launch, how it works, book of the week
-- [ ] One-page guide for each school's "seku seku friend"
+- [x] A4 poster with QR code, LT and EN (`brand/print/poster-a4-*.pdf`)
+- [x] Instagram templates: launch, how it works, book of the week, thank-you (`brand/social/instagram/`, 1080×1350)
+- [x] One-page guide for each school's "seku seku friend" (`brand/print/friend-guide-*.pdf`)
 
 **Launch day**
 - [ ] 100+ books and 10+ wishes on the shelf

@@ -37,4 +37,9 @@ ok('Spanish single-item subject', e2.subject === 'seku seku: De seku seku: Swap 
 const xss = buildEmail([{ type: 'announcement', data: { text: '<script>alert(1)</script>' } }], 'en', 'A', {}, 'https://x/');
 ok('HTML is escaped', !xss.html.includes('<script>') && xss.html.includes('&lt;script&gt;'));
 ok('declined wording', lineFor({ type: 'request_answered', data: { actor: 'ana', status: 'declined' } }, 'en', names) === 'Ana declined your request');
+const offPrefs = new Map([['u9', { email_mode: 'off', email_types: [], lang: 'en' }]]);
+const modN = { id: 99, user_id: 'u9', type: 'moderation', data: { action: 'hide_book', title: 'Zog', reason: 'Photo of a child' }, created_at: '2026-11-15T11:00:00Z', read_at: '2026-11-15T11:01:00Z' };
+ok('moderation notice is emailed even with email off and already read', pick([modN], offPrefs, 'instant', now).send.get('u9')?.length === 1);
+ok('moderation notice not sent twice by the daily run', !pick([modN], offPrefs, 'daily', now).send.has('u9'));
+ok('moderation wording has the reason and how to appeal', /hid your listing "Zog"\. Reason: Photo of a child\. If you think/.test(lineFor(modN, 'en', {})), lineFor(modN, 'en', {}));
 console.log(`\nRESULT: ${pass} passed, ${fail} failed`);

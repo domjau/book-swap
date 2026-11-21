@@ -74,6 +74,15 @@
       } catch (e) { return null; }
     },
 
+    // Shared catalogue: details other members typed in for this ISBN (migration 008). Null when unknown or not set up.
+    async catalogueLookup(isbn13) {
+      if (!enabled) return null;
+      try {
+        const res = await sb.from('catalogue').select('isbn13, title, author, description, lang, topics, age').eq('isbn13', isbn13).limit(1);
+        return !res.error && res.data && res.data[0] ? res.data[0] : null;
+      } catch (e) { return null; }
+    },
+
     // ---------- membership ----------
     async myMembership(uid) {
       const rows = check(await sb.from('members').select('group_id, role, display_name, country, postal_code, interested_langs, terms_version, groups(name, handover_place, handover_day)').eq('user_id', uid).limit(1));
@@ -104,6 +113,18 @@
       if (paths.length) check(await sb.storage.from(BUCKET).remove(paths));
       check(await sb.from('members').delete().eq('group_id', groupId).eq('user_id', uid));
     },
+
+    // Delete my account: remove my photos (storage can't be emptied from SQL), then the account itself,
+    // which deletes profile, books, wishes, chats, reviews, reports and notifications on the server.
+    async deleteAccount(groupId, uid) {
+      if (groupId) {
+        const list = check(await sb.storage.from(BUCKET).list(groupId + '/' + uid, { limit: 1000 }));
+        const paths = (list || []).map((f) => groupId + '/' + uid + '/' + f.name);
+        if (paths.length) check(await sb.storage.from(BUCKET).remove(paths));
+      }
+      check(await sb.rpc('delete_my_account'));
+    },
+    async exportMyData() { return check(await sb.rpc('export_my_data')); },
 
     // ---------- data ----------
     async loadGroup(groupId) {

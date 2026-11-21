@@ -8,7 +8,9 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import nodemailer from 'npm:nodemailer@6';
 
 const ALL_TYPES = ['request_new', 'message', 'request_answered', 'handover_set', 'handover_reminder', 'exchange_done',
-  'wish_match', 'wanted', 'review', 'announcement', 'report_new', 'member_joined'];
+  'wish_match', 'wanted', 'review', 'announcement', 'report_new', 'member_joined', 'moderation'];
+// Moderation notices (statement of reasons) always go out right away, whatever the person's settings.
+const ALWAYS = ['moderation'];
 const DEFAULT_PREFS = { email_types: ['request_new', 'message', 'request_answered', 'handover_reminder', 'wish_match', 'announcement', 'report_new'], email_mode: 'instant', lang: 'en' };
 
 export const TEXT = {
@@ -20,7 +22,11 @@ export const TEXT = {
     handover_set: 'Handover with {name}: {when}, {where}', handover_reminder: 'Reminder: handover with {name} tomorrow – {where}',
     exchange_done: 'Exchange with {name} is done – leave a review', wish_match: '"{title}" from your wish list was listed by {name}',
     wanted: '{name} is looking for "{title}" – you have it', review: '{name} gave you {n} of 5 books', announcement: 'From seku seku: {text}',
-    report_new: 'New report on seku seku', member_joined: '{name} joined the group'
+    report_new: 'New report on seku seku', member_joined: '{name} joined the group',
+    mod_hide_book: 'An admin hid your listing "{title}"', mod_unhide_book: 'Your listing "{title}" is visible again',
+    mod_auto_hide_book: 'Your listing "{title}" was hidden automatically after 3 reports; an admin will look at it',
+    mod_remove: 'An admin removed your seku seku profile', mod_remove_and_ban: 'An admin removed and blocked your seku seku account',
+    mod_reason: 'Reason: {reason}.', mod_appeal: 'If you think this is a mistake, reply to this email or write to us.'
   },
   lt: {
     subjectOne: 'seku seku: {text}', subjectMany: 'seku seku: {n} nauji pranešimai', hello: 'Labas, {name},', open: 'Atidaryti seku seku',
@@ -30,7 +36,11 @@ export const TEXT = {
     handover_set: 'Perdavimas su {name}: {when}, {where}', handover_reminder: 'Priminimas: rytoj perdavimas su {name} – {where}',
     exchange_done: 'Mainai su {name} baigti – įvertinkite', wish_match: '„{title}“ iš jūsų norų sąrašo pasiūlė {name}',
     wanted: '{name} ieško „{title}“ – jūs ją turite', review: '{name} jus įvertino {n} iš 5 knygelių', announcement: 'seku seku praneša: {text}',
-    report_new: 'Naujas pranešimas apie problemą seku seku platformoje', member_joined: '{name} prisijungė prie grupės'
+    report_new: 'Naujas pranešimas apie problemą seku seku platformoje', member_joined: '{name} prisijungė prie grupės',
+    mod_hide_book: 'Administratorius paslėpė jūsų skelbimą „{title}“', mod_unhide_book: 'Jūsų skelbimas „{title}“ vėl matomas',
+    mod_auto_hide_book: 'Jūsų skelbimas „{title}“ automatiškai paslėptas po 3 pranešimų; administratorius jį peržiūrės',
+    mod_remove: 'Administratorius pašalino jūsų seku seku profilį', mod_remove_and_ban: 'Administratorius pašalino ir užblokavo jūsų seku seku paskyrą',
+    mod_reason: 'Priežastis: {reason}.', mod_appeal: 'Jei manote, kad tai klaida, atsakykite į šį laišką arba parašykite mums.'
   },
   es: {
     subjectOne: 'seku seku: {text}', subjectMany: 'seku seku: {n} notificaciones nuevas', hello: 'Hola, {name}:', open: 'Abrir seku seku',
@@ -40,7 +50,11 @@ export const TEXT = {
     handover_set: 'Entrega con {name}: {when}, {where}', handover_reminder: 'Recordatorio: mañana entrega con {name} – {where}',
     exchange_done: 'Intercambio con {name} completado: deja tu valoración', wish_match: '{name} ha anunciado «{title}», de tu lista de deseos',
     wanted: '{name} busca «{title}» y tú lo tienes', review: '{name} te ha dado {n} de 5 libritos', announcement: 'De seku seku: {text}',
-    report_new: 'Nueva denuncia en seku seku', member_joined: '{name} se ha unido al grupo'
+    report_new: 'Nueva denuncia en seku seku', member_joined: '{name} se ha unido al grupo',
+    mod_hide_book: 'Un administrador ha ocultado tu anuncio «{title}»', mod_unhide_book: 'Tu anuncio «{title}» vuelve a estar visible',
+    mod_auto_hide_book: 'Tu anuncio «{title}» se ha ocultado automáticamente tras 3 denuncias; un administrador lo revisará',
+    mod_remove: 'Un administrador ha eliminado tu perfil de seku seku', mod_remove_and_ban: 'Un administrador ha eliminado y bloqueado tu cuenta de seku seku',
+    mod_reason: 'Motivo: {reason}.', mod_appeal: 'Si crees que es un error, responde a este correo o escríbenos.'
   }
 };
 
@@ -54,6 +68,8 @@ export function lineFor(n, lang, names) {
   const when = d.when ? new Date(String(d.when).slice(0, 10) + 'T10:00:00Z').toLocaleDateString(lang, { weekday: 'short', day: 'numeric', month: 'short' }) : '';
   if (n.type === 'message') return fill(d.count > 1 ? T.message_many : T.message, { name, n: d.count }) + (d.snippet ? ': "' + d.snippet + '"' : '');
   if (n.type === 'request_answered') return fill(d.status === 'declined' ? T.request_declined : T.request_accepted, { name });
+  if (n.type === 'moderation') return fill(T['mod_' + d.action] || T.mod_hide_book, { title: d.title || '' }) + '. '
+    + (d.reason ? fill(T.mod_reason, { reason: d.reason }) + ' ' : '') + T.mod_appeal;
   return fill(T[n.type] || n.type, { name, title: d.title || '', n: d.rating || '', text: d.text || '', when, where: d.where || '' });
 }
 
@@ -107,9 +123,10 @@ export function pick(pending, prefsByUser, mode, nowMs) {
   const send = new Map(); const skip = [];
   for (const n of pending) {
     const p = prefsByUser.get(n.user_id) || DEFAULT_PREFS;
-    const wants = p.email_mode !== 'off' && (p.email_types || []).includes(n.type) && ALL_TYPES.includes(n.type);
-    if (!wants || n.read_at) { skip.push(n.id); continue; }             // not wanted, or already seen in the app
-    if (p.email_mode !== mode) continue;                                   // handled by the other run
+    const always = ALWAYS.includes(n.type);
+    const wants = always || (p.email_mode !== 'off' && (p.email_types || []).includes(n.type) && ALL_TYPES.includes(n.type));
+    if (!wants || (n.read_at && !always)) { skip.push(n.id); continue; } // not wanted, or already seen in the app
+    if ((always ? 'instant' : p.email_mode) !== mode) continue;          // handled by the other run
     if (mode === 'instant' && nowMs - Date.parse(n.created_at) < 2 * 60 * 1000) continue; // give the app 2 minutes first
     if (!send.has(n.user_id)) send.set(n.user_id, []);
     send.get(n.user_id).push(n);

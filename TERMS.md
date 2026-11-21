@@ -7,6 +7,9 @@ seku seku is a free, volunteer-run noticeboard that helps people find each other
 ## 1. What seku seku is
 seku seku is a peer-to-peer (P2P) platform. We only provide a place to list books and talk to each other. We are not a shop, seller, buyer, agent or middleman, and we are never a party to any swap, sale or gift between users.
 
+## 1a. Adults only
+You must be 18 or older to create a profile. seku seku is for parents, guardians and other adults; children do not get their own accounts.
+
 ## 2. No checks, no guarantees
 We do not verify users' identity, the books, their condition, descriptions, prices or payments. Everything is provided "as is". We do not guarantee that another user will turn up, pay or hand over a book, or that the app will always work or be free of errors.
 
@@ -29,7 +32,7 @@ seku seku is for passing on physical books, never their content. Do not upload, 
 You share your country and postal code – never your address – so that neighbours can find each other and avoid shipping. Your country and postal code are visible to other signed-in users.
 
 ## 8. Privacy
-We only store what is needed for swapping. You can download or delete your data at any time from your profile. See [docs/PRIVACY.md](docs/PRIVACY.md).
+We only store what is needed for swapping. The privacy notice (Profile → Privacy) explains what is stored, why and for how long. You can download your data or delete your account at any time from your profile. See [docs/PRIVACY.md](docs/PRIVACY.md).
 
 ## 9. Changes and ending
 We may change these terms; you will then be asked to accept the new version. We may suspend or end the service or your profile at any time. You can stop using seku seku and delete your profile at any time.

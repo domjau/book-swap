@@ -57,15 +57,22 @@ The app is meant for adults (parents and guardians). Children's names and photos
 
 ## Retention (production)
 
-- Books marked *gone* are hidden right away and deleted after 12 months.
-- Chats for finished or declined requests are deleted after 12 months.
-- Deleting an account removes the profile, books, photos and messages within 30 days, including from backups as they rotate out.
+Done by `cleanup_old_data()` (migration 007), daily once pg_cron is on:
+
+- Read notifications are deleted after 90 days, all notifications after a year.
+- Chats of finished or declined requests are deleted after 12 months. Finished requests stay (without chat), because reviews belong to them; declined requests go after 12 months, unanswered ones after 6 months.
+- The library fair-use log is deleted after one day.
+- Deleting an account (`delete_my_account()`) removes the profile, books, photos, wish list, requests and chats, reviews, reports, notifications and settings right away, and from backups as they rotate out. Only a SHA-256 hash of a **blocked** member's email is kept, so the block still works.
+- Still to do: books marked *gone* (and their photos) after 12 months, and inactive accounts after 2 years with an email warning first. Both need an Edge Function (photos can only be removed through the Storage API) and working email.
+
+The in-app privacy notice is `privacy.js` (LT/ES/EN, route `#/privacy`). The record of processing and the breach plan are in [`docs/compliance/`](compliance/).
 
 ## GDPR checklist before launch
 
-- [ ] Choose an EU hosting region (e.g. Supabase eu-central / Frankfurt).
+- [x] Choose an EU hosting region (Supabase eu-central-1, Frankfurt).
 - [ ] Sign the data processing agreements (DPAs) with providers: database, email, hosting.
-- [ ] Publish a short privacy notice in every app language: who runs it, what is stored, why, how long, and how to contact you.
-- [ ] Make sure the export and delete functions work against the server data.
+- [x] Publish a short privacy notice in every app language: who runs it, what is stored, why, how long, and how to contact you. (Fill in `TERMS.operator` in `terms.js` with the controller's name, country and contact email.)
+- [x] Make sure the export and delete functions work against the server data (migration 007).
 - [ ] Use no analytics or tracking cookies (or, if added later, privacy-friendly analytics only, with no cookies).
-- [ ] Have a plan for a data breach: who decides, and how members are told within 72 hours.
+- [x] Have a plan for a data breach: who decides, and how members are told within 72 hours ([breach plan](compliance/breach-plan.md)).
+- [x] Self-host the Outfit font (`vendor/fonts/`), so Google Fonts no longer sees visitors' IP addresses.
