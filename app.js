@@ -804,7 +804,7 @@
     const mine = S.books.filter((b) => b.owner === MINE);
     const given = mine.filter((b) => b.status === 'gone');
     const freeGiven = given.filter((b) => b.offer === 'give').length;
-    const saved = S.received.reduce((a, r) => a + (r.offer === 'sell' ? Number(r.price || 0) : 5), 0);
+    const saved = S.received.reduce((a, r) => a + (r.how === 'bought' ? Number(r.price || 0) : 5), 0);
     const all = mine.concat(S.received);
     const langCount = {}; all.forEach((b) => { langCount[b.lang] = (langCount[b.lang] || 0) + 1; });
     const total = all.length || 1;
@@ -841,6 +841,7 @@
         <div class="row-gap tight-top"><input id="p-postal" class="input" maxlength="10" autocomplete="postal-code" value="${esc(S.me.postal || '')}">
           <button class="btn primary" data-action="savePostal">${esc(t('savePostal'))}</button></div>
         <div class="muted small">${esc(t('postalHint'))}</div></section>
+      ${receivedSection()}
       <section class="card pad-m"><h2 class="h3">${icon('heart', 20)} ${esc(t('myWishlist'))}</h2>
         ${myWishes.length ? `<ul class="wish-list">${myWishes.map((w) => {
           const avail = S.books.filter((b) => b.owner !== MINE && b.status === 'available' && wishMatches(w, b));
@@ -863,6 +864,30 @@
         ${LIVE ? `<p class="muted small">${esc(t('signedInAs', { email: live.email }))}</p><button class="btn ghost" data-action="signOut">${esc(t('signOut'))}</button>` : ''}
         <button class="btn danger" data-action="deleteAll">${icon('trash', 20)} ${esc(LIVE ? t('leaveGroup') : t('deleteAccount'))}</button></section>
     </main>`;
+  }
+
+  // "Books I got": books received in finished exchanges. Only the book – never who it came from.
+  function receivedHow(r) { return r.how === 'bought' ? t('gotBought', { price: '€' + Number(r.price || 0) }) : t(r.how === 'gift' ? 'gotGift' : 'gotSwapped'); }
+  function receivedSection() {
+    const rows = S.received.slice().sort((a, b) => (b.at || 0) - (a.at || 0));
+    const day = (ms) => (ms ? new Intl.DateTimeFormat(S.lang, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(ms)) : '');
+    const cls = { bought: 'b-sell', gift: 'b-give', swapped: 'b-swap' };
+    return `<section class="card pad-m"><h2 class="h3">${icon('books', 20)} ${esc(t('gotTitle'))}</h2>
+      <p class="muted small">${esc(t('gotHint'))}</p>
+      ${rows.length ? `<ul class="wish-list">${rows.map((r) => `<li><span class="grow"><span class="bold">${esc(r.title)}</span> <span class="muted small">${esc(r.author || '')}</span>
+          <span class="muted tiny got-meta">${esc(langName(r.lang))}${r.at ? ' · ' + esc(day(r.at)) : ''}</span></span>
+          <span class="badge ${cls[r.how] || 'b-swap'}">${esc(receivedHow(r))}</span></li>`).join('')}</ul>
+        <button class="btn ghost" data-action="downloadReceived">${icon('download', 20)} ${esc(t('gotDownload'))}</button>`
+      : `<p class="muted">${esc(t('gotEmpty'))}</p>`}</section>`;
+  }
+  function downloadReceived() {
+    const cell = (v) => { const x = String(v == null ? '' : v); return /[",\n;]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    const head = ['title', 'author', 'isbn', 'language', 'how', 'price_eur', 'date'];
+    const lines = S.received.slice().sort((a, b) => (b.at || 0) - (a.at || 0)).map((r) => [r.title, r.author, r.isbn, r.lang, r.how,
+      r.how === 'bought' ? Number(r.price || 0).toFixed(2) : '', r.at ? new Date(r.at).toISOString().slice(0, 10) : ''].map(cell).join(','));
+    const blob = new Blob(['\ufeff' + [head.join(',')].concat(lines).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'seku-seku-books-i-got.csv';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   }
 
   // ---------- render ----------
@@ -980,7 +1005,7 @@
     iGet.forEach((id) => {
       const b = book(id); if (!b) return;
       b.status = 'gone';
-      S.received.push({ title: b.title, lang: b.lang, topics: b.topics, offer: b.offer, price: b.price, at: Date.now() });
+      S.received.unshift(receivedRow(th, b, Date.now()));
     });
     sysMsg(th, 'sysDone');
   }
@@ -1467,6 +1492,7 @@
     },
     addWish: () => { ui.addMode = 'wish'; ui.addStep = 'scan'; ui.draft = null; ui.addMsg = ''; ui.searchResults = []; go('#/add'); },
     removeWish: (el) => { S.wishes = S.wishes.filter((w) => w.id !== el.dataset.v); save(); render(); },
+    downloadReceived: () => downloadReceived(),
     savePostal: () => {
       const cc = document.getElementById('p-country').value;
       const v = cleanPostal(cc, document.getElementById('p-postal').value);
@@ -1523,14 +1549,26 @@
       messages: msgs.length ? msgs : [{ from: 'system', key: 'sendRequest', vars: {}, text: '', at: Date.parse(r.created_at) }],
       unread: !!(lastOther && lastOther.at > readAt) };
   }
+  // A book I got, as the "Books I got" list keeps it: the book only, nothing about who it came from.
+  function receivedRow(th, b, at) {
+    const swap = (th.offered || []).length > 0;
+    const how = swap ? 'swapped' : b.offer === 'sell' ? 'bought' : b.offer === 'give' ? 'gift' : 'swapped';
+    return { title: b.title, author: b.author && b.author !== '—' ? b.author : '', isbn: b.isbn || '', lang: b.lang, topics: b.topics || [],
+      how: how, price: how === 'bought' ? Number(b.price || 0) : 0, at: at || 0 };
+  }
+  // Fallback when the server has no received_books table yet (migration 009 not applied).
   function computeReceived() {
     const out = [];
     S.threads.filter((th) => th.status === 'done').forEach((th) => {
       (th.role === 'owner' ? th.offered : th.accepted).forEach((id) => {
-        const b = book(id); if (b) out.push({ title: b.title, lang: b.lang, topics: b.topics, offer: b.offer, price: b.price });
+        const b = book(id); if (b) out.push(receivedRow(th, b, (th.messages[th.messages.length - 1] || {}).at || 0));
       });
     });
     return out;
+  }
+  function mapReceived(r) {
+    return { title: r.title, author: r.author || '', isbn: r.isbn || '', lang: r.lang, topics: r.topics || [], how: r.how,
+      price: (r.price_cents || 0) / 100, at: Date.parse(r.received_at) };
   }
 
   async function loadMembership() {
@@ -1552,7 +1590,7 @@
   function refreshAll() {
     if (!LIVE || !live.group) return Promise.resolve();
     if (refreshing) return refreshing;
-    refreshing = Promise.all([Backend.loadGroup(live.group.id), Backend.loadThreads(), Backend.loadNotifications().catch(() => [])]).then((res) => {
+    refreshing = Promise.all([Backend.loadGroup(live.group.id), Backend.loadThreads(), Backend.loadNotifications().catch(() => []), Backend.loadReceived()]).then((res) => {
       S.notifications = res[2].map((n) => { const d = Object.assign({}, n.data); if (d.actor === live.uid) d.actor = MINE;
         return { id: n.id, type: n.type, data: d, at: Date.parse(n.created_at), read: !!n.read_at }; });
       const g = res[0];
@@ -1567,7 +1605,7 @@
       S.books = g.books.map((r) => mapBook(r, g.urls));
       S.wishes = g.wishes.map((w) => ({ id: w.id, owner: w.owner_id === live.uid ? MINE : w.owner_id, title: w.title, author: w.author, lang: w.lang, isbn: w.isbn || '' }));
       S.threads = res[1].map(mapThread);
-      S.received = computeReceived();
+      S.received = res[3] ? res[3].map(mapReceived) : computeReceived();
       S.cart = S.cart.filter((id) => { const b = book(id); return b && b.status === 'available' && b.owner !== MINE; });
     }).finally(() => { refreshing = null; });
     return refreshing;

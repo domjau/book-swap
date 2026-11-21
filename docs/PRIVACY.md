@@ -23,6 +23,7 @@
 | Terms acceptance (version + time) | Proof that the user accepted the terms | Only you / admins | Device only | Server |
 | Books (title, details, photo) | The listing itself | Signed-in members | Device only | Server |
 | Requests & chat messages | Arranging the swap | The two people involved (+ admins for a reported conversation) | Device only | Server |
+| Books I got (title, author, ISBN, language, how it changed hands, price, date) | Your own history of books received; downloadable as CSV | Only you | Device only | Server, snapshot when a handover is marked done; holds nothing about the other member (no name, id, postal code or chat link); you can delete rows; deleted with your account |
 | Profile stats | Fun | Only you | Calculated on device | Calculated from the above |
 
 Book lookups send **only the ISBN or the search text** to Google Books / Open Library, with no user information. Lookups in the National Library of Lithuania go through our own server (Edge Function `isbn-lookup`), which sends only the ISBN to data.gov.lt. To stop overuse, the server notes which member made a library call and when (no ISBN), and deletes these notes after one day. Results are cached per ISBN, with no user information.

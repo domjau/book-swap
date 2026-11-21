@@ -37,6 +37,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 ## Tests
 - `bash supabase/tests/rls_test.sh` (001–003, 107 checks) and `bash supabase/tests/network_test.sh` (001–005, 46 checks) against local Postgres with `supabase/tests/local_supabase_stub.sql`.
 - `bash supabase/tests/isbn_lookup_test.sh` (fresh DB with 001–003, 005, 006; 16 checks) and `node supabase/functions/isbn-lookup/lnb_test.mjs` (35 checks; needs `npm i --no-save isbn3@2.0.13`).
+- `bash supabase/tests/received_books_test.sh` (fresh DB with 001–003, 005, 009; 18 checks).
 - Email logic: see the first line of `supabase/functions/send-notifications/logic_test.mjs`.
 - Demo mode: open `?demo=1` (sample data, localStorage only).
 
