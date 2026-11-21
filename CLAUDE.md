@@ -21,7 +21,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 - Supabase now; may move elsewhere later. Sign-in emails currently via the app's Gmail account.
 
 ## Stack
-- Static app, no build step: `index.html`, `app.js` (hash routes, views return HTML strings), `i18n.js`, `data.js`, `terms.js`, `config.js`, `backend.js`, `styles.css`. Served from GitHub Pages.
+- Static app, no build step: `index.html`, `app.js` (hash routes, views return HTML strings), `chat.js` (request message + quick replies, pure), `i18n.js`, `data.js`, `terms.js`, `config.js`, `backend.js`, `styles.css`. Served from GitHub Pages.
 - Supabase (EU): Postgres with RLS on every table, `SECURITY DEFINER` RPCs for state changes, private `book-photos` bucket, realtime, Edge Functions `send-notifications` and `isbn-lookup` (national library lookup, cached).
 - One open network: a single group `network_id()`; admins are rows in `platform_admins`.
 - Vendored libs in `vendor/` (supabase-js, zxing-wasm). Strict CSP in `index.html` – new external hosts must be added there.
@@ -37,6 +37,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 ## Tests
 - `bash supabase/tests/rls_test.sh` (001–003, 107 checks) and `bash supabase/tests/network_test.sh` (001–005, 46 checks) against local Postgres with `supabase/tests/local_supabase_stub.sql`.
 - `bash supabase/tests/isbn_lookup_test.sh` (fresh DB with 001–003, 005, 006; 16 checks) and `node supabase/functions/isbn-lookup/lnb_test.mjs` (35 checks; needs `npm i --no-save isbn3@2.0.13`).
+- Automatic request message + quick replies: `node tests/chat_test.mjs` (8 checks, no install).
 - Email logic: see the first line of `supabase/functions/send-notifications/logic_test.mjs`.
 - Demo mode: open `?demo=1` (sample data, localStorage only).
 

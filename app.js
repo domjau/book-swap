@@ -563,7 +563,7 @@
     const mine = S.books.filter((b) => b.owner === MINE && b.status === 'available');
     const bundles = Object.keys(byOwner).map((owner) => {
       const items = byOwner[owner];
-      const meta = S.cartMeta[owner] || { offered: [], msg: t('defaultMsg') };
+      const meta = S.cartMeta[owner] || { offered: [], msg: null };
       const sum = items.filter((b) => b.offer === 'sell').reduce((a, b) => a + Number(b.price || 0), 0);
       const offerOpen = ui.showOffer[owner] || meta.offered.length > 0;
       return `<section class="card bundle">
@@ -575,7 +575,7 @@
         ${offerOpen ? `<div class="muted small">${esc(t('pickYours'))}</div><div class="row-wrap">${mine.slice().sort((a, b) => (theyWant(owner, b) ? 1 : 0) - (theyWant(owner, a) ? 1 : 0)).map((m) => `<label class="check-pill ${meta.offered.indexOf(m.id) >= 0 ? 'on' : ''}">
           <input type="checkbox" data-action="toggleOffered" data-owner="${esc(owner)}" data-v="${esc(m.id)}" ${meta.offered.indexOf(m.id) >= 0 ? 'checked' : ''}> ${esc(m.title)}${theyWant(owner, m) ? ` <span class="heart-inline" title="${esc(t('onTheirWishlist'))}">${icon('heart', 14)}</span>` : ''}</label>`).join('')}</div>` : ''}
         <label class="sr" for="msg-${esc(owner)}">${esc(t('messagePh'))}</label>
-        <textarea id="msg-${esc(owner)}" class="input" rows="3" maxlength="500" placeholder="${esc(t('messagePh'))}" data-input="cartMsg" data-owner="${esc(owner)}">${esc(meta.msg)}</textarea>
+        <textarea id="msg-${esc(owner)}" class="input" rows="3" maxlength="500" placeholder="${esc(t('messagePh'))}" data-input="cartMsg" data-owner="${esc(owner)}">${esc(cartText(owner, items.map((b) => b.id), meta))}</textarea>
         <button class="btn primary big" data-action="sendRequest" data-v="${esc(owner)}">${icon('send')} ${esc(t('sendRequest'))}</button>
       </section>`;
     }).join('');
@@ -674,7 +674,7 @@
         <div class="safety">${icon('shield', 16)} <span>${esc(t('p2pNote'))} <a class="ulink" href="#/terms">${esc(t('viewTerms'))}</a></span></div>
       </section>
       <div class="msgs">${msgs}</div>
-      ${canChat ? `<div class="quick">${['qr1', 'qr2', 'qr3'].map((k) => `<button class="pill" data-action="quick" data-thread="${esc(th.id)}" data-v="${k}">${esc(t(k))}</button>`).join('')}</div>
+      ${canChat ? `<div class="quick" role="group" aria-label="${esc(t('quickReplies'))}">${SekuChat.quickReplies(isOwner, th.status).map((k) => `<button class="pill" data-action="quick" data-thread="${esc(th.id)}" data-v="${k}">${esc(t(k))}</button>`).join('')}</div>
       <form class="composer" data-action-submit="sendMsg" data-v="${esc(th.id)}"><label class="sr" for="msgbox">${esc(t('typeMessage'))}</label>
         <input id="msgbox" class="input grow" maxlength="1000" autocomplete="off" placeholder="${esc(t('typeMessage'))}">
         <button class="btn primary" type="submit" aria-label="${esc(t('send'))}">${icon('send')}</button></form>` : ''}
@@ -936,16 +936,35 @@
     if (v.when) v.when = fmtDate(new Date(v.when));
     return t(m.key, v);
   }
+  // The automatic request message names the books and asks one question (does this Saturday work?),
+  // which the owner's quick replies answer. meta.msg == null means "not edited, use the automatic text".
+  function autoRequestMsg(owner, ids, offered) {
+    const items = ids.map(book).filter(Boolean);
+    const offeredBooks = (offered || []).map(book).filter(Boolean);
+    return SekuChat.requestMsg(t, {
+      name: firstName(owner),
+      titles: items.map((b) => b.title),
+      offeredTitles: offeredBooks.map((b) => b.title),
+      offeredWished: offeredBooks.some((b) => theyWant(owner, b)),
+      sellSum: items.filter((b) => b.offer === 'sell').reduce((a, b) => a + Number(b.price || 0), 0),
+      day: new Intl.DateTimeFormat(S.lang, { day: 'numeric', month: 'long' }).format(new Date(nextSaturdayISO() + 'T12:00:00'))
+    });
+  }
+  function cartText(owner, ids, meta) {
+    // Older saved carts hold the old fixed default text; treat it as not edited.
+    if (meta.msg == null || meta.msg === t('defaultMsg')) return autoRequestMsg(owner, ids, meta.offered);
+    return meta.msg;
+  }
   function setStatus(ids, status) { ids.forEach((id) => { const b = book(id); if (b) b.status = status; }); }
 
   function sendRequest(owner) {
     if (LIVE) return liveSendRequest(owner);
     const ids = S.cart.filter((id) => { const b = book(id); return b && b.owner === owner; });
     if (!ids.length) return;
-    const meta = S.cartMeta[owner] || { offered: [], msg: t('defaultMsg') };
+    const meta = S.cartMeta[owner] || { offered: [], msg: null };
     const th = { id: uid('t'), with: owner, role: 'requester', books: ids, offered: meta.offered.slice(), accepted: [], status: 'pending',
       handover: null, unread: false, messages: [] };
-    const text = (meta.msg || '').trim();
+    const text = cartText(owner, ids, meta).trim();
     if (text) th.messages.push({ from: MINE, text: text, at: Date.now() });
     else sysMsg(th, 'sendRequest');
     S.threads.push(th);
@@ -1373,9 +1392,7 @@
       const id = el.dataset.v; const ex = ui.ex[id];
       if (!ex || !ex.get.length) { toast(t('pickSomething')); return; }
       ex.get.forEach((bid) => { if (S.cart.indexOf(bid) < 0) S.cart.push(bid); });
-      const titles = (ids) => ids.map((x) => (book(x) || {}).title).filter(Boolean).join(', ');
-      S.cartMeta[id] = { offered: ex.give.slice(),
-        msg: ex.give.length ? t('exchangeMsg', { give: titles(ex.give), get: titles(ex.get) }) : t('exchangeMsgPlain', { get: titles(ex.get) }) };
+      S.cartMeta[id] = { offered: ex.give.slice(), msg: null }; // automatic message names both sides
       ui.showOffer[id] = ex.give.length > 0;
       delete ui.ex[id];
       save(); go('#/requests');
@@ -1388,7 +1405,7 @@
     removeCart: (el) => { S.cart = S.cart.filter((x) => x !== el.dataset.v); save(); render(); },
     toggleOffer: (el) => { ui.showOffer[el.dataset.v] = el.checked; if (!el.checked && S.cartMeta[el.dataset.v]) S.cartMeta[el.dataset.v].offered = []; save(); render(); },
     toggleOffered: (el) => {
-      const o = el.dataset.owner; const m = S.cartMeta[o] = S.cartMeta[o] || { offered: [], msg: t('defaultMsg') };
+      const o = el.dataset.owner; const m = S.cartMeta[o] = S.cartMeta[o] || { offered: [], msg: null };
       const i = m.offered.indexOf(el.dataset.v); if (i >= 0) m.offered.splice(i, 1); else m.offered.push(el.dataset.v); save(); render();
     },
     sendRequest: (el) => sendRequest(el.dataset.v),
@@ -1419,6 +1436,7 @@
     markDone: (el) => { const th = S.threads.find((x) => x.id === el.dataset.v); finishThread(th); save(); render(); },
     quick: (el) => {
       const th = S.threads.find((x) => x.id === el.dataset.thread);
+      if (!th || SekuChat.ALL_QUICK.indexOf(el.dataset.v) < 0) return;
       th.messages.push({ from: MINE, text: t(el.dataset.v), at: Date.now() }); save(); render();
     },
     report: () => toast(t('reported')),
@@ -1647,9 +1665,9 @@
   async function liveSendRequest(owner) {
     const ids = S.cart.filter((id) => { const b = book(id); return b && b.owner === owner; });
     if (!ids.length) return;
-    const meta = S.cartMeta[owner] || { offered: [], msg: t('defaultMsg') };
+    const meta = S.cartMeta[owner] || { offered: [], msg: null };
     const offered = meta.offered.filter((id) => { const b = book(id); return b && b.owner === MINE && b.status === 'available'; });
-    const id = await liveAct(() => Backend.createRequest(owner, ids, offered, meta.msg));
+    const id = await liveAct(() => Backend.createRequest(owner, ids, offered, cartText(owner, ids, Object.assign({}, meta, { offered: offered }))));
     if (id && id !== true) {
       S.cart = S.cart.filter((x) => ids.indexOf(x) < 0); delete S.cartMeta[owner]; save();
       toast(t('sent')); go('#/chat/' + id);
@@ -1671,7 +1689,7 @@
         liveAct(() => Backend.schedule(thread(el).id, when, where));
       },
       markDone: (el) => liveAct(() => Backend.complete(thread(el).id)),
-      quick: (el) => liveAct(() => Backend.sendMessage(thread(el).id, live.uid, t(el.dataset.v))),
+      quick: (el) => { if (SekuChat.ALL_QUICK.indexOf(el.dataset.v) >= 0) liveAct(() => Backend.sendMessage(thread(el).id, live.uid, t(el.dataset.v))); },
       report: () => { const id = route().id; liveAct(() => Backend.report(live.group.id, live.uid, 'request', id, ''), t('reported')); },
       saveDraft: async () => {
         const d = ui.draft;

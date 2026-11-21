@@ -48,7 +48,7 @@ There is one kind of user: a **member**. Any member can list, browse, request an
 
 1. **Owner** gets a notification "Ana wants 3 books" and opens the chat. The bundle is pinned at the top.
 2. Owner ticks the books they can give (all or some) → **Accept**, or **Decline**. Accepted books show as *Reserved* to everyone else.
-3. Both chat as needed. **Quick replies** are available ("Yes, Saturday works", "Maybe next week?").
+3. Both chat as needed. The request starts with an **automatic message** that names the books (and any offered in return or the sale total) and asks one question: "Would this Saturday work for you?". **Quick replies** answer that question and change with the stage: the owner sees "Yes, Saturday works" / "Could we do another day?" / "Sorry, it's already gone"; later "See you on Saturday!", "Running a few minutes late", and so on. The requester can still edit the message before sending.
 4. Either person fills in the **handover card** (date and place, pre-filled from the group settings) and taps **Confirm**. Both get a reminder the day before.
 
 ## 6. Handover and afterwards
