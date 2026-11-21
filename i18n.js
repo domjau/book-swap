@@ -48,7 +48,6 @@ window.STRINGS = {
     handoverSet: '{when} · {where}', markDone: 'Pažymėti kaip perduota', doneMsg: 'Knygos perduotos. Ačiū, kad dalinatės!',
     reminderNote: 'Abu gausite priminimą dieną prieš.',
     typeMessage: 'Rašyti žinutę…', send: 'Siųsti', report: 'Pranešti', reported: 'Pranešta grupės organizatoriui.',
-    qr1: 'Taip, šeštadienis tinka', qr2: 'Gal kitą savaitę?', qr3: 'Atsiprašau, jau atiduota',
     sysAccepted: '{name} priėmė prašymą', sysDeclined: '{name} atmetė prašymą', sysHandover: 'Perdavimas suplanuotas: {when}, {where}', sysDone: 'Pažymėta kaip perduota',
     autoReply: 'Labas! Taip, galiu atnešti šeštadienį 🙂',
     // add book
@@ -119,7 +118,6 @@ window.STRINGS = {
     handoverSet: '{when} · {where}', markDone: 'Marcar como entregado', doneMsg: 'Libros entregados. ¡Gracias por compartir!',
     reminderNote: 'Ambos recibiréis un recordatorio el día antes.',
     typeMessage: 'Escribe un mensaje…', send: 'Enviar', report: 'Denunciar', reported: 'Se ha avisado al organizador del grupo.',
-    qr1: 'Sí, el sábado me va bien', qr2: '¿Mejor la semana que viene?', qr3: 'Lo siento, ya no está',
     sysAccepted: '{name} ha aceptado el pedido', sysDeclined: '{name} ha rechazado el pedido', sysHandover: 'Entrega programada: {when}, {where}', sysDone: 'Marcado como entregado',
     autoReply: '¡Hola! Sí, puedo traerlos el sábado 🙂',
     addTitle: 'Añadir libro', scanTitle: 'Escanea el código ISBN', scanHint: 'Está en la contraportada, sobre el código de barras pone «ISBN».',
@@ -187,7 +185,6 @@ window.STRINGS = {
     handoverSet: '{when} · {where}', markDone: 'Mark as handed over', doneMsg: 'Books handed over. Thanks for sharing!',
     reminderNote: "You'll both get a reminder the day before.",
     typeMessage: 'Type a message…', send: 'Send', report: 'Report', reported: 'Reported to the group organiser.',
-    qr1: 'Yes, Saturday works', qr2: 'Maybe next week?', qr3: 'Sorry, already gone',
     sysAccepted: '{name} accepted the request', sysDeclined: '{name} declined the request', sysHandover: 'Handover scheduled: {when}, {where}', sysDone: 'Marked as handed over',
     autoReply: 'Hi! Yes, I can bring them on Saturday 🙂',
     addTitle: 'Add a book', scanTitle: 'Scan the ISBN barcode', scanHint: 'It is on the back cover – look for "ISBN" above the barcode.',
@@ -783,4 +780,43 @@ Object.assign(window.STRINGS.es, {
 Object.assign(window.STRINGS.en, {
   lnbName: 'National Library of Lithuania',
   lnbCredit: 'Data: Martynas Mažvydas National Library of Lithuania, data.gov.lt.'
+});
+
+// ---- automatic request message + quick replies that answer it (chat.js)
+// The message asks "does this Saturday work?"; the owner's quick replies answer exactly that.
+Object.assign(window.STRINGS.en, {
+  rqHi: 'Hi {name}!', rqHiNoName: 'Hi!',
+  rqWantOne: 'I would love {title}.', rqWantMany: 'I would love these {n} books: {titles}.',
+  rqOffer: 'In return I can give you {titles}.', rqOfferWish: 'In return I can give you {titles} (from your wish list).',
+  rqPay: 'I will bring €{sum} for the books on sale.',
+  rqAsk: 'Would this Saturday ({day}) work for you? If not, just suggest another day.',
+  rqQuote: '“{x}”', rqAnd: '{list} and {last}', rqAndMore: '{list} and {n} more',
+  qrYesSat: 'Yes, Saturday works 🙂', qrOtherDay: 'Could we do another day?', qrGone: "Sorry, it's already gone",
+  qrAnyDay: 'Any day works for me', qrThanks: 'Thank you!', qrSeeSat: 'See you on Saturday!', qrWhere: 'Where would suit you?',
+  qrSeeYou: 'See you then!', qrLate: 'Running a few minutes late', qrMove: 'Can we move it?',
+  quickReplies: 'Quick replies'
+});
+Object.assign(window.STRINGS.lt, {
+  rqHi: 'Labas!', rqHiNoName: 'Labas!',
+  rqWantOne: 'Norėčiau knygos {title}.', rqWantMany: 'Norėčiau šių knygų ({n}): {titles}.',
+  rqOffer: 'Mainais galiu duoti {titles}.', rqOfferWish: 'Mainais galiu duoti {titles} (iš jūsų norų sąrašo).',
+  rqPay: 'Už parduodamas knygas atnešiu €{sum}.',
+  rqAsk: 'Ar tiktų šį šeštadienį ({day})? Jei ne, pasiūlykite kitą dieną.',
+  rqQuote: '„{x}“', rqAnd: '{list} ir {last}', rqAndMore: '{list} ir dar {n}',
+  qrYesSat: 'Taip, šeštadienis tinka 🙂', qrOtherDay: 'Gal galime kitą dieną?', qrGone: 'Atsiprašau, jau atiduota',
+  qrAnyDay: 'Man tinka bet kuri diena', qrThanks: 'Ačiū!', qrSeeSat: 'Iki šeštadienio!', qrWhere: 'Kur jums patogu susitikti?',
+  qrSeeYou: 'Iki susitikimo!', qrLate: 'Vėluoju kelias minutes', qrMove: 'Gal galime perkelti?',
+  quickReplies: 'Greiti atsakymai'
+});
+Object.assign(window.STRINGS.es, {
+  rqHi: '¡Hola, {name}!', rqHiNoName: '¡Hola!',
+  rqWantOne: 'Me encantaría {title}.', rqWantMany: 'Me encantarían estos {n} libros: {titles}.',
+  rqOffer: 'A cambio puedo darte {titles}.', rqOfferWish: 'A cambio puedo darte {titles} (de tu lista de deseos).',
+  rqPay: 'Llevaré {sum} € por los libros en venta.',
+  rqAsk: '¿Te viene bien este sábado ({day})? Si no, propón otro día.',
+  rqQuote: '«{x}»', rqAnd: '{list} y {last}', rqAndMore: '{list} y {n} más',
+  qrYesSat: 'Sí, el sábado me va bien 🙂', qrOtherDay: '¿Podemos otro día?', qrGone: 'Lo siento, ya no está',
+  qrAnyDay: 'Cualquier día me va bien', qrThanks: '¡Gracias!', qrSeeSat: '¡Nos vemos el sábado!', qrWhere: '¿Dónde te viene bien?',
+  qrSeeYou: '¡Nos vemos!', qrLate: 'Llego unos minutos tarde', qrMove: '¿Lo cambiamos de día?',
+  quickReplies: 'Respuestas rápidas'
 });
