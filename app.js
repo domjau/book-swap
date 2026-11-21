@@ -78,7 +78,7 @@
   let S = LIVE ? Object.assign(fresh(), pickPrefs(load() || {})) : (migrate(load()) || fresh());
   function pickPrefs(o) {
     const out = {};
-    ['lang', 'interested', 'cart', 'cartMeta', 'toured'].forEach((k) => { if (o[k] !== undefined) out[k] = o[k]; });
+    ['lang', 'interested', 'cart', 'cartMeta', 'toured', 'installDismissed'].forEach((k) => { if (o[k] !== undefined) out[k] = o[k]; });
     return out;
   }
   if (LIVE) Object.keys(MEMBERS).forEach((k) => delete MEMBERS[k]); // members come from the server
@@ -507,7 +507,7 @@
         <button class="link" data-action="clearFilters">${esc(t('clearFilters'))}</button></div>` +
         (filtered.length ? `<div class="grid pad">${filtered.map((b) => bookCard(b, 'grid')).join('')}</div>` : `<div class="card pad-m empty">${esc(t('noResults'))}</div>`);
     }
-    return `<main>
+    return `<main>${installBanner()}
       <div class="pad"><label class="search">${icon('search', 20)}<input id="q" type="search" value="${esc(ui.q)}" placeholder="${esc(t('searchPh'))}" aria-label="${esc(t('searchPh'))}" data-input="q"></label></div>
       <div class="pad near-row"><button class="pill ${ui.fNear ? 'on' : ''}" data-action="fNear" aria-pressed="${ui.fNear}">${icon('pin', 16)} ${esc(t('nearMe'))}${S.me.postal ? ' (' + esc(S.me.postal) + ')' : ''}</button></div>
       <div class="pad"><span class="label">${esc(t('bookLang'))}</span><div class="row-wrap">${langChips}</div></div>
@@ -963,6 +963,26 @@
   }
   window.addEventListener('hashchange', render);
 
+  // ---------- app updates and "add to home screen" ----------
+  // The service worker always asks the server for the newest files, so updates reach phones without a hard refresh.
+  if (navigator.serviceWorker && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  let installEvt = null;
+  const isStandalone = () => (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent);
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; render(); });
+  window.addEventListener('appinstalled', () => { installEvt = null; S.installDismissed = true; save(); render(); });
+  function installBanner() {
+    if (S.installDismissed || isStandalone() || !S.toured) return '';
+    if (!installEvt && !isIos()) return '';
+    return `<div class="pad"><div class="install card pad-m" role="region" aria-label="${esc(t('installTitle'))}">
+      <span class="install-ic">${icon('seku', 26)}</span>
+      <div class="grow"><b>${esc(t('installTitle'))}</b><div class="muted small">${esc(installEvt ? t('installText') : t('installIos'))}</div></div>
+      ${installEvt ? `<button class="btn primary" data-action="install">${esc(t('installBtn'))}</button>` : ''}
+      <button class="icon-btn" data-action="installLater" aria-label="${esc(t('installLater'))}" title="${esc(t('installLater'))}">${icon('x', 16)}</button></div></div>`;
+  }
+
   let toastTimer;
   function toast(msg) {
     ui.toast = msg; render();
@@ -1391,6 +1411,8 @@
     toggleInterest: (el) => { const v = el.dataset.v; const i = S.interested.indexOf(v); if (i >= 0) S.interested.splice(i, 1); else S.interested.push(v); save(); render(); },
     toggleAgree: (el) => { ui.onbAgree = el.checked; },
     toggleAdult: (el) => { ui.onbAdult = el.checked; },
+    install: async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; render(); },
+    installLater: () => { S.installDismissed = true; save(); render(); },
     toSignup: () => { const f = document.getElementById('signup'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); const e = document.getElementById('si-email'); if (e) setTimeout(() => e.focus({ preventScroll: true }), 350); },
     startSignup: () => { ui.introDone = true; render(); window.scrollTo(0, 0); },
     tourNext: () => { ui.tourStep = (ui.tourStep || 0) + 1; render(); },

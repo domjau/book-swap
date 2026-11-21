@@ -837,3 +837,8 @@ Object.assign(window.STRINGS.en, {
   n_mod_appeal: 'If you think this is a mistake, write to us (see "Contact" in the terms).',
   scamWarning: 'Be careful: don\'t pay in advance, never share bank or card details, and meet in a public place.'
 });
+
+// "Add to home screen"
+Object.assign(window.STRINGS.lt, { installTitle: 'Įsidėkite seku seku į telefono ekraną', installText: 'Atsidarys kaip programėlė, vienu paspaudimu.', installIos: 'Safari spauskite „Bendrinti“, tada „Įtraukti į pradžios ekraną“.', installBtn: 'Įdėti', installLater: 'Ne dabar' });
+Object.assign(window.STRINGS.es, { installTitle: 'Añade seku seku a tu pantalla de inicio', installText: 'Se abre como una app, con un toque.', installIos: 'En Safari, toca «Compartir» y luego «Añadir a pantalla de inicio».', installBtn: 'Añadir', installLater: 'Ahora no' });
+Object.assign(window.STRINGS.en, { installTitle: 'Add seku seku to your home screen', installText: 'It opens like an app, in one tap.', installIos: 'In Safari, tap Share, then "Add to Home Screen".', installBtn: 'Add', installLater: 'Not now' });
