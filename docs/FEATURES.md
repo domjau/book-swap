@@ -44,7 +44,7 @@
 | Push notifications on the phone | ⚪ |
 | Reports with reasons (didn't show up, inappropriate, piracy, spam, safety, other) on chats, listings and members | ✅ |
 | Admin panel: stats, announcements to everyone, members (remove, block), reports (read reported chat, hide listing, resolve), admins (add by email, remove), moderation log | ✅ |
-| Installable PWA with offline shell | 🟠 (manifest done) |
+| Installable PWA with offline shell, "add to home screen" prompt, updates without a hard refresh | ✅ |
 
 ## Finding books
 | Feature | Status |

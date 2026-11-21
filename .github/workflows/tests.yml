@@ -1,0 +1,39 @@
+# Runs all tests on every push and pull request: database security tests (local Postgres),
+# email and library-lookup logic, a syntax check of the app files, and a browser smoke test.
+name: tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Start Postgres
+        run: sudo systemctl start postgresql.service && sudo -u postgres psql -c 'select version()'
+      - name: Database tests
+        run: sudo bash supabase/tests/run_all.sh
+      - name: Syntax check of the app files
+        run: for f in app.js backend.js i18n.js data.js terms.js privacy.js config.js sw.js; do node --check "$f" || exit 1; done
+      - name: Email logic
+        working-directory: supabase/functions/send-notifications
+        run: |
+          sed -e "s#^import .*supabase-js.*#const createClient = null;#" -e "s#^import nodemailer.*#const nodemailer = null;#" index.ts > fn.mjs
+          node logic_test.mjs | tee out.txt; grep -q " 0 failed" out.txt
+      - name: Library lookup logic
+        run: |
+          npm i --no-save isbn3@2.0.13 playwright@1.49.1
+          node supabase/functions/isbn-lookup/lnb_test.mjs | tee out.txt; grep -q " 0 failed" out.txt
+      - name: Browser smoke test (demo mode)
+        run: |
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8080 >/dev/null 2>&1 &
+          sleep 1
+          node tests/smoke.mjs

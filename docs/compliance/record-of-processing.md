@@ -24,7 +24,7 @@
 | 7 | Reports and moderation | Keep the platform safe and legal (DSA) | 6(1)(f) safety; 6(1)(c) DSA duties | Members, reported members, people who report by email | Report category and text, moderation log (action, reason, time), statements of reasons, hashed emails of blocked members | Admins | Reports and log: kept while needed for safety and DSA (review yearly); blocked-email hash: as long as the block |
 | 8 | Abuse limits | Stop spam and overuse | 6(1)(f) | Members | Counts of books, requests and messages per day; library-lookup log (member id and time) | Nobody outside the system | Library log 1 day; counts are computed from existing rows |
 | 9 | Book lookups | Fill in book details from an ISBN | 6(1)(b) | Members | ISBN or search text only; the member's browser IP is seen by Google Books and Open Library | Google (US), Internet Archive (US), National Library of Lithuania (via our server, ISBN only) | Not stored with personal data; library results cached per ISBN, no user data |
-| 10 | Hosting of the app | Deliver the web app | 6(1)(f) | Visitors | IP address and browser data in server logs | GitHub (Pages, US), Google Fonts (US) | Provider's own log retention |
+| 10 | Hosting of the app | Deliver the web app | 6(1)(f) | Visitors | IP address and browser data in server logs | GitHub (Pages, US) | Provider's own log retention |
 
 No special-category data, no data about children, no profiling, no automated decisions with legal effect (the automatic hide after 3 reports is reviewed by an admin and the member is told).
 
@@ -36,7 +36,7 @@ No special-category data, no data about children, no profiling, no automated dec
 | Brevo (Sendinblue SAS) | Sign-in and notification emails (planned) | EU (France) | Brevo DPA (part of their terms) | Stays in the EU |
 | Google LLC (Gmail, if used for sending) | Emails | US/global | Google Workspace / Gmail terms | EU–US Data Privacy Framework |
 | GitHub Inc. | Hosting of the static app | US | GitHub DPA | EU–US Data Privacy Framework |
-| Google LLC (Google Fonts, Google Books) | Font delivery, book lookups | US | Independent controller | DPF; plan: self-host the font |
+| Google LLC (Google Books) | Book lookups | US | Independent controller | ISBN or search text only |
 | Internet Archive (Open Library) | Book lookups | US | Independent controller | ISBN only |
 
 ## Security measures (art. 32)

@@ -1,0 +1,21 @@
+# Uptime check: every 3 hours, checks that the app and the database answer.
+# If it fails, GitHub emails the repository owner (Settings → Notifications → Actions).
+# The database call also counts as activity, which helps keep a free Supabase project from pausing.
+name: uptime
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: App answers
+        run: curl -fsS --retry 3 --retry-delay 20 -o /dev/null -w '%{http_code} %{time_total}s\n' https://domjau.github.io/book-swap/
+      - name: Database answers
+        run: |
+          KEY=$(curl -fsS https://domjau.github.io/book-swap/config.js | grep -o "sb_publishable_[A-Za-z0-9_-]*")
+          curl -fsS --retry 3 --retry-delay 20 -o /dev/null -w '%{http_code} %{time_total}s\n' -H "apikey: $KEY" https://dkypgyfbjtixyypsmais.supabase.co/auth/v1/health

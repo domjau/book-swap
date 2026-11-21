@@ -75,4 +75,4 @@ The in-app privacy notice is `privacy.js` (LT/ES/EN, route `#/privacy`). The rec
 - [x] Make sure the export and delete functions work against the server data (migration 007).
 - [ ] Use no analytics or tracking cookies (or, if added later, privacy-friendly analytics only, with no cookies).
 - [x] Have a plan for a data breach: who decides, and how members are told within 72 hours ([breach plan](compliance/breach-plan.md)).
-- [ ] Self-host the Outfit font (today Google Fonts sees visitors' IP addresses; German courts have fined sites for this).
+- [x] Self-host the Outfit font (`vendor/fonts/`), so Google Fonts no longer sees visitors' IP addresses.

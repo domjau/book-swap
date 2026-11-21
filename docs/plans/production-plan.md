@@ -50,8 +50,8 @@ Safety and moderation
 
 Security basics
 - [ ] **You** – GitHub settings: Dependabot alerts, secret scanning, protect the main branch
-- [ ] **Claude** – GitHub Actions: run the database and browser tests on every change
-- [ ] **Claude** – `security.txt` and OWASP ASVS Level 1 checklist in the docs
+- [x] **Claude** – GitHub Actions: run the database and browser tests on every change (`.github/workflows/tests.yml`)
+- [x] **Claude** – `security.txt` and OWASP ASVS Level 1 checklist in the docs (`docs/compliance/asvs-level1.md`)
 - [ ] **Claude** – Run the Supabase security check after every database change
 
 ## Phase 2 – production setup
@@ -60,13 +60,13 @@ Security basics
 - [ ] **You** – Decide Supabase plan: the free plan pauses inactive projects and has no downloadable backups – check current terms; Pro is the safe choice at launch
 - [ ] **Claude** – Weekly backup export (if staying on free)
 - [ ] **You + Claude** – Second Supabase project as "staging" for testing changes before they go live
-- [ ] **Claude** – Error monitoring (e.g. Sentry free tier) and an uptime check
+- [ ] **Claude** – Error monitoring (e.g. Sentry free tier) and an uptime check – uptime check done (`uptime.yml`, every 3 h); Sentry needs an account
 - [ ] **Claude** – Security headers via the new host (not possible on GitHub Pages)
 
 ## Phase 3 – launch
 - [ ] **You** – Pilot with 10–20 Saturday-school families for 4 weeks; collect feedback
 - [ ] **Claude** – Fix pilot feedback; accessibility and speed check on older phones
-- [ ] **Claude** – "Install the app" prompt (add to home screen)
+- [x] **Claude** – "Install the app" prompt (add to home screen), plus a service worker so updates reach phones without a hard refresh and the app opens offline
 - [ ] **You** – Poster / QR code for the school, message for parent groups
 - [ ] **You** – Open to other diaspora communities
 
