@@ -784,3 +784,17 @@ Object.assign(window.STRINGS.en, {
   lnbName: 'National Library of Lithuania',
   lnbCredit: 'Data: Martynas Mažvydas National Library of Lithuania, data.gov.lt.'
 });
+
+// Photo viewer on a book page
+Object.assign(window.STRINGS.lt, {
+  photosOfCopy: 'Egzemplioriaus nuotraukos', photoNofM: 'Nuotrauka {n} iš {m}',
+  prevPhoto: 'Ankstesnė nuotrauka', nextPhoto: 'Kita nuotrauka'
+});
+Object.assign(window.STRINGS.es, {
+  photosOfCopy: 'Fotos del ejemplar', photoNofM: 'Foto {n} de {m}',
+  prevPhoto: 'Foto anterior', nextPhoto: 'Foto siguiente'
+});
+Object.assign(window.STRINGS.en, {
+  photosOfCopy: 'Photos of this copy', photoNofM: 'Photo {n} of {m}',
+  prevPhoto: 'Previous photo', nextPhoto: 'Next photo'
+});
