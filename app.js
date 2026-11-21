@@ -28,6 +28,7 @@
     chat: 'M4 5h16v11H9l-5 4z',
     user: 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.5-7 8-7s8 3 8 7',
     back: 'M15 5l-7 7 7 7',
+    next: 'M9 5l7 7-7 7',
     search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4',
     camera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
     check: 'M5 12.5l4.5 4.5L19 7.5',
@@ -91,7 +92,7 @@
   const ui = {
     q: '', fLang: 'all', fTopic: null, fAge: null,
     draft: null, addStep: 'scan', addMsg: '', addMsgKind: '', searchResults: [], busy: false, lastSaved: null,
-    ticks: {}, showOffer: {}, rating: {}, editReview: {}, toast: '', onbName: '', onbPostal: '', onbCountry: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, chatTab: 'active'
+    ticks: {}, showOffer: {}, rating: {}, editReview: {}, toast: '', onbName: '', onbPostal: '', onbCountry: '', onbAgree: false, fNear: false, ex: {}, addMode: 'shelf', lastWish: null, scanner: null, photoIdx: {}, chatTab: 'active'
   };
 
   // ---------- i18n ----------
@@ -240,6 +241,42 @@
     return `<div class="cover cover-${size}" style="background:${tp.color}">${lang}
       <div class="cover-icon">${icon(tp.icon, size === 'l' ? 84 : size === 'm' ? 52 : 40)}</div>
       <div class="cover-title">${esc(b.title)}</div></div>`;
+  }
+  // Several photos of one copy: swipe (scroll-snap), arrows, keyboard or thumbnails switch between them.
+  function photoViewer(b) {
+    const ph = b.photos.slice(0, MAX_PHOTOS);
+    const cur = Math.min(Math.max(ui.photoIdx[b.id] || 0, 0), ph.length - 1);
+    const n = ph.length;
+    return `<div class="viewer" data-viewer="${esc(b.id)}" role="region" aria-roledescription="carousel" aria-label="${esc(t('photosOfCopy'))}">
+      <div class="viewer-track" tabindex="0" data-viewer-track="${esc(b.id)}">${ph.map((src, i) => `<div class="viewer-slide" role="group" aria-roledescription="slide" aria-label="${esc(t('photoNofM', { n: i + 1, m: n }))}">
+        <img src="${esc(src)}" alt="${esc(t('photoN', { n: i + 1 }))}"${i ? ' loading="lazy"' : ''} draggable="false"></div>`).join('')}</div>
+      <span class="lang-tag">${esc((b.lang || '').toUpperCase() || '·')}</span>
+      <button class="viewer-nav prev" data-action="photoStep" data-id="${esc(b.id)}" data-v="-1" aria-label="${esc(t('prevPhoto'))}"${cur === 0 ? ' disabled' : ''}>${icon('back', 22)}</button>
+      <button class="viewer-nav next" data-action="photoStep" data-id="${esc(b.id)}" data-v="1" aria-label="${esc(t('nextPhoto'))}"${cur === n - 1 ? ' disabled' : ''}>${icon('next', 22)}</button>
+      <div class="viewer-count" aria-live="polite">${cur + 1} / ${n}</div>
+    </div>
+    <div class="viewer-thumbs">${ph.map((src, i) => `<button class="viewer-thumb" data-action="photoGo" data-id="${esc(b.id)}" data-v="${i}" aria-label="${esc(t('photoN', { n: i + 1 }))}"${i === cur ? ' aria-current="true"' : ''}><img src="${esc(src)}" alt=""></button>`).join('')}</div>`;
+  }
+  // Update arrows, counter and thumbnails in place (no re-render, so a swipe isn't interrupted).
+  function syncViewer(id, i) {
+    const box = $app.querySelector(`.viewer[data-viewer="${CSS.escape(id)}"]`);
+    if (!box) return;
+    const n = box.querySelectorAll('.viewer-slide').length;
+    ui.photoIdx[id] = i;
+    box.querySelector('.viewer-nav.prev').disabled = i <= 0;
+    box.querySelector('.viewer-nav.next').disabled = i >= n - 1;
+    box.querySelector('.viewer-count').textContent = `${i + 1} / ${n}`;
+    const thumbs = box.parentNode.querySelectorAll('.viewer-thumb');
+    thumbs.forEach((th, k) => { if (k === i) th.setAttribute('aria-current', 'true'); else th.removeAttribute('aria-current'); });
+  }
+  function showPhoto(id, i, smooth) {
+    const track = $app.querySelector(`[data-viewer-track="${CSS.escape(id)}"]`);
+    if (!track) return;
+    const n = track.children.length;
+    const k = Math.min(Math.max(i, 0), n - 1);
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    track.scrollTo({ left: k * track.clientWidth, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    syncViewer(id, k);
   }
   function bookCard(b, size) {
     const loc = b.owner !== MINE && postalOf(b.owner) ? `<div class="book-loc">${icon('pin', 12)} ${esc(near(b.owner).label)}</div>` : '';
@@ -487,11 +524,10 @@
     const condKey = { new: 'condNew', good: 'condGood', worn: 'condWorn' }[b.cond] || 'condGood';
     return `<main class="pad">
       <button class="back" data-action="back">${icon('back', 20)} ${esc(t('back'))}</button>
-      <div class="center-col">${cover(b, 'l')}</div>
+      <div class="center-col">${(b.photos || []).length > 1 ? photoViewer(b) : cover(b, 'l')}</div>
       <h1 class="h1 center">${esc(b.title)}</h1>
       <div class="muted center bold">${esc(b.author)}</div>
       <div class="row-wrap center-row">${offerBadge(b)} ${topics}</div>
-      ${(b.photos || []).length > 1 ? `<div class="gallery">${b.photos.map((ph, i) => `<img src="${esc(ph)}" alt="${esc(t('photoN', { n: i + 1 }))}" loading="lazy">`).join('')}</div>` : ''}
       ${iWant(b) ? `<div class="notice wish">${icon('heart', 20)} ${esc(t('onYourWishlist'))}</div>` : ''}
       ${b.owner === MINE && wishersOf(b).length ? `<div class="notice wish">${icon('heart', 20)} <span>${esc(t('wantedBy'))} ${wishersOf(b).map(memberLink).join(', ')}</span></div>` : ''}
       <div class="actions">${actions}</div>
@@ -900,6 +936,8 @@
     }
     $app.innerHTML = body + reportSheet() + (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '');
     if (routeChanged && r.name === 'profile' && r.id === 'notifications') { const el = document.getElementById('notif-settings'); if (el) el.scrollIntoView(); }
+    // A re-render rebuilds the photo viewer – keep the photo the person was looking at.
+    $app.querySelectorAll('[data-viewer-track]').forEach((tr) => { const i = ui.photoIdx[tr.dataset.viewerTrack] || 0; if (i) showPhoto(tr.dataset.viewerTrack, i, false); });
     if (focusId && !routeChanged) {
       const el = document.getElementById(focusId);
       if (el) { el.focus(); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) {} }
@@ -1363,6 +1401,8 @@
     },
     go: (el) => go(el.dataset.v),
     back: () => { if (history.length > 1) history.back(); else go('#/'); },
+    photoStep: (el) => showPhoto(el.dataset.id, (ui.photoIdx[el.dataset.id] || 0) + Number(el.dataset.v), true),
+    photoGo: (el) => showPhoto(el.dataset.id, Number(el.dataset.v), true),
     fLang: (el) => { ui.fLang = el.dataset.v; render(); },
     fNear: () => { ui.fNear = !ui.fNear; render(); },
     exToggle: (el) => {
@@ -2058,6 +2098,21 @@
     if (!fn) return;
     if (el.tagName === 'INPUT' && el.type === 'checkbox') { fn(el); return; }
     e.preventDefault(); fn(el);
+  });
+  // Swiping the photo viewer scrolls it natively (scroll-snap); work out which photo is now showing.
+  // Scroll events don't bubble, so listen in the capture phase.
+  $app.addEventListener('scroll', (e) => {
+    const tr = e.target;
+    if (!tr.dataset || !tr.dataset.viewerTrack || !tr.clientWidth) return;
+    const i = Math.round(tr.scrollLeft / tr.clientWidth);
+    if (i !== (ui.photoIdx[tr.dataset.viewerTrack] || 0)) syncViewer(tr.dataset.viewerTrack, i);
+  }, true);
+  $app.addEventListener('keydown', (e) => {
+    const tr = e.target.closest && e.target.closest('[data-viewer-track]');
+    if (!tr || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    e.preventDefault();
+    const id = tr.dataset.viewerTrack;
+    showPhoto(id, (ui.photoIdx[id] || 0) + (e.key === 'ArrowRight' ? 1 : -1), true);
   });
   $app.addEventListener('submit', (e) => {
     const f = e.target.closest('[data-action-submit]'); if (!f) return;
