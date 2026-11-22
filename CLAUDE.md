@@ -37,7 +37,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 ## Tests
 - `bash supabase/tests/rls_test.sh` (001–003, 107 checks) and `bash supabase/tests/network_test.sh` (001–005, 46 checks) against local Postgres with `supabase/tests/local_supabase_stub.sql`.
 - `bash supabase/tests/isbn_lookup_test.sh` (fresh DB with 001–003, 005, 006; 16 checks) and `node supabase/functions/isbn-lookup/lnb_test.mjs` (35 checks; needs `npm i --no-save isbn3@2.0.13`).
-- `bash supabase/tests/privacy_safety_test.sh` (fresh DB with 001–003, 005–007; 50 checks) and `bash supabase/tests/catalogue_test.sh` (005–008; 10 checks).
+- `bash supabase/tests/privacy_safety_test.sh` (fresh DB with 001–003, 005–007; 50 checks) and `bash supabase/tests/catalogue_test.sh` (005–008; 10 checks), `bash supabase/tests/blocked_words_pt_test.sh` (007 + 010; 8 checks).
 - Email logic: see the first line of `supabase/functions/send-notifications/logic_test.mjs`.
 - All database tests at once: `sudo bash supabase/tests/run_all.sh`. Browser smoke test: `python3 -m http.server 8080` then `node tests/smoke.mjs`. GitHub Actions runs everything on every push.
 - Demo mode: open `?demo=1` (sample data, localStorage only).

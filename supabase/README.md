@@ -55,10 +55,14 @@ Run [`migrations/007_privacy_safety.sql`](migrations/007_privacy_safety.sql) in 
 - **Statement of reasons**: when an admin hides a listing or removes a member, and when a listing is hidden automatically, the member gets a `moderation` notification (always shown in the app and always emailed) with the reason and how to object.
 - **Auto-hide** of a listing after reports from 3 different members, until an admin looks at it.
 - **Daily limits**: books 40 (new accounts, first 7 days) / 100, requests 5 / 20, chat messages 100 / 300. Admins have none.
-- **Blocked words** (LT/ES/EN) in listings, wish lists, names, chat and reviews. Add more in the SQL editor: `insert into public.blocked_terms (term, prefix) values ('word', false);` (`prefix = true` also blocks words that start with it).
+- **Blocked words** (LT/ES/EN, PT in migration 010) in listings, wish lists, names, chat and reviews. Add more in the SQL editor: `insert into public.blocked_terms (term, prefix) values ('word', false);` (`prefix = true` also blocks words that start with it).
 - **Names that pose as admins** (admin, moderator, seku seku, support, official …) are refused, except for real admins.
 
 Tests: `bash supabase/tests/privacy_safety_test.sh` (50 checks).
+
+## Portuguese blocked words (migration 010)
+
+Run [`migrations/010_blocked_words_pt.sql`](migrations/010_blocked_words_pt.sql) after 007 (it only adds rows to `blocked_terms`, safe to run twice). Tests: `bash supabase/tests/blocked_words_pt_test.sh` (8 checks).
 
 ## Shared catalogue (migration 008)
 

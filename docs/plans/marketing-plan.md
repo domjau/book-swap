@@ -131,14 +131,14 @@ Dominykas
 
 **It just works**
 - [ ] Sign-in email arrives within a minute in Gmail, Outlook and iCloud inboxes
-- [ ] Tested on an older iPhone and an Android phone, in LT, ES and EN
+- [ ] Tested on an older iPhone and an Android phone, in LT, ES, EN and PT
 - [ ] Supabase plan that doesn't pause, backups and error alerts before January
 - [x] "Add to home screen" prompt
 
 **Materials (Claude can design in the brand style)**
-- [x] A4 poster with QR code, LT and EN (`brand/print/poster-a4-*.pdf`)
-- [x] Instagram templates: launch, how it works, book of the week, thank-you (`brand/social/instagram/`, 1080×1350)
-- [x] One-page guide for each school's "seku seku friend" (`brand/print/friend-guide-*.pdf`)
+- [x] A4 poster with QR code, LT, EN and PT (`brand/print/poster-a4-*.pdf`)
+- [x] Instagram templates: launch, how it works, book of the week, thank-you, LT, EN and PT (`brand/social/instagram/`, 1080×1350)
+- [x] One-page guide for each school's "seku seku friend", LT, EN and PT (`brand/print/friend-guide-*.pdf`)
 
 **Launch day**
 - [ ] 100+ books and 10+ wishes on the shelf

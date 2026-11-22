@@ -5,7 +5,7 @@
 ## Core
 | Feature | Status |
 |---|---|
-| UI in Lithuanian, Spanish, English; easy to add more | ✅ |
+| UI in Lithuanian, Spanish, English, Portuguese; easy to add more | ✅ |
 | Book-language filter (separate from UI language) | ✅ |
 | Topics: dinosaurs, fairies & magic, animals, space, monsters, funny, bedtime, feelings, learning | ✅ |
 | Age groups 0–3, 3–6, 7–9, 10+ | ✅ |

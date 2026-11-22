@@ -15,3 +15,5 @@ Notification emails (requests, messages, wish-list matches…) are built by
 
 All emails load the logo from `brand/email/seku-email-logo.png` on the live site, so
 deploy the `brand/` folder before switching templates.
+
+Templates are in LT, EN, ES and PT. After changing a file here, paste it into Supabase again.

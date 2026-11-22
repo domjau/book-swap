@@ -11,7 +11,8 @@ Live app: https://domjau.github.io/book-swap/ · Repo: github.com/domjau/book-sw
 - [x] App: scan ISBN + own photos, wish lists, bundles, chat, reviews (little books), profile pictures, notifications, admin panel
 - [x] One open network, open sign-up, admins moderate (you are the first admin)
 - [x] Brand: seku seku (lowercase), logo, palette, Outfit, branded emails
-- [x] Intro before sign-up + four-step tour after sign-up (LT/ES/EN)
+- [x] Intro before sign-up + four-step tour after sign-up (LT/ES/EN/PT)
+- [x] App in Portuguese (European, pt-PT): every screen, terms, privacy notice, emails, poster, friend guide and Instagram templates (22 Nov)
 - [x] Database migrations 001, 002, 003, 005 applied to the live project; Supabase security findings fixed
 - [x] Database security tests (107 + 46 checks) and browser tests passing
 
@@ -33,7 +34,7 @@ Catalogue
 - [x] **Claude** – "Book data: National Library of Lithuania" credit line (shown when the library supplied the details)
 
 Privacy and law (GDPR, DSA)
-- [x] **Claude** – Privacy notice page in the app (LT/ES/EN) – `#/privacy`, plus `#/about` with the data sources
+- [x] **Claude** – Privacy notice page in the app (LT/ES/EN/PT) – `#/privacy`, plus `#/about` with the data sources
 - [ ] **Claude** – Terms: your name, country, contact email; 18+ checkbox at sign-up – 18+ checkbox and terms §1a done (21 Nov); name, country and email go in `TERMS.operator` once you choose them
 - [x] **Claude** – Delete my account + Download my data in the live app (migration 007)
 - [x] **Claude** – Automatic clean-up (old notifications, old chats) – migration 007; gone books and inactive accounts wait for email and an Edge Function
@@ -44,7 +45,7 @@ Privacy and law (GDPR, DSA)
 Safety and moderation
 - [ ] **You** – OpenAI API account; key saved as a Supabase secret (never in the app)
 - [ ] **Claude** – Automatic check of photos, titles, descriptions, names before publishing; "waiting for review" queue
-- [x] **Claude** – Word lists (LT/ES/EN), auto-hide after 3 reports, new-account limits
+- [x] **Claude** – Word lists (LT/ES/EN; PT in migration 010 – **You**: run it in the SQL editor), auto-hide after 3 reports, new-account limits
 - [x] **Claude** – Scam warnings in chat; display names can't impersonate admins
 - [ ] **You** – Cloudflare account for Turnstile (free CAPTCHA); **Claude** adds it to sign-up
 
