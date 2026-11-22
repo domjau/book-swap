@@ -4,7 +4,7 @@
    2. If the phone is offline, the last copy is shown so the app still opens.
    Other sites (Supabase, fonts, book lookups) are not touched. */
 const CACHE = 'seku-shell-v1';
-const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'i18n.js', 'data.js', 'terms.js', 'privacy.js', 'config.js', 'backend.js',
+const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'i18n.js', 'i18n.pt.js', 'data.js', 'terms.js', 'privacy.js', 'config.js', 'backend.js',
   'manifest.json', 'brand/icons/favicon.svg', 'vendor/fonts/outfit.css'];
 
 self.addEventListener('install', (e) => {

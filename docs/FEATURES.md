@@ -27,11 +27,11 @@
 | Profile picture (square, 256 px, metadata removed) | ✅ |
 | Sold / donated / exchanged counts on profiles and member pages | ✅ |
 | Download my data / delete my account (server) | ✅ |
-| Privacy notice, data sources page, report page for non-members (LT/ES/EN) | ✅ |
+| Privacy notice, data sources page, report page for non-members (LT/ES/EN/PT) | ✅ |
 | 18+ confirmation at sign-up | ✅ |
 | Safety: blocked words, names can't pose as admins, daily limits, auto-hide after 3 reports, scam warnings in chat, statement of reasons | ✅ |
 | Automatic clean-up of old notifications and chats | ✅ (needs pg_cron) |
-| Terms of use (LT/ES/EN), required at sign-up, re-accept on new version | ✅ |
+| Terms of use (LT/ES/EN/PT), required at sign-up, re-accept on new version | ✅ |
 | Country + postal code at sign-up (format check for common countries), shown on books & members, "Near me" filter, sorted by distance | ✅ |
 | Wish list (add by scan / search / manual), matched against shelves | ✅ |
 | "From your wish list" and "They want your books" rows | ✅ |

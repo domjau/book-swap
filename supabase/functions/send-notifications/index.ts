@@ -55,6 +55,20 @@ export const TEXT = {
     mod_auto_hide_book: 'Tu anuncio «{title}» se ha ocultado automáticamente tras 3 denuncias; un administrador lo revisará',
     mod_remove: 'Un administrador ha eliminado tu perfil de seku seku', mod_remove_and_ban: 'Un administrador ha eliminado y bloqueado tu cuenta de seku seku',
     mod_reason: 'Motivo: {reason}.', mod_appeal: 'Si crees que es un error, responde a este correo o escríbenos.'
+  },
+  pt: {
+    subjectOne: 'seku seku: {text}', subjectMany: 'seku seku: {n} notificações novas', hello: 'Olá, {name},', open: 'Abrir o seku seku',
+    footer: 'Recebes estes emails por causa das tuas definições de notificações. Podes alterá-las em seku seku → Perfil → Notificações.',
+    request_new: '{name} pede-te livro(s)', message: 'Nova mensagem de {name}', message_many: '{n} mensagens novas de {name}',
+    request_accepted: '{name} aceitou o teu pedido', request_declined: '{name} recusou o teu pedido',
+    handover_set: 'Entrega com {name}: {when}, {where}', handover_reminder: 'Lembrete: amanhã há entrega com {name} – {where}',
+    exchange_done: 'Troca com {name} concluída: deixa a tua avaliação', wish_match: '{name} publicou «{title}», da tua lista de desejos',
+    wanted: '{name} procura «{title}» e tu tens esse livro', review: '{name} deu-te {n} de 5 livrinhos', announcement: 'Do seku seku: {text}',
+    report_new: 'Nova denúncia no seku seku', member_joined: '{name} juntou-se ao grupo',
+    mod_hide_book: 'Um administrador ocultou o teu anúncio «{title}»', mod_unhide_book: 'O teu anúncio «{title}» voltou a estar visível',
+    mod_auto_hide_book: 'O teu anúncio «{title}» foi ocultado automaticamente após 3 denúncias; um administrador vai analisá-lo',
+    mod_remove: 'Um administrador removeu o teu perfil do seku seku', mod_remove_and_ban: 'Um administrador removeu e bloqueou a tua conta do seku seku',
+    mod_reason: 'Motivo: {reason}.', mod_appeal: 'Se achas que é um erro, responde a este email ou escreve-nos.'
   }
 };
 

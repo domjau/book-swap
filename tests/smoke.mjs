@@ -9,7 +9,7 @@ let pass = 0, fail = 0;
 const ok = (name, cond, extra) => { if (cond) { pass++; console.log('  ok  ', name); } else { fail++; console.log('  FAIL', name, extra || ''); } };
 
 const browser = await chromium.launch();
-for (const lang of ['lt', 'es', 'en']) {
+for (const lang of ['lt', 'es', 'en', 'pt']) {
   const page = await browser.newPage({ locale: lang, viewport: { width: 390, height: 844 } });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
