@@ -65,7 +65,7 @@ Done by `cleanup_old_data()` (migration 007), daily once pg_cron is on:
 - Deleting an account (`delete_my_account()`) removes the profile, books, photos, wish list, requests and chats, reviews, reports, notifications and settings right away, and from backups as they rotate out. Only a SHA-256 hash of a **blocked** member's email is kept, so the block still works.
 - Still to do: books marked *gone* (and their photos) after 12 months, and inactive accounts after 2 years with an email warning first. Both need an Edge Function (photos can only be removed through the Storage API) and working email.
 
-The in-app privacy notice is `privacy.js` (LT/ES/EN, route `#/privacy`). The record of processing and the breach plan are in [`docs/compliance/`](compliance/).
+The in-app privacy notice is `privacy.js` (LT/ES/EN/PT, route `#/privacy`). The record of processing and the breach plan are in [`docs/compliance/`](compliance/).
 
 ## GDPR checklist before launch
 

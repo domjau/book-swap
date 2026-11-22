@@ -30,7 +30,7 @@ Report to the data protection authority of the country where the controller is e
 
 ## 5. Tell the members (without undue delay, if the risk is high)
 
-Use an announcement in the admin panel and an email. Plain language, in LT, ES and EN:
+Use an announcement in the admin panel and an email. Plain language, in LT, ES, EN and PT:
 
 > We found a problem on seku seku on [date]: [what happened]. It affected [what data] of [who]. We have [what we did]. Please [what members should do, e.g. be careful with emails that ask you to sign in]. Questions: [contact].
 

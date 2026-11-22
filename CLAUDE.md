@@ -11,7 +11,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 - When a task in the plan is done, tick it in `docs/plans/production-plan.md` in the same commit.
 
 ## Product decisions (keep unless the owner changes them)
-- For children's books; generic users (mostly parents), no separate kid accounts. Any diaspora, any language; book language is a filter. UI in LT, ES, EN.
+- For children's books; generic users (mostly parents), no separate kid accounts. Any diaspora, any language; book language is a filter. UI in LT, ES, EN, PT (European Portuguese).
 - One open network, open sign-up, moderated by platform admins only (no organisers/communities).
 - Add-book starts with an ISBN scan to prefill, plus the owner's own photos; fun topic categories.
 - Users share a postal code, never an address, so swaps happen between neighbours.
@@ -28,7 +28,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 
 ## Rules
 - Escape everything rendered with `esc()`; events via `data-action` delegation, never inline handlers.
-- Every UI string in LT, ES and EN (`i18n.js`, append `Object.assign` blocks).
+- Every UI string in LT, ES and EN (`i18n.js`, append `Object.assign` blocks), and PT in `i18n.pt.js` (its own file, append there too).
 - Brand: `brand/tokens.css`, Outfit 400–600, palette "Summer meadow". No official book covers – only the owner's photos.
 - Database changes: new numbered file in `supabase/migrations/`, never edit an applied one. Run the Supabase security advisor after applying.
 - Never commit or paste secrets (service_role key, SMTP password, CRON_SECRET, DB password). The publishable key in `config.js` is public by design.
@@ -37,7 +37,7 @@ Children's book swap for families (started at a Lithuanian Saturday school in Co
 ## Tests
 - `bash supabase/tests/rls_test.sh` (001–003, 107 checks) and `bash supabase/tests/network_test.sh` (001–005, 46 checks) against local Postgres with `supabase/tests/local_supabase_stub.sql`.
 - `bash supabase/tests/isbn_lookup_test.sh` (fresh DB with 001–003, 005, 006; 16 checks) and `node supabase/functions/isbn-lookup/lnb_test.mjs` (35 checks; needs `npm i --no-save isbn3@2.0.13`).
-- `bash supabase/tests/privacy_safety_test.sh` (fresh DB with 001–003, 005–007; 50 checks) and `bash supabase/tests/catalogue_test.sh` (005–008; 10 checks).
+- `bash supabase/tests/privacy_safety_test.sh` (fresh DB with 001–003, 005–007; 50 checks) and `bash supabase/tests/catalogue_test.sh` (005–008; 10 checks), `bash supabase/tests/blocked_words_pt_test.sh` (007 + 010; 8 checks).
 - Email logic: see the first line of `supabase/functions/send-notifications/logic_test.mjs`.
 - All database tests at once: `sudo bash supabase/tests/run_all.sh`. Browser smoke test: `python3 -m http.server 8080` then `node tests/smoke.mjs`. GitHub Actions runs everything on every push.
 - Demo mode: open `?demo=1` (sample data, localStorage only).

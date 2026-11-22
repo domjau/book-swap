@@ -40,7 +40,7 @@ Snapshot of 2026-11-15. **Live board with current status:** https://claude.ai/ar
 
 | Status | Task | Owner | When |
 |---|---|---|---|
-| To do | Privacy notice page (LT/ES/EN) | Claude | 17 Nov 2026 – 20 Nov 2026 |
+| To do | Privacy notice page (LT/ES/EN/PT) | Claude | 17 Nov 2026 – 20 Nov 2026 |
 | To do | Terms with your name and contact; 18+ checkbox | Claude | 17 Nov 2026 – 20 Nov 2026 |
 | To do | Delete my account + download my data | Claude | 18 Nov 2026 – 22 Nov 2026 |
 | To do | Automatic clean-up of old data | Claude | 30 Nov 2026 – 4 Dec 2026 |
@@ -95,7 +95,7 @@ Snapshot of 2026-11-15. **Live board with current status:** https://claude.ai/ar
 |---|---|---|---|
 | To do | Reserve @sekuseku on Instagram and Facebook | You | 16 Nov 2026 – 18 Nov 2026 |
 | To do | Pick 5 founding families | You | 16 Nov 2026 – 22 Nov 2026 |
-| To do | Design A4 poster with QR code (LT/EN) | Claude | 18 Nov 2026 – 22 Nov 2026 |
+| To do | Design A4 poster with QR code (LT/EN/PT) | Claude | 18 Nov 2026 – 22 Nov 2026 |
 | To do | Instagram templates: launch, how it works, book of the week | Claude | 19 Nov 2026 – 25 Nov 2026 |
 
 ### Week 2 – fill the shelf (0/3 done)

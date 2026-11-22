@@ -1,6 +1,6 @@
 # Terms of use
 
-*Version 2026-11-15.5. The same text is shown in the app in Lithuanian, Spanish and English (`terms.js`), and every user must accept it before using the app.*
+*Version 2026-11-15.5. The same text is shown in the app in Lithuanian, Spanish, English and Portuguese (`terms.js`), and every user must accept it before using the app.*
 
 seku seku is a free, volunteer-run noticeboard that helps people find each other to swap, sell or give away books. By creating a profile you accept these terms.
 

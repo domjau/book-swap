@@ -65,5 +65,24 @@ window.TERMS = {
       ['10. Contacto', 'Preguntas y denuncias: {contact}'],
       ['11. Reclamaciones de derechos de autor', 'Si crees que algo en seku seku infringe tus derechos de autor, denúncialo con el botón de la bandera o a través de {contact}, indicando qué es y dónde está. Retiraremos el contenido infractor sin demora.']
     ]
+  },
+  pt: {
+    title: 'Termos de utilização',
+    intro: 'O seku seku é um quadro de anúncios gratuito, gerido por voluntários, que ajuda as pessoas a encontrarem-se para trocar, vender ou oferecer livros. Ao criares um perfil aceitas estes termos.',
+    sections: [
+      ['1. O que é o seku seku', 'O seku seku é uma plataforma entre particulares (P2P). Só oferecemos um sítio para anunciar livros e falar uns com os outros. Não somos uma loja, vendedor, comprador, agente nem intermediário, e nunca somos parte de nenhuma troca, venda ou oferta entre utilizadores.'],
+      ['1a. Só para adultos', 'Tens de ter 18 anos ou mais para criar um perfil. O seku seku é para pais, mães, tutores e outros adultos; as crianças não têm conta própria.'],
+      ['2. Sem verificações nem garantias', 'Não verificamos a identidade dos utilizadores, os livros, o seu estado, descrições, preços ou pagamentos. Tudo é disponibilizado «tal como está». Não garantimos que outro utilizador apareça, pague ou entregue um livro, nem que a aplicação funcione sempre ou sem erros.'],
+      ['3. A tua responsabilidade', 'Qualquer acordo é exclusivamente entre os utilizadores envolvidos. Tu decides em quem confiar, vês o livro antes de pagar e escolhes como pagar. Conselhos: encontrem-se num local público, não pagues adiantado a desconhecidos e nunca partilhes os teus acessos bancários nem os dados do teu cartão.'],
+      ['4. Limitação de responsabilidade', 'Na medida máxima permitida por lei, as pessoas que gerem o seku seku não são responsáveis por qualquer perda ou dano resultante da utilização da plataforma ou de negócios entre utilizadores – incluindo fraudes, burlas, livros não entregues, dinheiro perdido, livros danificados ou litígios. Nada nestes termos limita a responsabilidade que a lei não permite limitar.'],
+      ['5. Litígios entre utilizadores', 'Tens de resolver os litígios diretamente com o outro utilizador. Os administradores do seku seku podem – sem serem obrigados a isso – analisar denúncias, ocultar anúncios ou remover e bloquear utilizadores. Quando uma conversa é denunciada, os administradores podem lê-la para tratar a denúncia; caso contrário, as conversas são privadas entre as duas pessoas. As ações dos administradores ficam registadas.'],
+      ['6. Utilização aceitável', 'Anuncia só livros em papel que sejam teus e que possas oferecer ou vender. Cada anúncio precisa de pelo menos uma foto do teu exemplar; as fotos só podem mostrar a capa e o seu estado. É proibido conteúdo ilegal, ofensivo ou para adultos, spam, revenda comercial em grande escala e assédio. Não publiques nomes de crianças nem fotos de pessoas.'],
+      ['6a. Direitos de autor – nada de cópias', 'O seku seku serve para passar livros em papel, nunca o seu conteúdo. Não carregues, envies nem partilhes ligações para digitalizações, fotos das páginas de dentro, PDF, livros eletrónicos, audiolivros ou quaisquer outras cópias – nem em anúncios, nem em fotos, nem no chat. Copiar e partilhar o conteúdo de um livro sem autorização viola os direitos do autor e da editora. Removemos esse conteúdo e podemos remover quem o publique.'],
+      ['7. A tua localização', 'Partilhas o teu país e código postal – nunca a tua morada – para que os vizinhos se possam encontrar e evitar envios. O teu país e código postal são visíveis para os outros utilizadores com sessão iniciada.'],
+      ['8. Privacidade', 'Só guardamos o que é preciso para as trocas. O aviso de privacidade (Perfil → Privacidade) explica o que guardamos, porquê e durante quanto tempo. Podes descarregar os teus dados ou apagar a tua conta a qualquer momento a partir do teu perfil.'],
+      ['9. Alterações e fim', 'Podemos alterar estes termos; nesse caso vamos pedir-te que aceites a nova versão. Podemos suspender ou terminar o serviço ou o teu perfil a qualquer momento. Podes deixar de usar o seku seku e apagar o teu perfil quando quiseres.'],
+      ['10. Contacto', 'Perguntas e denúncias: {contact}'],
+      ['11. Queixas sobre direitos de autor', 'Se achas que algo no seku seku viola os teus direitos de autor, denuncia-o com o botão da bandeira ou através de {contact}, indicando o que é e onde está. Removeremos sem demora o conteúdo que viole esses direitos.']
+    ]
   }
 };

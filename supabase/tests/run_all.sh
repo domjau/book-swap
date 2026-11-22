@@ -14,4 +14,5 @@ build $ALL;                                                                  run
 run "isbn lookup" supabase/tests/isbn_lookup_test.sh
 run "privacy and safety" supabase/tests/privacy_safety_test.sh
 run "shared catalogue" supabase/tests/catalogue_test.sh
+run "Portuguese blocked words" supabase/tests/blocked_words_pt_test.sh
 exit $status

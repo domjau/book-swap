@@ -32,7 +32,7 @@ The camera only works over HTTPS or on `localhost`.
 
 ## What's in it
 
-- **Interface in Lithuanian, Spanish and English.** Switch any time with LT / ES / EN at the top.
+- **Interface in Lithuanian, Spanish, English and Portuguese.** Switch any time with LT / ES / EN / PT at the top.
 - **Joining:** name, app language and the book languages you're interested in.
 - **Browse:** search, book-language filter, topic tiles (dinosaurs, fairies & magic, animals, space, monsters, funny, bedtime, feelings, learning), age filter, and a "New this week" row.
 - **Book page:** description, details, and "More from <owner>".
@@ -51,7 +51,7 @@ The camera only works over HTTPS or on `localhost`.
 - **No piracy:** only physical books. The chat blocks e-book files and file-sharing links, and the terms forbid sharing copies. See [docs/COPYRIGHT.md](docs/COPYRIGHT.md).
 - **Wish lists and tailored exchanges:** add books you're looking for (scan, search or type). See "From your wish list" and "They want your books" on the home screen. A member's page pre-ticks a fair swap: their books you want, and your books they want.
 - **Neighbours first:** members give their country and postal code, never an address. The country list is shown in the app language, and postal codes are checked for common countries (DK, LT, ES, DE, UK, NL…). Books show the owner's area, a *Near me* filter is available, and lists are sorted nearest first to avoid shipping.
-- **Terms of use:** must be accepted at sign-up, in LT/ES/EN. They make clear that seku seku is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
+- **Terms of use:** must be accepted at sign-up, in LT/ES/EN/PT. They make clear that seku seku is a peer-to-peer noticeboard and is not responsible for deals between users. See [TERMS.md](TERMS.md).
 - **Reviews with little books:** after a handover, each side rates the other 1–5 little books, with an optional comment. Ratings appear on profiles, member pages and book pages.
 - **Profile pictures** and **sold / donated / exchanged** counts for every member.
 - **Notifications:** a bell with the latest updates. At sign-up and in the profile, each person chooses which of 10 types they get in the app and/or by email, and whether emails come right away, once a day, or never.
@@ -70,8 +70,9 @@ The camera only works over HTTPS or on `localhost`.
 | `supabase/` | Database schema, row-level security, functions, storage rules and security tests |
 | `vendor/supabase.js` | supabase-js 2.119.0 (MIT), hosted locally |
 | `i18n.js` | Translations. To add a language, copy the `en` block and add its code to `UI_LANGS` |
+| `i18n.pt.js` | Portuguese (pt-PT) translations, kept in their own file |
 | `data.js` | Topics, sample members (with postal codes), sample books and wish lists |
-| `terms.js` | Terms of use in LT/ES/EN and the current version |
+| `terms.js` | Terms of use in LT/ES/EN/PT and the current version |
 | `styles.css` | Styles |
 | `vendor/zxing-reader.js`, `vendor/zxing_reader.wasm` | ZXing barcode decoder compiled to WebAssembly ([zxing-wasm](https://github.com/Sec-ant/zxing-wasm) 3.1.6, MIT), hosted locally |
 

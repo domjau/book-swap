@@ -2,7 +2,7 @@
 
 There are two kinds of language in the app:
 
-- **App (UI) language:** the language of the buttons and text. Currently `lt`, `es`, `en`.
+- **App (UI) language:** the language of the buttons and text. Currently `lt`, `es`, `en`, `pt` (European Portuguese, informal *tu*).
 - **Book language:** the language a book is written in, used as a filter. Currently `lt`, `es`, `en`, `da`, `fr`, `de`, `pl`, `ru`, `uk`, `lv`, `sv`, `no`, `it`, `pt`, `other` (see `BOOK_LANGS` in `data.js`).
 
 A Spanish-speaking family can use the app in Spanish and browse Lithuanian books.
@@ -16,6 +16,8 @@ A Spanish-speaking family can use the app in Spanish and browse Lithuanian books
 5. In `data.js`, add `pl: '…'` to every topic's `names`.
 
 Any key that is missing falls back to English, so a partly translated language still works.
+
+A language can also live in its own file, like Portuguese in `i18n.pt.js` (loaded right after `i18n.js` in `index.html` and listed in `sw.js`). The file pushes its code to `UI_LANGS` itself. Also add the language to `terms.js`, `privacy.js` (privacy notice, about page, report page) and the `TEXT` block of `supabase/functions/send-notifications/index.ts` for emails.
 
 ## Add a new book language
 

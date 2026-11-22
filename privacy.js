@@ -53,6 +53,22 @@ window.PRIVACY = {
       ['Solo para adultos', 'seku seku es para mayores de 18 años. Por favor, no publiques nombres de niños ni fotos de personas.'],
       ['Cambios', 'Si este aviso cambia de forma importante, te lo diremos en la app.']
     ]
+  },
+  pt: {
+    title: 'Aviso de privacidade',
+    intro: 'O seku seku é uma troca de livros gratuita para famílias. Guardamos o mínimo possível sobre ti, nunca o vendemos e não há publicidade nem rastreio.',
+    sections: [
+      ['Quem é responsável', 'O seku seku é gerido por {operator}, que é o responsável pelo tratamento dos dados. Perguntas sobre os teus dados: {contact}.'],
+      ['O que guardamos', 'O teu endereço de email (só para entrares e para os emails que escolheres); o nome visível, país, código postal, línguas dos livros e a imagem de perfil opcional que indicares; os teus livros com as tuas próprias fotos, a tua lista de desejos, pedidos, mensagens de chat, avaliações e denúncias; as tuas definições de notificações; quando aceitaste os termos; e registos básicos das ações de moderação. Nunca pedimos a tua morada, número de telefone nem nada sobre os teus filhos.'],
+      ['Porquê, e com que fundamento jurídico', 'Para fazer funcionar a troca a que aderiste: o teu perfil, anúncios, pedidos, conversas, avaliações e emails (RGPD, art. 6.º, n.º 1, alínea b), contrato). Para manter a plataforma segura e legal: denúncias, moderação, palavras bloqueadas, limites diários e registos de segurança (art. 6.º, n.º 1, alínea f), o nosso interesse legítimo num serviço seguro, e alínea c) para as obrigações do Regulamento dos Serviços Digitais).'],
+      ['Quem vê o quê', 'Os outros membros com sessão iniciada veem o teu nome visível, país e código postal, imagem de perfil, livros, lista de desejos e avaliações. As conversas só são visíveis para as duas pessoas envolvidas; os administradores só podem ler uma conversa depois de ela ser denunciada. O teu email nunca é mostrado a outros membros. Nada é visível na web pública nem nos motores de busca.'],
+      ['Quem nos ajuda', 'Supabase (base de dados, acesso e armazenamento de ficheiros, servidores em Frankfurt, UE). Os emails de acesso e de notificação são enviados através de um fornecedor de email (atualmente a Brevo, França, ou o Gmail da Google). A própria aplicação é servida pelo GitHub Pages, que vê o teu endereço IP quando a página carrega. Quando lês o código ou procuras um livro, o ISBN ou o texto da pesquisa é enviado para o Google Books e a Open Library, e os ISBN lituanos para a Biblioteca Nacional da Lituânia através do nosso próprio servidor – nunca com o teu nome ou email.'],
+      ['Durante quanto tempo guardamos', 'Enquanto tiveres conta. As notificações lidas são apagadas ao fim de 90 dias e todas as notificações ao fim de um ano. As conversas de trocas concluídas ou recusadas são apagadas ao fim de 12 meses, e os pedidos sem resposta ao fim de 6 meses. O registo de utilização da biblioteca é apagado ao fim de um dia. Quando apagas a tua conta, o teu perfil, livros, fotos, lista de desejos, conversas, avaliações, denúncias e notificações são apagados de imediato, e das cópias de segurança à medida que estas são substituídas. Se uma conta foi bloqueada, guardamos uma impressão digital irreversível (hash) do seu email para que o bloqueio continue a funcionar.'],
+      ['Cookies e armazenamento', 'Sem cookies, sem estatísticas e sem rastreio. A aplicação guarda a tua sessão e escolhas como o idioma da aplicação no armazenamento local do teu navegador; isto é necessário para a aplicação funcionar.'],
+      ['Os teus direitos', 'Podes ver e corrigir o teu perfil a qualquer momento, descarregar todos os teus dados (Perfil → Descarregar os meus dados) e apagar a tua conta (Perfil → Apagar a minha conta). Também nos podes pedir que limitemos ou deixemos de tratar os teus dados, ou opor-te ao tratamento, através de {contact}. Podes apresentar queixa a uma autoridade de proteção de dados, por exemplo a CNPD (Portugal), a Datatilsynet (Dinamarca) ou a Inspeção Estatal de Proteção de Dados (Lituânia).'],
+      ['Só para adultos', 'O seku seku é para pessoas com 18 anos ou mais. Não publiques nomes de crianças nem fotos de pessoas.'],
+      ['Alterações', 'Se este aviso mudar de forma importante, avisamos-te na aplicação.']
+    ]
   }
 };
 
@@ -90,6 +106,17 @@ window.ABOUT = {
       ['Open Library', 'Datos abiertos de libros del Internet Archive.', 'https://openlibrary.org/']
     ],
     photosNote: 'Las fotos de los libros las hacen siempre los propios miembros: nunca mostramos portadas de editoriales.'
+  },
+  pt: {
+    title: 'Sobre o seku seku',
+    intro: 'O seku seku é uma troca de livros gratuita para famílias, gerida por voluntários, que nasceu numa escola lituana de sábado em Copenhaga.',
+    sourcesTitle: 'De onde vêm os dados dos livros',
+    sources: [
+      ['Biblioteca Nacional da Lituânia', 'Dados dos livros: Biblioteca Nacional Martynas Mažvydas da Lituânia, dados abertos em data.gov.lt. Usados com indicação da fonte, como a licença permite.', 'https://data.gov.lt/'],
+      ['Google Books', 'Títulos, autores e descrições encontrados pelo ISBN ou por pesquisa.', 'https://books.google.com/'],
+      ['Open Library', 'Dados abertos de livros do Internet Archive.', 'https://openlibrary.org/']
+    ],
+    photosNote: 'As fotos dos livros são sempre tiradas pelos próprios membros – nunca mostramos capas de editoras.'
   }
 };
 
@@ -112,5 +139,11 @@ window.REPORT_INFO = {
     intro: 'Cualquiera puede avisarnos de contenido en seku seku que crea ilegal, como una infracción de derechos de autor, discurso de odio o una estafa; no necesitas cuenta.',
     steps: ['Miembros: usad el botón de la bandera en el anuncio, el perfil o el chat.', 'Los demás: escribe a {contact} indicando qué es, dónde está (un enlace o el título del libro y el nombre del miembro), por qué crees que es ilegal, y tu nombre y correo.', 'Te confirmaremos que lo hemos recibido, lo revisaremos pronto y te diremos qué hemos decidido. Si denuncias una infracción de derechos de autor, retiramos el contenido rápidamente.'],
     note: 'Denuncia solo de buena fe. Las denuncias sobre la seguridad de menores siempre van primero.'
+  },
+  pt: {
+    title: 'Denunciar conteúdo ilegal',
+    intro: 'Qualquer pessoa nos pode avisar de conteúdo no seku seku que considere ilegal, como uma violação de direitos de autor, discurso de ódio ou uma burla – não precisas de conta.',
+    steps: ['Membros: usem o botão da bandeira no anúncio, no perfil ou no chat.', 'Todos os outros: escrevam para {contact} a dizer o que é, onde está (uma ligação ou o título do livro e o nome do membro), porque acham que é ilegal, e o vosso nome e email.', 'Confirmamos que recebemos, analisamos rapidamente e dizemos-te o que decidimos. Se denunciares uma violação de direitos de autor, removemos o conteúdo depressa.'],
+    note: 'Denuncia só de boa-fé. As denúncias sobre a segurança de crianças são sempre tratadas primeiro.'
   }
 };

@@ -3,7 +3,7 @@
     python3 brand/print/make.py            # writes the HTML files
     node brand/print/render.mjs            # renders them to PDF / PNG (needs Playwright)
 
-Outputs: brand/print/poster-a4-{lt,en}.(html|pdf|png), brand/print/friend-guide-{lt,en}.(html|pdf),
+Outputs: brand/print/poster-a4-{lt,en,pt}.(html|pdf|png), brand/print/friend-guide-{lt,en,pt}.(html|pdf),
 brand/social/instagram/*.(html|png). The QR code points to APP_URL; keep that address forever.
 """
 import pathlib, re
@@ -58,6 +58,10 @@ POSTER = {
                steps=[('barcode', 'Scan', 'the barcode'), ('camera', 'Snap', 'a photo of your book'), ('swap', 'Share', 'swap, sell or give away')],
                chips=['Free', 'In your language', 'Nearby'], cta='Scan the QR code to join',
                small='No passwords, no ads. Hand books over at school on Saturday.'),
+    'pt': dict(lang='pt', h1='Livros infantis, de família para família.', lead='Livros que já não servem, amados outra vez.',
+               steps=[('barcode', 'Lê', 'o código de barras'), ('camera', 'Fotografa', 'o teu livro'), ('swap', 'Partilha', 'troca, vende ou oferece')],
+               chips=['Grátis', 'Na tua língua', 'Perto de ti'], cta='Lê o código QR para entrar',
+               small='Sem palavras-passe nem anúncios. Entrega os livros na escola, ao sábado.'),
 }
 POSTER_CSS = BASE_CSS + """
 @page{size:A4;margin:0}
@@ -117,6 +121,10 @@ IG = {
              how=[('barcode', 'Scan the barcode', 'The book details fill themselves in.'), ('camera', 'Snap a photo', 'Of your own copy – cover and condition.'), ('swap', 'Meet and swap', 'For example at school on Saturday.')],
              howTitle='How it works', week=('Book of the week', '[Title]', 'Waiting for new readers in [city] – find it on seku seku.', 'Place a photo of your book here'),
              thanks=('Thank you, families!', 'On Saturday [number] books found new homes at school.')),
+  'pt': dict(launch=('Quantos livros da tua estante estão à espera de um novo leitor?', 'Livros infantis, de família para família. Lê, fotografa, partilha.', 'Grátis · sem anúncios'),
+             how=[('barcode', 'Lê o código de barras', 'Os dados do livro preenchem-se sozinhos.'), ('camera', 'Tira uma foto', 'Do teu exemplar – a capa e o estado.'), ('swap', 'Encontra-te e troca', 'Por exemplo, na escola ao sábado.')],
+             howTitle='Como funciona', week=('Livro da semana', '[Título]', 'À espera de novos leitores em [cidade] – procura-o no seku seku.', 'Coloca aqui uma foto do teu livro'),
+             thanks=('Obrigado, famílias!', 'No sábado, [número] livros encontraram uma nova casa na escola.')),
 }
 def ig_posts(lang, c):
     out = {}
@@ -152,6 +160,15 @@ GUIDE = {
             ('shield', 'Saugumas', 'Perduokite viešose vietose, geriausia mokykloje. Niekada nemokėkite iš anksto nepažįstamiems. Vaikai paskyrų neturi. Apie keistus dalykus praneškite vėliavėle – administratoriai peržiūrės.'),
             ('flag', 'Kažkas negerai?', 'Parašykite seku seku administratoriams (kontaktai programėlėje: Profilis → Naudojimosi sąlygos → Kontaktai). Papasakokite, kas tėvams buvo neaišku – pataisysime.')],
     foot='seku seku – vaikiškos knygos iš šeimos į šeimą.'),
+  'pt': dict(title='És o amigo seku seku da escola', intro='Obrigado! Ajudas as famílias da tua escola a trocar livros infantis. Leva cerca de uma hora por mês. Aqui está tudo o que precisas.',
+    blocks=[('heart', 'A tua tarefa numa frase', 'Ser a cara simpática que ajuda os pais a adicionar o primeiro livro e responde às perguntas.'),
+            ('books', 'Antes da primeira troca', 'Adiciona 10–15 livros teus, para a estante não ficar vazia. Pede a 3–5 pais ativos que façam o mesmo. Afixa na escola o cartaz com o código QR.'),
+            ('barcode', 'Ajudar um pai ou mãe a registar-se (3 minutos)', 'Lê o código QR → escreve o email → escreve o código de 6 dígitos do email → nome, país, código postal → marca as duas caixas. Depois: Adicionar → lê o código de barras → tira uma foto → guarda.'),
+            ('swap', 'Mesa de trocas, uma vez por período', 'Uma mesa com o cartaz à hora de saída. Os pais trazem livros, adicionam-nos logo ali e levam outros para casa. Fotografa a mesa e os livros – nunca as crianças.'),
+            ('chat', 'Perguntas frequentes', 'É grátis? Sim, sem taxas nem anúncios. Tenho de dar a morada? Não, só o código postal – encontram-se na escola. Livro não encontrado? Escreve o título; da próxima vez vai ser encontrado.'),
+            ('shield', 'Segurança', 'As entregas fazem-se em locais públicos, de preferência na escola. Nunca pagues adiantado a desconhecidos. As crianças não têm conta. Denuncia algo estranho com o botão da bandeira – os administradores analisam.'),
+            ('flag', 'Algo correu mal?', 'Escreve aos administradores do seku seku (contacto na aplicação: Perfil → Termos de utilização → Contacto). Conta-nos o que confundiu os pais – nós corrigimos.')],
+    foot='seku seku – livros infantis, de família para família.'),
 }
 GUIDE_CSS = BASE_CSS + """
 @page{size:A4;margin:0}
