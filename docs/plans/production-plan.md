@@ -18,7 +18,7 @@ Live app: https://domjau.github.io/book-swap/ · Repo: github.com/domjau/book-sw
 
 ## Phase 0 – this week (You)
 - [ ] Download the National Library's "Bibliografiniai įrašai" dataset from data.gov.lt and send it to Claude; note the licence shown on the page
-- [ ] Gmail app password → Supabase **Authentication → Emails → SMTP**; add `{{ .Token }}` to the Magic Link and Confirm signup templates (files in `supabase/email-templates/`)
+- [ ] Gmail app password → Supabase **Authentication → Emails → SMTP** (done 23 Nov); paste the three new templates and set Email OTP Length to 6, steps in `supabase/email-templates/README.md`
 - [ ] Deploy the `send-notifications` Edge Function, add its secrets, then run `004_schedules.sql` (steps in `supabase/README.md`)
 - [ ] Choose the public contact email for the terms and privacy notice; confirm your full name and country can be shown there
 - [ ] Sign Supabase's Data Processing Agreement (dashboard)

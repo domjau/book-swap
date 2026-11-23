@@ -22,6 +22,8 @@ jobs:
         run: sudo bash supabase/tests/run_all.sh
       - name: Syntax check of the app files
         run: for f in app.js backend.js i18n.js data.js terms.js privacy.js config.js sw.js; do node --check "$f" || exit 1; done
+      - name: Email templates are built from theme.mjs
+        run: node supabase/email-templates/build.mjs --check
       - name: Email logic
         working-directory: supabase/functions/send-notifications
         run: |
